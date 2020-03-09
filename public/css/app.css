@@ -28500,6 +28500,10 @@ a.text-muted:hover {
   color: #f66D9b;
 }
 
+.color-light-red {
+  color: #ff4949;
+}
+
 .color-red {
   color: #e3342f;
 }
@@ -28538,6 +28542,10 @@ a.text-muted:hover {
 
 .text-pink {
   color: #f66D9b;
+}
+
+.text-light-red {
+  color: #ff4949;
 }
 
 .text-red {

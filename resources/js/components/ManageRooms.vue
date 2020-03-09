@@ -6,7 +6,7 @@
           <div class="card" v-if="$route.path === '/manage-rooms' || $route.path === '/manage-rooms/booking-list'">
             <create-modal model_title="Book Room"></create-modal>
             <div class="card-header">
-              <h3 class="card-title">Booking Room List</h3>
+              <h3 class="card-title"><strong>Booking Room List</strong></h3>
               <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">Book Room</button>
             </div>
             <div class="card-body">
@@ -63,7 +63,7 @@
           <div class="card" v-else-if="$route.path === '/manage-rooms/settings'">
             <create-modal model_title="Add New Room"></create-modal>
             <div class="card-header">
-              <h3 class="card-title">Booking Room List</h3>
+              <h3 class="card-title"><strong>Booking Room List</strong></h3>
               <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">Add New Room</button>
             </div>
             <div class="card-body">

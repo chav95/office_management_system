@@ -43,6 +43,11 @@ let routes = [
     // Document Routes
     {path: '/manage-docs', component: require('./components/ManageDocs.vue').default},
     {path: '/manage-docs/:id', component: require('./components/DetailDocs.vue').default},
+
+    // HRD Routes
+    {path: '/hrd', component: require('./components/SalarySlipList.vue').default},
+    {path: '/hrd/salary-slip', component: require('./components/SalarySlipList.vue').default},
+    {path: '/hrd/salary-slip/:id', component: require('./components/SalarySlipDetail.vue').default},
     
     {path: '/manage-users', component: require('./components/Users.vue').default},
 ]

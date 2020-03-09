@@ -1,4 +1,4 @@
-@extends('layouts.audioPlaylist')
+@extends('layouts.officeSystem')
 
 @section('content')
 <div class="container">

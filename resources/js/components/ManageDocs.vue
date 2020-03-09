@@ -6,7 +6,7 @@
         <div class="card">
           <create-modal model_title="New Document"></create-modal>
           <div class="card-header">
-            <h3 class="card-title">Document List</h3>
+            <h3 class="card-title"><strong>Document List</strong></h3>
             <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">New Document</button>
           </div>
           <div class="card-body">
