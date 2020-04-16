@@ -4,10 +4,10 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card" v-if="$route.path === '/manage-cars' || $route.path === '/manage-cars/booking-list'">
-          <create-modal model_title="Book Car"></create-modal>
+          <book-car model_title="Book Car" :carData="car_list" @success="loadBookingData()" v-show="can_create"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Booking Car List</strong></h3>
-            <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">Book Room</button>
+            <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateCarBooking" v-show="can_create">Book Car</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -18,88 +18,76 @@
                   <th>Purpose</th>
                   <th>Book Time</th>
                   <th>Booked By</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Toyota Avanza / B 5213 BMD</td>
-                  <td>Pondok Indah Mall</td>
-                  <td>Meeting event partnership</td>
-                  <td>28 Feb 2020 <br> <i>(10.00 - 13.00)</i></td>
-                  <td>Andi Mawardi</td>
-                </tr>
-                <tr>
-                  <td>Daihatsu Xenia / B 1977 TYZ</td>
-                  <td>Rosalyn Citta Jewellery</td>
-                  <td>Sales meeting</td>
-                  <td>28 Feb 2020 <br> <i>(15.00 - 16.00)</i></td>
-                  <td>Stefani</td>
-                </tr>
-                <tr>
-                  <td>Toyota Avanza / B 5213 BMD</td>
-                  <td>Kantor HOOQ</td>
-                  <td>Media partner meeting</td>
-                  <td>28 Feb 2020 <br> <i>(15.00 - 18.00)</i></td>
-                  <td>David Agustinus</td>
-                </tr>
+                <template v-if="booking_list.length > 0">
+                  <tr v-for="(booking, index) in booking_list" :key="booking.id">
+                    <td>{{booking.car.model}} / {{booking.car.police_number}}</td>
+                    <td>{{booking.destination}}</td>
+                    <td>{{booking.purpose}}</td>
+                    <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td>
+                    <td>{{booking.user.name}}</td>
+                    <td>
+                      <div>
+                        <!-- <a class="modify-btn" title="Edit Room">
+                          <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
+                        </a> -->
+                        <a class="modify-btn" @click="deleteItem('booking_list', index, booking.id)" title="Delete Car Booking">
+                          <i class="fa fa-trash color-red fa-fw fa-lg"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+                <template v-else>
+                  <tr><td colspan="100%"><h5 class="text-center">No Booking</h5></td></tr>
+                </template>
               </tbody>
             </table>
           </div>
         </div>
 
         <div class="card" v-else-if="$route.path === '/manage-cars/settings'">
-          <create-modal model_title="Add New Car"></create-modal>
+          <!-- <create-modal model_title="Add New Car"></create-modal> -->
           <div class="card-header">
             <h3 class="card-title"><strong>Car List</strong></h3>
-            <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">Add New Car</button>
+            <!-- <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">Add New Car</button> -->
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th>Car Model</th>
-                  <th>Police Number / Year</th>
-                  <th>Capacity</th>
-                  <th>Next Vehicle Registration</th>
+                  <th>Police Number</th>
                   <th>Status</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Toyota Avanza</td>
-                  <td>B 5213 BMD / 2015</td>
-                  <td>5 people</td>
-                  <td>May 2020 </td>
-                  <td class="text-indigo"><b>Available</b></td>
-                  <td>
-                    <div>
-                      <a class="modify-btn" title="Edit Car">
-                        <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                      </a>
-                      <a class="modify-btn" @click="deleteItem('Toyota Avanza (B 5213 BMD)')" title="Delete Car">
-                        <i class="fa fa-trash color-red fa-fw fa-lg"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>Daihatsu Xenia</td>
-                  <td>B 1977 TYZ / 2018</td>
-                  <td>5 people</td>
-                  <td>Sep 2023</td>
-                  <td class="text-indigo"><b>Available</b></td>
-                  <td>
-                    <div>
-                      <a class="modify-btn" title="Edit Car">
-                        <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                      </a>
-                      <a class="modify-btn" @click="deleteItem('Daihatsu Xenia (B 1977 TYZ)')" title="Delete Car">
-                        <i class="fa fa-trash color-red fa-fw fa-lg"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
+                <template v-if="car_list.length > 0">
+                  <tr v-for="car in car_list" :key="car.id">
+                    <template v-if="car.police_number !== '-'">
+                      <td>{{car.model}}</td>
+                      <td>{{car.police_number}}</td>
+                      <td class="text-green"><b>Available</b></td>
+                      <td>
+                        <!-- <div>
+                          <a class="modify-btn" title="Edit Room">
+                            <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
+                          </a>
+                          <a class="modify-btn" @click="deleteItem('Meeting Room C')" title="Delete Room">
+                            <i class="fa fa-trash color-red fa-fw fa-lg"></i>
+                          </a>
+                        </div> -->
+                      </td>
+                    </template>
+                  </tr>
+                </template>
+                <template v-else>
+                  <tr><td colspan="100%"><h5 class="text-center">No Available Car</h5></td></tr>
+                </template>
               </tbody>
             </table>
           </div>
@@ -112,37 +100,86 @@
 
 <script>
   import CreateModal from './reusables/CreateNewModal.vue';
+  import moment from 'moment'
+  import BookCar from './modals/BookCar.vue'
+
 
   export default {
     components: {
-      CreateModal,
+      CreateModal, BookCar
     },
     data(){
       return{
-        
+        userLogin: {
+          id: 0,
+          privilege: ''
+        },
+        booking_list: [],
+        car_list: [],        
+      }
+    },
+    mounted(){
+      axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
+        this.userLogin = data;
+      });
+      this.loadBookingData();
+      this.loadCarData();
+    },
+    computed:{
+      can_create(){
+        if(this.userLogin.privilege == 'super_admin' 
+          || this.userLogin.id == 3 
+          || this.userLogin.id == 4 
+          || this.userLogin.id == 5 
+          || this.userLogin.id == 6)
+        {
+          return true
+        }
+        return false
       }
     },
     methods:{
-      deleteItem(name){
-        this.$confirm(`Delete ${name}?`, '', 'question')
+      formatDatetime(datetime){
+        return moment(String(datetime)).format('ll');
+      },
+      loadBookingData(){
+        axios.get(window.location.origin+'/api/car/getBookingData')
+          .then(({data}) => {
+            this.booking_list = data
+          })
+      },
+      loadCarData(){
+        axios.get(window.location.origin+'/api/car/getCarData')
+          .then(({data}) => {
+            this.car_list = data;
+          })
+          // .catch(err => location.reload())
+      },
+      deleteItem(collection, index, id){
+        let text = ''
+        if(collection === 'booking_list'){
+          text = `Booking ${this.booking_list[index].purpose}`
+        }else{
+          // text = `Car ${this.room_list.name}`
+        } console.log(text)
+        this.$confirm(`Delete ${text}?`, '', 'question')
           .then( ()=> {
-            this.$confirm('This delete action cannot be undone!', '', 'warning')
-              .then( ()=> {
-                this.$alert('Delete Successful', '', 'success');
-                this.loadMusics();
-              });
+            // this.$confirm('This delete action cannot be undone!', '', 'warning')
+            //   .then( ()=> {
+                axios.delete(`${window.location.origin}/api/car/booking-${id}`)
+                  .then(res => {
+                    this.$alert('Delete Successful', '', 'success');
+                    this.loadBookingData()
+                  })
+                  .catch(err => {
+                    this.$alert(err, '', 'error')
+                  })
+                
+              // });
             })
           .catch(error => console.error(error));
       }
     },
-    watch: {
-      // '$route.params.playlist_id': function(playlist_id){
-      //   this.loadWishlist();
-      // }
-    },
-    mounted() {
-      
-    }
   }
 </script>
 

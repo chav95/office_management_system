@@ -11,6 +11,10 @@ class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
+    public function room(){
+        return $this->hasManyThrough('App\Room', 'App\RoomBooking', 'booked_by', 'id');
+    }
+
     /**
      * The attributes that are mass assignable.
      *

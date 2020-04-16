@@ -38,7 +38,6 @@ let routes = [
     {path: '/manage-cars', component: require('./components/ManageCars.vue').default},
     {path: '/manage-cars/booking-list', component: require('./components/ManageCars.vue').default},
     {path: '/manage-cars/settings', component: require('./components/ManageCars.vue').default},
-    {path: '/manage-cars/maintenance', component: require('./components/ManageCars.vue').default},
 
     // Document Routes
     {path: '/manage-docs', component: require('./components/ManageDocs.vue').default},
@@ -61,11 +60,6 @@ const router = new VueRouter({
 Vue.filter('upText', function(text){
     return text.charAt(0).toUpperCase() + value.slice(1) ;
 });
-
-Vue.component('upload-music', require('./components/Upload.vue').default);
-Vue.component('create-playlist', require('./components/CreatePlaylist.vue').default);
-Vue.component('add-playlist', require('./components/reusables/AddPlaylist.vue').default)
-Vue.component('playlist-sidebar', require('./components/PlaylistSidebar.vue').default)
 
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('apexchart', VueApexCharts);

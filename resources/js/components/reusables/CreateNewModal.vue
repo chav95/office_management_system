@@ -14,14 +14,6 @@
             <div class="modal-body" v-if="$route.path === '/manage-rooms' || $route.path === '/manage-rooms/booking-list'">
               <div class="form-group">
                 <div class="form-group">
-                  <input type="number" class="form-control" placeholder="Number of Participants"/>
-                  <select class="form-control">
-                    <option disabled selected>Choose Room</option>
-                    <option>Meeting Room A</option>
-                    <option>Meeting Room B</option>
-                    <option disabled>Meeting Room C</option>
-                  </select>
-                  <input type="text" class="form-control" placeholder="Booking Purpose"/>
                   <datepicker :language="id" placeholder="Choose Booking Date"
                     input-class="room-datepicker" wrapper-class="room-datepicker-div"
                   ></datepicker>
@@ -49,6 +41,14 @@
                     <option>17.00</option>
                     <option>18.00</option>
                   </select>
+                  <input type="number" class="form-control" placeholder="Number of Participants"/>
+                  <input type="text" class="form-control" placeholder="Booking Purpose"/>
+                  <select class="form-control">
+                    <option disabled selected>Choose Room</option>
+                    <option>Meeting Room A</option>
+                    <option>Meeting Room B</option>
+                    <option disabled>Meeting Room C</option>
+                  </select>
                   <div style="padding-left: 15px; text-align: left">
                     <span style="margin-right: 20px">Options:</span>
                     <input type="checkbox" id="snack"/> <label for="snack" style="margin-right: 15px">Snacks</label>
@@ -70,13 +70,6 @@
             <div class="modal-body" v-else-if="$route.path === '/manage-cars' || $route.path === '/manage-cars/booking-list'">
               <div class="form-group">
                 <div class="form-group">
-                  <select class="form-control">
-                    <option disabled selected>-Choose Car-</option>
-                    <option>Toyota Avanza (B 5213 BMD)</option>
-                    <option>Daihatsu Xenia (B 1977 TYZ)</option>
-                  </select>
-                  <input type="text" class="form-control" placeholder="Destination"/>
-                  <input type="text" class="form-control" placeholder="Booking Purpose"/>
                   <datepicker :language="id" placeholder="Choose Booking Date"
                     input-class="car-datepicker" wrapper-class="car-datepicker-div"
                   ></datepicker>
@@ -103,6 +96,13 @@
                     <option>16.00</option>
                     <option>17.00</option>
                     <option>18.00</option>
+                  </select>
+                  <input type="text" class="form-control" placeholder="Destination"/>
+                  <input type="text" class="form-control" placeholder="Booking Purpose"/>
+                  <select class="form-control">
+                    <option disabled selected>-Choose Car-</option>
+                    <option>Toyota Avanza (B 5213 BMD)</option>
+                    <option>Daihatsu Xenia (B 1977 TYZ)</option>
                   </select>
                 </div>
               </div>
@@ -164,6 +164,10 @@
       model_title: {
         type: String,
         default: 'Create New',
+      },
+      module: {
+        type: String,
+        default: ''
       }
     },
     data(){

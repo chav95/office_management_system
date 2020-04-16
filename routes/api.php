@@ -18,8 +18,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request){
 });
 
 Route::apiResources([
-    'music' => 'API\MusicController',
-    'playlist' => 'API\PlaylistController',
+    'room' => 'API\RoomCOntroller',
+    'car' => 'API\CarController',
     'log' => 'API\LogController',
     'wishlist' => 'API\WishlistController',
     'user' => 'API\UserController',
