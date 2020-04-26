@@ -24,7 +24,7 @@
               <tbody>
                 <template v-if="booking_list.length > 0">
                   <tr v-for="(booking, index) in booking_list" :key="booking.id">
-                    <td>{{booking.car.model}} / {{booking.car.police_number}}</td>
+                    <td>{{booking.car.type}} / {{booking.car.police_number}}</td>
                     <td>{{booking.destination}}</td>
                     <td>{{booking.purpose}}</td>
                     <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td>
@@ -59,20 +59,32 @@
             <table id="example1" class="table table-bordered table-striped">
               <thead>
                 <tr>
+                  <th>Company</th>
                   <th>Car Model</th>
+                  <th>Engine</th>
                   <th>Police Number</th>
-                  <th>Status</th>
-                  <th></th>
+                  <th>Driver</th>
+                  <th>Lease Duration</th>
+                  <th>Vendor</th>
+                  <th>User</th>
+                  <!-- <th>Status</th> -->
+                  <!-- <th></th> -->
                 </tr>
               </thead>
               <tbody>
                 <template v-if="car_list.length > 0">
                   <tr v-for="car in car_list" :key="car.id">
                     <template v-if="car.police_number !== '-'">
-                      <td>{{car.model}}</td>
+                      <td>{{car.company_name}}</td>
+                      <td>{{car.type}}</td>
+                      <td>{{car.engine_cc}}</td>
                       <td>{{car.police_number}}</td>
-                      <td class="text-green"><b>Available</b></td>
-                      <td>
+                      <td>{{car.driver_name}}</td>
+                      <td>{{formatDatetime(car.lease_start)}} s/d {{car.lease_due === null ? '-' : formatDatetime(car.lease_due)}}</td>
+                      <td>{{car.vendor_name}}</td>
+                      <td>{{car.division_name}}</td>
+                      <!-- <td class="text-green"><b>Available</b></td> -->
+                      <!-- <td> -->
                         <!-- <div>
                           <a class="modify-btn" title="Edit Room">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
@@ -81,7 +93,7 @@
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
                         </div> -->
-                      </td>
+                      <!-- </td> -->
                     </template>
                   </tr>
                 </template>

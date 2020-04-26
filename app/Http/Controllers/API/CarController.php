@@ -87,6 +87,7 @@ class CarController extends Controller
             $result = Car::with('today_booking', 'today_booking.user')->get();
         }else if($id === 'getBookingData'){
             $result = CarBooking::with('car', 'user')
+                ->where('tanggal', '>=', date('Y-m-d'))
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
                 ->get();
