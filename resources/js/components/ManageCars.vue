@@ -50,10 +50,11 @@
         </div>
 
         <div class="card" v-else-if="$route.path === '/manage-cars/settings'">
-          <!-- <create-modal model_title="Add New Car"></create-modal> -->
+          <create-car :company_data="company_list" :driver_data="driver_list" 
+          :vendor_data="vendor_list" :division_data="division_list" @success="loadCarData()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Car List</strong></h3>
-            <!-- <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">Add New Car</button> -->
+            <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateCar">Add New Car</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -67,33 +68,31 @@
                   <th>Lease Duration</th>
                   <th>Vendor</th>
                   <th>User</th>
-                  <!-- <th>Status</th> -->
-                  <!-- <th></th> -->
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="car_list.length > 0">
-                  <tr v-for="car in car_list" :key="car.id">
+                  <tr v-for="(car, index) in car_list" :key="car.id">
                     <template v-if="car.police_number !== '-'">
-                      <td>{{car.company_name}}</td>
+                      <td>{{car.company.name}}</td>
                       <td>{{car.type}}</td>
                       <td>{{car.engine_cc}}</td>
                       <td>{{car.police_number}}</td>
-                      <td>{{car.driver_name}}</td>
+                      <td>{{car.driver.name}}</td>
                       <td>{{formatDatetime(car.lease_start)}} s/d {{car.lease_due === null ? '-' : formatDatetime(car.lease_due)}}</td>
-                      <td>{{car.vendor_name}}</td>
-                      <td>{{car.division_name}}</td>
-                      <!-- <td class="text-green"><b>Available</b></td> -->
-                      <!-- <td> -->
-                        <!-- <div>
-                          <a class="modify-btn" title="Edit Room">
+                      <td>{{car.vendor.name}}</td>
+                      <td>{{car.division.name}}</td>
+                      <td>
+                        <div>
+                          <!-- <a class="modify-btn" title="Edit Room">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                          </a>
-                          <a class="modify-btn" @click="deleteItem('Meeting Room C')" title="Delete Room">
+                          </a> -->
+                          <a class="modify-btn" @click="deleteItem('car_list', index, car.id)" title="Delete Room">
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
-                        </div> -->
-                      <!-- </td> -->
+                        </div>
+                      </td>
                     </template>
                   </tr>
                 </template>
@@ -111,14 +110,13 @@
 </template>
 
 <script>
-  import CreateModal from './reusables/CreateNewModal.vue';
   import moment from 'moment'
   import BookCar from './modals/BookCar.vue'
-
+  import CreateCar from './modals/CreateCar.vue';
 
   export default {
     components: {
-      CreateModal, BookCar
+      BookCar, CreateCar
     },
     data(){
       return{
@@ -127,15 +125,25 @@
           privilege: ''
         },
         booking_list: [],
-        car_list: [],        
+        car_list: [],
+
+        company_list: [],
+        driver_list: [],
+        vendor_list: [],
+        division_list: [],
       }
     },
     mounted(){
       axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
         this.userLogin = data;
-      });
-      this.loadBookingData();
-      this.loadCarData();
+      })
+      this.loadBookingData()
+      this.loadCarData()
+
+      this.loadCompanyData()
+      this.loadDriverData()
+      this.loadVendorData()
+      this.loadDivisionData()
     },
     computed:{
       can_create(){
@@ -154,6 +162,35 @@
       formatDatetime(datetime){
         return moment(String(datetime)).format('ll');
       },
+      deleteItem(collection, index, id){
+        let text = ''
+        let url = ''
+
+        if(collection === 'booking_list'){
+          text = `Booking ${this.booking_list[index].purpose}`
+          url = 'booking'
+        }else if(collection === 'car_list'){
+          text = `Car ${this.car_list[index].type}`
+          url = 'car'
+        } console.log(text)
+        this.$confirm(`Delete ${text}?`, '', 'question')
+          .then( ()=> {
+            this.$confirm('This delete action cannot be undone!', '', 'warning')
+              .then( ()=> {
+                axios.delete(`${window.location.origin}/api/car/${url}-${id}`)
+                  .then(res => {
+                    this.$alert('Delete Successful', '', 'success');
+                    collection === 'booking_list' ? this.loadBookingData() : this.loadCarData()
+                  })
+                  .catch(err => {
+                    this.$alert(err, '', 'error')
+                  })
+                
+              });
+            })
+          .catch(error => console.error(error));
+      },
+      
       loadBookingData(){
         axios.get(window.location.origin+'/api/car/getBookingData')
           .then(({data}) => {
@@ -167,30 +204,30 @@
           })
           // .catch(err => location.reload())
       },
-      deleteItem(collection, index, id){
-        let text = ''
-        if(collection === 'booking_list'){
-          text = `Booking ${this.booking_list[index].purpose}`
-        }else{
-          // text = `Car ${this.room_list.name}`
-        } console.log(text)
-        this.$confirm(`Delete ${text}?`, '', 'question')
-          .then( ()=> {
-            // this.$confirm('This delete action cannot be undone!', '', 'warning')
-            //   .then( ()=> {
-                axios.delete(`${window.location.origin}/api/car/booking-${id}`)
-                  .then(res => {
-                    this.$alert('Delete Successful', '', 'success');
-                    this.loadBookingData()
-                  })
-                  .catch(err => {
-                    this.$alert(err, '', 'error')
-                  })
-                
-              // });
-            })
-          .catch(error => console.error(error));
-      }
+      loadCompanyData(){
+        axios.get(window.location.origin+'/api/company/getCompanyData')
+          .then(({data}) => {
+            this.company_list = data
+          })
+      },
+      loadDriverData(){
+        axios.get(window.location.origin+'/api/driver/getDriverData')
+          .then(({data}) => {
+            this.driver_list = data
+          })
+      },
+      loadVendorData(){
+        axios.get(window.location.origin+'/api/vendor/getVendorData')
+          .then(({data}) => {
+            this.vendor_list = data
+          })
+      },
+      loadDivisionData(){
+        axios.get(window.location.origin+'/api/division/getDivisionData')
+          .then(({data}) => {
+            this.division_list = data
+          })
+      },
     },
   }
 </script>

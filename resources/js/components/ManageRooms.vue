@@ -59,10 +59,10 @@
           </div>
 
           <div class="card" v-else-if="$route.path === '/manage-rooms/settings'">
-            <!-- <create-modal model_title="Add New Room"></create-modal> -->
+            <create-room @success="loadRoomData()"/>
             <div class="card-header">
               <h3 class="card-title"><strong>Booking Room List</strong></h3>
-              <!-- <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateRoom">Add New Room</button> -->
+              <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateRoom">Add New Room</button>
             </div>
             <div class="card-body">
               <table id="example1" class="table table-bordered table-striped">
@@ -76,19 +76,19 @@
                 </thead>
                 <tbody>
                   <template v-if="room_list.length > 0">
-                    <tr v-for="room in room_list" :key="room.id">
+                    <tr v-for="(room, index) in room_list" :key="room.id">
                       <td>{{room.name}}</td>
                       <td>{{room.capacity}}</td>
                       <td class="text-green"><b>Available</b></td>
                       <td>
-                        <!-- <div>
-                          <a class="modify-btn" title="Edit Room">
+                        <div>
+                          <!-- <a class="modify-btn" title="Edit Room">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                          </a>
-                          <a class="modify-btn" @click="deleteItem('Meeting Room C')" title="Delete Room">
+                          </a> -->
+                          <a class="modify-btn" @click="deleteItem('room_list', index, room.id)" title="Delete Room">
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
-                        </div> -->
+                        </div>
                       </td>
                     </tr>
                   </template>
@@ -107,11 +107,12 @@
 
 <script>
   import moment from 'moment'
-  import BookRoom from './modals/BookRoom.vue'
+  import BookRoom from './modals/BookRoom'
+  import CreateRoom from './modals/CreateRoom'
 
   export default {
     components: {
-      BookRoom
+      BookRoom, CreateRoom
     },
     data(){
       return{
@@ -165,25 +166,29 @@
       },
       deleteItem(collection, index, id){
         let text = ''
+        let url = ''
+
         if(collection === 'booking_list'){
           text = `Booking ${this.booking_list[index].purpose}`
-        }else{
-          text = `Room ${this.room_list.name}`
-        } console.log(text)
+          url = 'booking'
+        }else if(collection === 'room_list'){
+          text = `Room ${this.room_list[index].name}`
+          url = 'room'
+        }
         this.$confirm(`Delete ${text}?`, '', 'question')
           .then( ()=> {
-            // this.$confirm('This delete action cannot be undone!', '', 'warning')
-            //   .then( ()=> {
-                axios.delete(`${window.location.origin}/api/room/booking-${id}`)
+            this.$confirm('This delete action cannot be undone!', '', 'warning')
+              .then( ()=> {
+                axios.delete(`${window.location.origin}/api/room/${url}-${id}`)
                   .then(res => {
                     this.$alert('Delete Successful', '', 'success');
-                    this.loadBookingData()
+                    collection == 'booking_list' ? this.loadBookingData() : this.loadRoomData()
                   })
                   .catch(err => {
                     this.$alert(err, '', 'error')
                   })
                 
-              // });
+              });
             })
           .catch(error => console.error(error));
       }

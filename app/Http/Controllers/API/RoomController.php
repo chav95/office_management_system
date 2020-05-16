@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Room;
 use App\RoomBooking;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookRoomNotif;
 
 class RoomController extends Controller
 {
@@ -46,6 +48,7 @@ class RoomController extends Controller
             if($request->action === 'create_booking'){
                 $check_existing_booking = RoomBooking::with('room', 'user')
                     ->where('tanggal', '=', date('Y-m-d', strtotime($request->tanggal)))
+                    ->where('room_id', '=', $request->room)
                     ->get();
                 
                 foreach($check_existing_booking as $item){
@@ -71,7 +74,18 @@ class RoomController extends Controller
                 $booking->booked_by = auth('api')->user()->id;
                 $booking->save();
 
+                // Mail::to('om@jtd.co.id')->send(new BookRoomNotif($booking));
+                Mail::to('chavinpradana@gmail.com')->send(new BookRoomNotif($booking));
+
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
+            }else if($request->action === 'create_room'){
+                $room = new Room;
+                $room->name = $request->name;
+                $room->capacity = $request->capacity;
+                $room->created_by = auth('api')->user()->id;
+                $room->save();
+
+                return response()->json(array('success' => true, 'last_insert_id' => $room->id), 200);
             }
         }
     }
@@ -136,7 +150,9 @@ class RoomController extends Controller
         
         return response()->json(array(
             'success' => true, 
-            'result' => RoomBooking::where('id', $item_id)->delete()
+            'result' => $item_class === 'booking'
+                ? RoomBooking::where('id', $item_id)->delete()
+                : Room::where('id', $item_id)->delete()
         ), 200);
     }
 }

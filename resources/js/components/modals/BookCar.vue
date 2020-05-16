@@ -46,7 +46,7 @@
                   <input v-model="postToCar.purpose" type="text" class="form-control" placeholder="Booking Purpose"/>
                   <select v-model="postToCar.car" v-show="show_car_select" class="form-control car-select">
                     <option value="0" disabled>{{available_car.length > 0 ? 'Choose Car' : 'No Car Available'}}</option>
-                    <option v-for="car in available_car" :key="car.id" :value="car.id">{{car.model}} / {{car.police_number}}</option>
+                    <option v-for="car in available_car" :key="car.id" :value="car.id">{{car.type}} / {{car.police_number}}</option>
                   </select>
                 </div>
               </div>

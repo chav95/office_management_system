@@ -18,4 +18,17 @@ class Car extends Model
     public function user(){
         return $this->hasManyThrough('App\User', 'App\CarBooking', 'booked_by', 'id');
     }
+
+    public function company(){
+        return $this->belongsTo('App\Company');
+    }
+    public function driver(){
+        return $this->belongsTo('App\Driver');
+    }
+    public function vendor(){
+        return $this->belongsTo('App\Vendor');
+    }
+    public function division(){
+        return $this->belongsTo('App\Division');
+    }
 }

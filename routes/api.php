@@ -20,7 +20,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request){
 Route::apiResources([
     'room' => 'API\RoomCOntroller',
     'car' => 'API\CarController',
+    'doc' => 'API\DocumentController',
     'log' => 'API\LogController',
     'wishlist' => 'API\WishlistController',
     'user' => 'API\UserController',
+    'company' => 'API\CompanyController',
+    'driver' => 'API\DriverController',
+    'vendor' => 'API\VendorController',
+    'division' => 'API\DivisionController',
 ]);

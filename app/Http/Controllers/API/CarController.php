@@ -6,9 +6,16 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Car;
 use App\CarBooking;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\BookCarNotif;
 
 class CarController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -45,6 +52,7 @@ class CarController extends Controller
                 if($selected_car->police_number !== '-'){
                     $check_existing_booking = CarBooking::with('car', 'user')
                         ->where('tanggal', '=', date('Y-m-d', strtotime($request->tanggal)))
+                        ->where('car_id', '=', $request->car)
                         ->get();
             
                     foreach($check_existing_booking as $item){
@@ -70,7 +78,26 @@ class CarController extends Controller
                 $booking->booked_by = auth('api')->user()->id;
                 $booking->save();
 
+                // Mail::to('om@jtd.co.id')->send(new BookCarNotif($booking));
+                Mail::to('chavinpradana@gmail.com')->send(new BookCarNotif($booking));
+
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
+            }else if($request->action == 'create_car'){
+                $car = new Car;
+                $car->company_id = $request->company;
+                $car->type = $request->type;
+                $car->engine_cc = $request->engine;
+                $car->police_number = $request->police_number;
+                $car->driver_id = $request->driver;
+                $car->lease_start = date('Y-m-d H:i:s', strtotime($request->lease_start));
+                $car->lease_due = date('Y-m-d H:i:s', strtotime($request->lease_due));
+                $car->lease_price = $request->lease_price;
+                $car->vendor_id = $request->vendor;
+                $car->division_id = $request->division;
+                $car->created_by = auth('api')->user()->id;
+                $car->save();
+
+                return response()->json(array('success' => true, 'last_insert_id' => $car->id), 200);
             }
         }
     }
@@ -84,7 +111,7 @@ class CarController extends Controller
     public function show($id)
     {
         if($id === 'getCarData'){
-            $result = Car::with('today_booking', 'today_booking.user')->get();
+            $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->get();
         }else if($id === 'getBookingData'){
             $result = CarBooking::with('car', 'user')
                 ->where('tanggal', '>=', date('Y-m-d'))
@@ -132,7 +159,9 @@ class CarController extends Controller
         
         return response()->json(array(
             'success' => true, 
-            'result' => CarBooking::where('id', $item_id)->delete()
+            'result' => $item_class == 'booking' 
+                ? CarBooking::where('id', $item_id)->delete()
+                : Car::where('id', $item_id)->delete()
         ), 200);
     }
 }

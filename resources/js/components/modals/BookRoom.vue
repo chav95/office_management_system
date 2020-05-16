@@ -224,6 +224,10 @@
                 this.postToRoom.purpose = ''
                 this.postToRoom.room = 0
                 this.postToRoom.options = []
+                this.options = {
+                  snack: false,
+                  projector: false,
+                }
               }else{ //console.log(res)
                 this.postToRoom.options = this.postToRoom.options.split(',')
                 const data = res.data
