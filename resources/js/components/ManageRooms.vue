@@ -3,21 +3,21 @@
     <div class="container-fluid">
       <div class="row justify-content-center mt-4 mb-4 h-100">
         <div class="col-12">
-          <div class="card" v-if="$route.path === '/manage-rooms' || $route.path === '/manage-rooms/booking-list'">
-            <book-room model_title="Book Room" :roomData="room_list" @success="loadBookingData()" v-show="can_create"/>
+          <div class="card" v-if="$route.path == '/manage-rooms' || $route.path == '/manage-rooms/booking-list' || $route.path == '/manage-rooms/pending-list'">
+            <book-room :roomData="room_list" :divisionList="division_list" v-show="can_create" @success="loadBookingData()"/>
+            <assign-room :bookingItem="selected_booking" :roomData="room_list" @success="loadPendingBooking()"/>
             <div class="card-header">
               <h3 class="card-title"><strong>Booking Room List</strong></h3>
-              <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateRoomBooking"
-                v-if="userLogin.privilege == 'super_admin' || userLogin.id == 3 || userLogin.id == 4 || userLogin.id == 5 || userLogin.id == 6"
-              >Book Room</button>
+              <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateRoomBooking">Book Room</button>
             </div>
+
             <div class="card-body">
-              <table id="example1" class="table table-bordered table-striped">
+              <table id="booking_list" class="table table-bordered table-striped">
                 <thead>
                   <tr>
                     <th>Room</th>
                     <th>Purpose</th>
-                    <th>Participant</th>
+                    <th>Participants</th>
                     <th>Book Time</th>
                     <th>Extra(s)</th>
                     <th>Booked By</th>
@@ -29,7 +29,7 @@
                     <tr v-for="(booking, index) in booking_list" :key="booking.id">
                       <td>{{booking.room.name}}</td>
                       <td>{{booking.purpose}}</td>
-                      <td>{{booking.participant}}</td>
+                      <td>{{booking.participant}} People <i>({{booking.division.name}} Division)</i></td>
                       <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td>
                       <td>
                         <ul v-if="booking.options.length > 0">
@@ -39,14 +39,39 @@
                       </td>
                       <td>{{booking.user.name}}</td>
                       <td>
-                        <div>
-                          <!-- <a class="modify-btn" title="Edit Room">
-                            <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                          </a> -->
-                          <a class="modify-btn" @click="deleteItem('booking_list', index, booking.id)" title="Delete Room">
-                            <i class="fa fa-trash color-red fa-fw fa-lg"></i>
-                          </a>
-                        </div>
+                        <template v-if="$route.path == '/manage-rooms/pending-list' && booking.status == 0">
+                          <div class="modify_box" v-if="booking.user.id == userLogin.id">
+                            <a class="modify-btn" @click="editItem('booking_list', index)" title="Edit Booking">
+                              <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
+                            </a>
+                            <a class="modify-btn" @click="deleteItem('booking_list', index, booking.id)" title="Delete Room">
+                              <i class="fa fa-trash color-red fa-fw fa-lg"></i>
+                            </a>
+                          </div>
+                          <div class="modify_box" v-if="userLogin.id == 6">
+                            <a class="modify-btn" title="Assign Room" @click="assign(booking)">
+                              <i class="fa fa-thumbtack color-blue fa-fw fa-lg"></i>
+                            </a>
+                            <a class="modify-btn" title="Reject Booking" @click="reject(booking)">
+                              <i class="fa fa-window-close color-red fa-fw fa-lg"></i>
+                            </a>
+                          </div>
+                        </template>
+                        <template v-if="$route.path == '/manage-rooms/pending-list' && booking.status == -1">
+                          <div>
+                            <span class="rejected">Rejected</span>
+                            <button class="btn notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
+                              Notes
+                            </button>
+                          </div>
+                        </template>
+                        <template v-else>
+                          <div v-if="booking.notes !== null && booking.notes !== ''">
+                            <button class="btn notes-btn" title="See Notes From Dian" @click="$alert(booking.notes)">
+                              Notes
+                            </button>
+                          </div>
+                        </template>
                       </td>
                     </tr>
                   </template>
@@ -108,11 +133,12 @@
 <script>
   import moment from 'moment'
   import BookRoom from './modals/BookRoom'
+  import AssignRoom from './modals/AssignRoom'
   import CreateRoom from './modals/CreateRoom'
 
   export default {
     components: {
-      BookRoom, CreateRoom
+      BookRoom, AssignRoom, CreateRoom
     },
     data(){
       return{
@@ -120,16 +146,37 @@
           id: 0,
           privilege: ''
         },
+
         booking_list: [],
         room_list: [],
+        division_list: [],
+        
+        selected_booking: {
+          tanggal: '',
+          jam_awal: 0,
+          jam_akhir: 0,
+          participant: '',
+          id: 0,
+          purpose: '',
+          room: {
+            id: 0,
+          },
+          division: {
+            name: '',
+          },
+          user: {
+            name: '',
+          },
+        },
       }
     },
     mounted(){
       axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
         this.userLogin = data;
-      });
-      this.loadBookingData();
-      this.loadRoomData();
+      })
+      this.$route.path == '/manage-rooms/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
+      this.loadRoomData()
+      this.loadDivisionData()
     },
     computed:{
       can_create(){
@@ -144,9 +191,23 @@
         return false
       }
     },
+    watch:{
+      '$route.path'(newVal, oldVal){
+        this.$route.path == '/manage-rooms/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
+      },
+    },
     methods:{
       formatDatetime(datetime){
         return moment(String(datetime)).format('ll');
+      },
+      loadPendingBooking(){
+        axios.get(window.location.origin+'/api/room/getPendingBooking')
+          .then(({data}) => {
+            data.forEach(item => {
+              item.options = item.options != '' && item.options !== null ? item.options.split(',') : []
+            });
+            this.booking_list = data
+          })
       },
       loadBookingData(){
         axios.get(window.location.origin+'/api/room/getBookingData')
@@ -163,6 +224,41 @@
             this.room_list = data;
           })
           // .catch(err => location.reload())
+      },
+      loadDivisionData(){
+        axios.get(window.location.origin+'/api/division/getDivisionData')
+          .then(({data}) => {
+            this.division_list = data
+          })
+      },
+
+      assign(item){
+        this.selected_booking = item
+        $('#AssignRoom').modal('show');
+      },
+      reject(item){
+        this.$prompt('State Reason For Rejection')
+          .then(reject_notes => {
+            this.$confirm(`Confirm Reject '${item.purpose}' Booking?`, '', 'warning')
+              .then(()=> {
+                let reject_data = {
+                  action: 'reject',
+                  booking_id: item.id,
+                  notes: reject_notes
+                }
+                axios.post(`${window.location.origin}/api/room`, reject_data)
+                  .then(res => {
+                    this.$alert('Reject Successful', '', 'success');
+                    this.loadPendingBooking()
+                  })
+                  .catch(err => {
+                    this.$alert(err, '', 'error')
+                  })
+              })
+          })
+          .catch(err => {
+            this.$alert('Reason For Rejection Cannot Be Empty', '', 'error')
+          })
       },
       deleteItem(collection, index, id){
         let text = ''
@@ -199,5 +295,26 @@
 <style scoped>
   .card-tools{
     text-align: right;
+  }
+
+  .modify_box{
+    width: 52px;
+    margin-bottom: 10px;
+  }
+
+  .notes-btn{
+    display: block;
+    width: 65px;
+    padding: 0.25rem 0.5rem;
+    color: white;
+    background-color: cornflowerblue;
+  }
+
+  .rejected{
+    display: block;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: crimson;
   }
 </style>

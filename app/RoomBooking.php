@@ -15,4 +15,8 @@ class RoomBooking extends Model
     public function user(){
         return $this->belongsTo('App\USer', 'booked_by');
     }
+    
+    public function division(){
+        return $this->belongsTo('App\Division', 'division');
+    }
 }

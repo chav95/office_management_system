@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="CreateCarBookingLabel">{{model_title}}</h5>
+              <h5 class="modal-title font-weight-bold" id="CreateCarBookingLabel">Book A Car</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -44,10 +44,14 @@
                   </select>
                   <input v-model="postToCar.destination" type="text" class="form-control" placeholder="Destination"/>
                   <input v-model="postToCar.purpose" type="text" class="form-control" placeholder="Booking Purpose"/>
-                  <select v-model="postToCar.car" v-show="show_car_select" class="form-control car-select">
+                  <!-- <select v-model="postToCar.division" class="form-control">
+                    <option value="0" disabled>{{"Choose Room User's Division"}}</option>
+                    <option v-for="div in divisionList" :key="div.id" :value="div.id">{{div.name}}</option>
+                  </select> -->
+                  <!-- <select v-model="postToCar.car" v-show="show_car_select" class="form-control car-select">
                     <option value="0" disabled>{{available_car.length > 0 ? 'Choose Car' : 'No Car Available'}}</option>
                     <option v-for="car in available_car" :key="car.id" :value="car.id">{{car.type}} / {{car.police_number}}</option>
-                  </select>
+                  </select> -->
                 </div>
               </div>
             </div>
@@ -75,12 +79,15 @@
       Datepicker
     },
     props: {
-      carData: {
-        type: Array
+      edit_booking: {
+        type: Object,
       },
-      model_title: {
-        type: String,
-        default: 'Create New',
+      carData: {
+        type: Array,
+        default: []
+      },
+      divisionList: {
+        type: Array,
       },
       module: {
         type: String,
@@ -101,7 +108,8 @@
           jam_akhir: 0,
           destination: '',
           purpose: '',
-          car: 0
+          division: 0,
+          // car: 0
         }
       }
     },
@@ -109,39 +117,61 @@
       
     },
     watch: {
-      postToCar: {
-        handler: function(newVal, oldVal) { //console.log('triggered')
-          this.fill_available_car()
-        },
-        deep: true
-      },
+      // postToCar: {
+      //   handler: function(newVal, oldVal) { //console.log('triggered')
+      //     this.fill_available_car()
+      //   },
+      //   deep: true
+      // },
+      // edit_booking:{
+      //   immediate: true,
+      //   handler: function(newVal, oldVal){
+      //     if(Object.keys(edit_booking).length === 0 && edit_booking.constructor === Object){
+      //       this.action = 'create_booking'
+      //       this.postToCar.tanggal = ''
+      //       this.postToCar.jam_awal = 0
+      //       this.postToCar.jam_akhir = 0
+      //       this.postToCar.destination = ''
+      //       this.postToCar.purpose = ''
+      //       this.postToCar.division = 0
+      //     }else{
+      //       this.action = 'edit_booking'
+      //       this.postToCar.tanggal = this.edit_booking.tanggal
+      //       this.postToCar.jam_awal = this.edit_booking.jam_awal
+      //       this.postToCar.jam_akhir = this.edit_booking.jam_akhir
+      //       this.postToCar.destination = this.edit_booking.destination
+      //       this.postToCar.purpose = this.edit_booking.purpose
+      //       this.postToCar.division = this.edit_booking.division
+      //     }
+      //   }
+      // },
       'postToCar.tanggal'(newVal, oldVal) { //console.log(newVal)
         this.postToCar.tanggal = moment(String(newVal)).format('YYYY-MM-DD');
       },
-      available_car(){
-        let valid = false
-        this.available_car.forEach(item => {
-          if(item.id == this.postToCar.car){
-            valid = true
-          }
-        });
+      // available_car(){
+      //   let valid = false
+      //   this.available_car.forEach(item => {
+      //     if(item.id == this.postToCar.car){
+      //       valid = true
+      //     }
+      //   });
 
-        if(valid === false){
-          this.postToCar.car = 0
-        }
-      }
+      //   if(valid === false){
+      //     this.postToCar.car = 0
+      //   }
+      // }
     },
     computed: {
-      show_car_select(){
-        if(
-          this.postToCar.tanggal != '' 
-          && this.postToCar.jam_awal > 0 
-          && this.postToCar.jam_akhir > 0 
-        ){
-          return true
-        }
-        return false
-      }
+      // show_car_select(){
+      //   if(
+      //     this.postToCar.tanggal != '' 
+      //     && this.postToCar.jam_awal > 0 
+      //     && this.postToCar.jam_akhir > 0 
+      //   ){
+      //     return true
+      //   }
+      //   return false
+      // }
     },
     methods:{
       formatDatetime(datetime){
@@ -153,46 +183,48 @@
       DatetimeStringFormat(datetime){
         return moment(String(datetime)).format('ll');
       },
-      fill_available_car(){
-        let arr = []
-        if(
-          (this.postToCar.jam_akhir != 0 && this.postToCar.jam_akhir != 0) 
-          && parseInt(this.postToCar.jam_akhir) <= parseInt(this.postToCar.jam_awal)
-        ){
-          this.$alert('Jam Akhir Tidak Boleh Lebih Kecil / Sama Dengan Jam Awal Booking', '', 'error')
-          this.postToCar.jam_akhir = 0
-        }else{
-          this.carData.forEach(item => {
-            if(item.police_number === '-'){
-              arr.push(item)
-            }else if(item.today_booking.length > 0){
-              item.today_booking.forEach(booking => {
-                if(booking.tanggal != this.postToCar.tanggal){
-                  arr.push(item)
-                }else if(this.postToCar.jam_awal >= booking.jam_akhir + 1){
-                  arr.push(item)
-                }
-              });
-            }else{ /* if(item.capacity >= parseInt(this.postToCar.participant)){ */
-              arr.push(item)
-            }
-          });
-        }
-        this.available_car = arr;
-      },
+      // fill_available_car(){
+      //   let arr = []
+      //   if(
+      //     (this.postToCar.jam_akhir != 0 && this.postToCar.jam_akhir != 0) 
+      //     && parseInt(this.postToCar.jam_akhir) <= parseInt(this.postToCar.jam_awal)
+      //   ){
+      //     this.$alert('Jam Akhir Tidak Boleh Lebih Kecil / Sama Dengan Jam Awal Booking', '', 'error')
+      //     this.postToCar.jam_akhir = 0
+      //   }else{
+      //     this.carData.forEach(item => {
+      //       if(item.police_number === '-'){
+      //         arr.push(item)
+      //       }else if(item.today_booking.length > 0){
+      //         item.today_booking.forEach(booking => {
+      //           if(booking.tanggal != this.postToCar.tanggal){
+      //             arr.push(item)
+      //           }else if(this.postToCar.jam_awal >= booking.jam_akhir + 1){
+      //             arr.push(item)
+      //           }
+      //         });
+      //       }else{ /* if(item.capacity >= parseInt(this.postToCar.participant)){ */
+      //         arr.push(item)
+      //       }
+      //     });
+      //   }
+      //   this.available_car = arr;
+      // },
       submitBooking(){
         if(this.postToCar.tanggal === ''){
-          this.$alert('Booking Date Cannot Be Empty', '', 'warning');
+          this.$alert('Booking Date Cannot Be Empty', '', 'warning')
         }else if(this.postToCar.jam_awal == 0 || this.postToCar.jam_akhir == 0){
-          this.$alert('Booking Time Cannot Be Empty', '', 'warning');
+          this.$alert('Booking Time Cannot Be Empty', '', 'warning')
         }else if(this.postToCar.destination == ''){
-          this.$alert('Booking Destination Cannot Be Empty', '', 'warning');
+          this.$alert('Booking Destination Cannot Be Empty', '', 'warning')
         }else if(this.postToCar.purpose === ''){
-          this.$alert('Booking Purpose Cannot Be Empty', '', 'warning');
-        }else if(this.postToCar.car == 0 && this.available_car.length > 0){
-          this.$alert('Please Choose A car To Book', '', 'warning');
-        }else if(this.available_car.length == 0){
-          this.$alert('No car Available For Choosen Date & Time', '', 'error');
+          this.$alert('Booking Purpose Cannot Be Empty', '', 'warning')
+        // }else if(this.postToCar.division === 0){
+        //   this.$alert("Please Choose Car User's Division", '', 'warning')
+        // }else if(this.postToCar.car == 0 && this.available_car.length > 0){
+        //   this.$alert('Please Choose A car To Book', '', 'warning');
+        // }else if(this.available_car.length == 0){
+        //   this.$alert('No car Available For Choosen Date & Time', '', 'error');
         }else{
           axios.post(window.location.origin+'/api/car', this.postToCar)
             .then(res => {
@@ -206,7 +238,8 @@
                 this.postToCar.jam_akhir = 0
                 this.postToCar.destination = ''
                 this.postToCar.purpose = ''
-                this.postToCar.car = 0
+                this.postToCar.division = 0
+                // this.postToCar.car = 0
               }else{ //console.log(res)
                 const data = res.data
                 this.$alert(data.msg, '', 'warning')

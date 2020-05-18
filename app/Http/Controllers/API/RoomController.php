@@ -69,6 +69,7 @@ class RoomController extends Controller
                 $booking->jam_akhir = $request->jam_akhir;
                 $booking->participant = $request->participant;
                 $booking->purpose = $request->purpose;
+                $booking->division = $request->division;
                 $booking->room_id = $request->room;
                 $booking->options = $request->options;
                 $booking->booked_by = auth('api')->user()->id;
@@ -78,6 +79,25 @@ class RoomController extends Controller
                 Mail::to('chavinpradana@gmail.com')->send(new BookRoomNotif($booking));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
+            }else if($request->action === 'assign'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        RoomBooking::where('id', $request->booking_id)->update([
+                            'room_id' => $request->room_id,
+                            'notes' => $request->notes,
+                            'status' => 1,
+                        ])
+                ), 200);
+            }else if($request->action == 'reject'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        RoomBooking::where('id', $request->booking_id)->update([
+                            'notes' => $request->notes,
+                            'status' => -1,
+                        ])
+                ), 200);
             }else if($request->action === 'create_room'){
                 $room = new Room;
                 $room->name = $request->name;
@@ -104,7 +124,15 @@ class RoomController extends Controller
 
             // $result->booking = $room_last_booking;
         }else if($id === 'getBookingData'){
-            $result = RoomBooking::with('room', 'user')
+            $result = RoomBooking::with('room', 'user', 'division')
+                ->where('status', '=', 1)
+                ->where('tanggal', '>=', date('Y-m-d'))
+                ->orderBy('tanggal', 'ASC')
+                ->orderBy('jam_awal', 'ASC')
+                ->get();
+        }else if($id === 'getPendingBooking'){
+            $result = RoomBooking::with('room', 'user', 'division')
+                ->where('status', '!=', 1)
                 ->where('tanggal', '>=', date('Y-m-d'))
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')

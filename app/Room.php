@@ -14,7 +14,7 @@ class Room extends Model
 
     public function today_booking(){
         $today = date('Y-m-d');
-        return $this->hasMany('App\RoomBooking')->where('tanggal', $today);
+        return $this->hasMany('App\RoomBooking')->whereDate('tanggal', '>=', $today);
     }
 
     public function user(){

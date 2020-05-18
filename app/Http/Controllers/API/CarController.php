@@ -46,35 +46,14 @@ class CarController extends Controller
     {
         if($request->action){
             if($request->action === 'create_booking'){
-                $selected_car = Car::find($request->car);
-                // return response()->json(array('success' => true, 'item' => $selected_car), 200);
-                
-                if($selected_car->police_number !== '-'){
-                    $check_existing_booking = CarBooking::with('car', 'user')
-                        ->where('tanggal', '=', date('Y-m-d', strtotime($request->tanggal)))
-                        ->where('car_id', '=', $request->car)
-                        ->get();
-            
-                    foreach($check_existing_booking as $item){
-                        for($i = $request->jam_awal; $i <= $request->jam_akhir; $i++){
-                            if(($item->jam_awal <= $i) && ($i <= $item->jam_akhir)){
-                                $book_time = date('M n, Y', strtotime($item->tanggal)).' - '.$item->jam_awal.'.00 s/d '.$item->jam_akhir.'.00';
-                                return response()->json(array(
-                                    'success' => false, 
-                                    'msg' => 'Choosen Car Already Booked At: '.$item->jam_awal.'.00 s/d '.$item->jam_akhir.'.00'
-                                ), 200);
-                            }
-                        }
-                    }
-                }   
-
                 $booking = new CarBooking;
                 $booking->tanggal = date('Y-m-d H:i:s', strtotime($request->tanggal));
                 $booking->jam_awal = $request->jam_awal;
                 $booking->jam_akhir = $request->jam_akhir;
                 $booking->destination = $request->destination;
                 $booking->purpose = $request->purpose;
-                $booking->car_id = $request->car;
+                $booking->division = $request->division;
+                $booking->car_id = 0; //$request->car;
                 $booking->booked_by = auth('api')->user()->id;
                 $booking->save();
 
@@ -82,6 +61,48 @@ class CarController extends Controller
                 Mail::to('chavinpradana@gmail.com')->send(new BookCarNotif($booking));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
+            }else if($request->action === 'assign'){
+                // $selected_car = Car::find($request->car);
+                // // return response()->json(array('success' => true, 'item' => $selected_car), 200);
+                
+                // if($selected_car->police_number !== '-'){
+                //     $check_existing_booking = CarBooking::with('car', 'user')
+                //         ->where('tanggal', '=', date('Y-m-d', strtotime($request->tanggal)))
+                //         ->where('car_id', '=', $request->car)
+                //         ->get();
+            
+                //     foreach($check_existing_booking as $item){
+                //         for($i = $request->jam_awal; $i <= $request->jam_akhir; $i++){
+                //             if(($item->jam_awal <= $i) && ($i <= $item->jam_akhir)){
+                //                 $book_time = date('M n, Y', strtotime($item->tanggal)).' - '.$item->jam_awal.'.00 s/d '.$item->jam_akhir.'.00';
+                //                 return response()->json(array(
+                //                     'success' => false, 
+                //                     'msg' => 'Choosen Car Already Booked At: '.$item->jam_awal.'.00 s/d '.$item->jam_akhir.'.00'
+                //                 ), 200);
+                //             }
+                //         }
+                //     }
+                // }
+
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        CarBooking::where('id', $request->booking_id)->update([
+                            'car_id' => $request->car_id,
+                            'driver_id' => $request->driver_id,
+                            'notes' => $request->notes,
+                            'status' => 1,
+                        ])
+                ), 200);
+            }else if($request->action == 'reject'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        CarBooking::where('id', $request->booking_id)->update([
+                            'notes' => $request->notes,
+                            'status' => -1,
+                        ])
+                ), 200);
             }else if($request->action == 'create_car'){
                 $car = new Car;
                 $car->company_id = $request->company;
@@ -113,7 +134,15 @@ class CarController extends Controller
         if($id === 'getCarData'){
             $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->get();
         }else if($id === 'getBookingData'){
-            $result = CarBooking::with('car', 'user')
+            $result = CarBooking::with('car', 'driver', 'user', 'division')
+                ->where('car_id', '>', 0)
+                ->where('tanggal', '>=', date('Y-m-d'))
+                ->orderBy('tanggal', 'ASC')
+                ->orderBy('jam_awal', 'ASC')
+                ->get();
+        }else if($id === 'getPendingBooking'){
+            $result = CarBooking::with('user', 'division')
+                ->where('car_id', '=', 0)
                 ->where('tanggal', '>=', date('Y-m-d'))
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')

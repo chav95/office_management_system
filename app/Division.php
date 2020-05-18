@@ -9,4 +9,10 @@ class Division extends Model
     public function car(){
         return $this->hasMany('App\Car');
     }
+    public function car_booking(){
+        return $this->hasMany('App\CarBooking');
+    }
+    public function room_booking(){
+        return $this->hasMany('App\RoomBooking');
+    }
 }

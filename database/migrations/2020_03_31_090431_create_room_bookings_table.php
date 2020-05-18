@@ -20,7 +20,7 @@ class CreateRoomBookingsTable extends Migration
             $table->integer('jam_akhir');
             $table->integer('participant');
             $table->string('purpose');
-            $table->string('room_id');
+            $table->integer('room_id');
             $table->string('options')->nullable();
             $table->integer('booked_by');
             $table->timestamps();

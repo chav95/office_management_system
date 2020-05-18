@@ -10,7 +10,15 @@ class CarBooking extends Model
         return $this->belongsTo('App\Car');
     }
 
+    public function driver(){
+        return $this->belongsTo('App\Driver');
+    }
+
     public function user(){
         return $this->belongsTo('App\USer', 'booked_by');
+    }
+    
+    public function division(){
+        return $this->belongsTo('App\Division', 'division');
     }
 }

@@ -20,7 +20,7 @@ class CreateCarBookingsTable extends Migration
             $table->integer('jam_akhir');
             $table->string('destination');
             $table->string('purpose');
-            $table->string('car_id');
+            $table->integer('car_id');
             $table->integer('booked_by');
             $table->timestamps();
         });

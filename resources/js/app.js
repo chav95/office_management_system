@@ -31,11 +31,13 @@ let routes = [
     
     // Meeting Room Routes
     {path: '/manage-rooms', component: require('./components/ManageRooms.vue').default},
+    {path: '/manage-rooms/pending-list', component: require('./components/ManageRooms.vue').default},
     {path: '/manage-rooms/booking-list', component: require('./components/ManageRooms.vue').default},
     {path: '/manage-rooms/settings', component: require('./components/ManageRooms.vue').default},
 
     // Car Routes
     {path: '/manage-cars', component: require('./components/ManageCars.vue').default},
+    {path: '/manage-cars/pending-list', component: require('./components/ManageCars.vue').default},
     {path: '/manage-cars/booking-list', component: require('./components/ManageCars.vue').default},
     {path: '/manage-cars/settings', component: require('./components/ManageCars.vue').default},
 

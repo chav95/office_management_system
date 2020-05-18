@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="CreateRoomBookingLabel">{{model_title}}</h5>
+              <h5 class="modal-title font-weight-bold" id="CreateRoomBookingLabel">Book A Room</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -44,6 +44,10 @@
                   </select>
                   <input v-model="postToRoom.participant" type="number" class="form-control" placeholder="Number of Participants"/>
                   <input v-model="postToRoom.purpose" type="text" class="form-control" placeholder="Booking Purpose"/>
+                  <select v-model="postToRoom.division" class="form-control">
+                    <option value="0" disabled>{{"Choose Room User's Division"}}</option>
+                    <option v-for="div in divisionList" :key="div.id" :value="div.id">{{div.name}}</option>
+                  </select>
                   <select v-show="show_room_select" v-model="postToRoom.room" class="form-control room-select">
                     <option value="0" disabled>{{available_room.length > 0 ? 'Choose Room' : 'No Room Available'}}</option>
                     <option v-for="room in available_room" :key="room.id" :value="room.id">{{room.name}} (Capacity: {{room.capacity}})</option>
@@ -84,9 +88,9 @@
         type: Array,
         default: []
       },
-      model_title: {
-        type: String,
-        default: 'Create New',
+      divisionList: {
+        type: Array,
+        default: []
       },
       module: {
         type: String,
@@ -112,6 +116,7 @@
           jam_akhir: 0,
           participant: '',
           purpose: '',
+          division: 0,
           room: 0,
           options: []
         }
@@ -202,6 +207,8 @@
           this.$alert('Booking Purpose Cannot Be Empty', '', 'warning');
         }else if(this.postToRoom.room == 0 && this.available_room.length > 0){
           this.$alert('Please Choose A Room To Book', '', 'warning');
+        }else if(this.postToRoom.division == 0){
+          this.$alert("Please Select Room User's Division", '', 'warning')
         }else if(this.available_room.length == 0){
           this.$alert('No Room Available For Choosen Date & Time', '', 'error');
         }else{
@@ -222,6 +229,7 @@
                 this.postToRoom.jam_akhir = 0
                 this.postToRoom.participant = ''
                 this.postToRoom.purpose = ''
+                this.postToRoom.division = 0
                 this.postToRoom.room = 0
                 this.postToRoom.options = []
                 this.options = {

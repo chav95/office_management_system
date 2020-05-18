@@ -6,7 +6,7 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
 
-  <title>{{str_replace('_', ' ', config('app.name'))}} | Starter</title>
+  <title>{{str_replace('_', ' ', config('app.name'))}}</title>
 
   <link rel="stylesheet" href="{{asset('css/app.css')}}">
 </head>
@@ -125,7 +125,7 @@
     <!-- Brand Logo -->
     <router-link to="/" class="brand-link sidebar-app-logo">
       <img src="{{asset('storage/app_image/logo.png')}}" alt="Office Management Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">{{str_replace('_', ' ', config('app.name'))}}</span>
+      <span class="brand-text font-weight-light">Office Management</span>
     </router-link>
 
     <!-- Sidebar -->
@@ -145,7 +145,7 @@
         <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
             <router-link to="/dashboard" class="nav-link">
-              <i class="nav-icon fas fa-building color-teal"></i>
+              <i class="nav-icon fas fa-chart-bar color-teal"></i>
               <p>Dashboard</p>
             </router-link>
           </li>
@@ -155,6 +155,12 @@
               <p>Manage Rooms <i class="right fas fa-angle-left"></i></p>
             </router-link>
             <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <router-link to="/manage-rooms/pending-list" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-purple"></i>
+                  <p>Pending Booking</p>  
+                </router-link>
+              </li>
               <li class="nav-item">
                 <router-link to="/manage-rooms/booking-list" class="nav-link">
                   <i class="nav-icon fas fa-list-alt color-purple"></i>
@@ -175,6 +181,12 @@
               <p>Manage Cars <i class="right fas fa-angle-left"></i></p>
             </router-link>
             <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <router-link to="/manage-cars/pending-list" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-blue"></i>
+                  <p>Pending Booking</p>
+                </router-link>
+              </li>
               <li class="nav-item">
                 <router-link to="/manage-cars/booking-list" class="nav-link">
                   <i class="nav-icon fas fa-list-alt color-blue"></i>

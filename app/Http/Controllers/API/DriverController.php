@@ -53,7 +53,7 @@ class DriverController extends Controller
     public function show($id)
     {
         if($id === 'getDriverData'){
-            return Driver::orderBy('name', 'ASC')->get();
+            return Driver::with('today_booking')->orderBy('name', 'ASC')->get();
         }
     }
 

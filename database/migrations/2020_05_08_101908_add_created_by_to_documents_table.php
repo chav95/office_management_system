@@ -26,7 +26,7 @@ class AddCreatedByToDocumentsTable extends Migration
     public function down()
     {
         Schema::table('documents', function (Blueprint $table) {
-            //
+            $table->dropColumn('created_by');
         });
     }
 }
