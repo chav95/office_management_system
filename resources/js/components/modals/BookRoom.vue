@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="CreateRoomBookingLabel">Book A Room</h5>
+              <h5 class="modal-title font-weight-bold" id="CreateRoomBookingLabel">{{postToRoom.action == 'create_booking' ? 'Book A Room' : 'Edit Booking'}}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -62,8 +62,15 @@
             </div>
 
             <div class="modal-footer">
-              <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="submitBooking" class="btn btn-primary">Create</button>
+              <button type="reset" :disabled="loading" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+              <button type="button" :disabled="loading" @click="submitBooking" class="btn btn-primary">
+                {{loading 
+                  ? 'Please Wait...' 
+                  : postToRoom.action == 'create_booking'
+                    ? 'Create'
+                    : 'Submit Edit'
+                }}
+              </button>
             </div>
           </form>
         </div>
@@ -95,7 +102,10 @@
       module: {
         type: String,
         default: ''
-      }
+      },
+      bookingItem: {
+        type: Object,
+      },
     },
     data(){
       return{
@@ -110,7 +120,8 @@
         },
         
         postToRoom: {
-          action: 'create_booking',
+          action: '',
+          id: 0,
           tanggal: '',
           jam_awal: 0,
           jam_akhir: 0,
@@ -119,13 +130,34 @@
           division: 0,
           room: 0,
           options: []
-        }
+        },
+
+        loading: false,
       }
     },
-    mounted(){
-      
-    },
     watch: {
+      bookingItem: {
+        handler: function(newVal, oldVal) {
+          this.postToRoom.action = this.bookingItem.action
+          this.postToRoom.id = this.bookingItem.id
+          this.postToRoom.tanggal = this.bookingItem.tanggal
+          this.postToRoom.jam_awal = this.bookingItem.jam_awal
+          this.postToRoom.jam_akhir = this.bookingItem.jam_akhir
+          this.postToRoom.participant = this.bookingItem.participant
+          this.postToRoom.purpose = this.bookingItem.purpose
+          this.postToRoom.division = this.bookingItem.division.id
+          this.postToRoom.room = this.bookingItem.room.id
+          this.bookingItem.options.forEach(item => {
+            if(item == 'projector'){
+              this.options.projector = true
+            }else if(item == 'snack'){
+              this.options.snack = true
+            }
+          })
+        },
+        immediate: true,
+        deep: true,
+      },
       postToRoom: {
         handler: function(newVal, oldVal) { //console.log('triggered')
           this.fill_available_room()
@@ -173,27 +205,30 @@
       },
       fill_available_room(){
         let arr = []
-        if(
-          (this.postToRoom.jam_akhir != 0 && this.postToRoom.jam_akhir != 0) 
-          && parseInt(this.postToRoom.jam_akhir) <= parseInt(this.postToRoom.jam_awal)
-        ){
-          this.$alert('Jam Akhir Tidak Boleh Lebih Kecil / Sama Dengan Jam Awal Booking', '', 'error')
-          this.postToRoom.jam_akhir = 0
-        }else{
-          this.roomData.forEach(item => {
-            if(item.today_booking.length > 0){
-              item.today_booking.forEach(booking => {
-                if(booking.tanggal != this.postToRoom.tanggal){
-                  arr.push(item)
-                }else if(this.postToRoom.jam_awal >= booking.jam_akhir + 1){
-                  arr.push(item)
+        this.roomData.forEach(room => {
+          if(room.today_booking.length > 0){
+            let valid = true
+            room.today_booking.forEach(booking => {
+              if(this.bookingItem.tanggal == booking.tanggal && booking.status == 1){
+                if(this.bookingItem.jam_awal <= booking.jam_akhir && this.bookingItem.jam_awal >= booking.jam_awal){
+                  valid = false
+                }else if(this.bookingItem.jam_akhir <= booking.jam_akhir && this.bookingItem.jam_akhir >= booking.jam_awal - 1){
+                  valid = false
+                }else if(this.bookingItem.jam_awal < booking.jam_awal && this.bookingItem.jam_akhir > booking.jam_akhir){
+                  valid = false
                 }
-              });
-            }else if(item.capacity >= parseInt(this.postToRoom.participant)){
-              arr.push(item)
+              }else if(room.capacity < this.bookingItem.participant){
+                valid = false
+              }
+            });
+
+            if(valid == true){
+              arr.push(room)
             }
-          });
-        }
+          }else if(room.capacity >= parseInt(this.bookingItem.participant)){
+            arr.push(room)
+          }
+        });
         this.available_room = arr;
       },
       submitBooking(){
@@ -212,6 +247,8 @@
         }else if(this.available_room.length == 0){
           this.$alert('No Room Available For Choosen Date & Time', '', 'error');
         }else{
+          this.loading = true
+
           for(let [key, value] of Object.entries(this.options)){
             value === true ? this.postToRoom.options.push(key) : null
           }
@@ -219,6 +256,8 @@
   
           axios.post(window.location.origin+'/api/room', this.postToRoom)
             .then(res => {
+              this.loading = false
+
               if(res.data.success === true){
                 this.$emit('success')
                 this.$alert('Book Room Success', '', 'success')
@@ -243,6 +282,8 @@
               }
             })
             .catch((error) => {
+              this.loading = false
+              
               this.postToRoom.options = this.postToRoom.options.split(',')
               this.$alert(error, '', 'error')
             });          

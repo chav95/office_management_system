@@ -4,8 +4,17 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card" v-if="$route.path == '/manage-cars' || $route.path == '/manage-cars/booking-list' || $route.path == '/manage-cars/pending-list'">
-          <book-car :edit_booking="edit_booking" :carData="car_list" :divisionList="division_list" @success="$route.path == '/manage-cars/pending-list' ? loadPendingBooking() : loadBookingData()"/>
-          <assign-car :bookingItem="selected_booking" :carData="car_list" :driverData="driver_list" @success="loadPendingBooking()"/>
+          <book-car 
+            :bookingItem="selected_booking"
+            :carData="car_list" 
+            @success="$route.path == '/manage-cars/pending-list' ? loadPendingBooking() : loadBookingData()"
+          />
+          <assign-car 
+            :bookingItem="selected_booking" 
+            :carData="car_list" 
+            :driverData="driver_list" 
+            @success="assignSuccess()"
+          />
           <div class="card-header">
             <h3 class="card-title"><strong>{{$route.path == '/manage-cars/pending-list' ? 'Pending' : ''}} Booking Car List</strong></h3>
             <button class="btn btn-primary" style="float: right" @click="createBooking()">Book Car</button>
@@ -39,7 +48,7 @@
                     <td>
                       <template v-if="$route.path == '/manage-cars/pending-list' && booking.status == 0">
                         <div class="modify_box" v-if="booking.user.id == userLogin.id">
-                          <a class="modify-btn" @click="editItem('booking_list', index)" title="Edit Booking">
+                          <a class="modify-btn" @click="editBooking(booking)" title="Edit Booking">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                           </a>
                           <a class="modify-btn" @click="deleteItem('booking_list', index, booking.id)" title="Delete Booking">
@@ -82,11 +91,11 @@
         </div>
 
         <div class="card" v-else-if="$route.path === '/manage-cars/settings'">
-          <create-car :company_data="company_list" :driver_data="driver_list" 
+          <create-car :action="action" :selected_car="selected_car" :company_data="company_list" :driver_data="driver_list" 
           :vendor_data="vendor_list" :division_data="division_list" @success="loadCarData()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Car List</strong></h3>
-            <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateCar">Assign Car & Driver</button>
+            <button class="btn btn-primary" style="float: right" @click="createCar()">Create Car</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -96,7 +105,7 @@
                   <th>Car Model</th>
                   <th>Engine</th>
                   <th>Police Number</th>
-                  <th>Driver</th>
+                  <!-- <th>Driver</th> -->
                   <th>Lease Duration</th>
                   <th>Vendor</th>
                   <th>User</th>
@@ -111,15 +120,15 @@
                       <td>{{car.type}}</td>
                       <td>{{car.engine_cc}}</td>
                       <td>{{car.police_number}}</td>
-                      <td>{{car.driver.name}}</td>
+                      <!-- <td>{{car.driver.name}}</td> -->
                       <td>{{formatDatetime(car.lease_start)}} s/d {{car.lease_due === null ? '-' : formatDatetime(car.lease_due)}}</td>
                       <td>{{car.vendor.name}}</td>
                       <td>{{car.division.name}}</td>
                       <td>
                         <div>
-                          <!-- <a class="modify-btn" title="Edit Car">
+                          <a class="modify-btn" @click="editCar(car)" title="Edit Car">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                          </a> -->
+                          </a>
                           <a class="modify-btn" @click="deleteItem('car_list', index, car.id)" title="Delete Car">
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
@@ -145,7 +154,7 @@
   import moment from 'moment'
   import BookCar from './modals/BookCar'
   import AssignCar from './modals/AssignCar'
-  import CreateCar from './modals/CreateCar';
+  import CreateCar from './modals/CreateCar'
 
   export default {
     components: {
@@ -160,22 +169,39 @@
 
         booking_list: [],
         selected_booking: {
+          action: '',
+          id: 0,
           tanggal: '',
           jam_awal: 0,
           jam_akhir: 0,
           destination: '',
           purpose: '',
           user: {
+            id: '',
             name: '',
           },
         },
-        edit_booking: {},
         car_list: [],
 
         company_list: [],
         driver_list: [],
         vendor_list: [],
         division_list: [],
+
+        action: '',
+        selected_car: {
+          id: 0,
+          company_id: 0,
+          type: '',
+          engine_cc: 0,
+          police_number: '',
+          driver_id: 0,
+          lease_start: '',
+          lease_due: '',
+          lease_price: 0,
+          vendor_id: 0,
+          division_id: 0,
+        }
       }
     },
     mounted(){
@@ -217,6 +243,29 @@
       formatDatetime(datetime){
         return moment(String(datetime)).format('ll');
       },
+      
+      createCar(){
+        this.action = 'create'
+        this.selected_car = {
+          id: 0,
+          company_id: 0,
+          type: '',
+          engine_cc: 0,
+          police_number: '',
+          driver_id: 0,
+          lease_start: '',
+          lease_due: '',
+          lease_price: 0,
+          vendor_id: 0,
+          division_id: 0,
+        }
+        $('#CreateCar').modal('show');
+      },
+      editCar(item){
+        this.action = 'edit'
+        this.selected_car = item
+        $('#CreateCar').modal('show');
+      },
       assign(item){
         this.selected_booking = item
         $('#AssignCar').modal('show');
@@ -245,15 +294,31 @@
             this.$alert('Reason For Rejection Cannot Be Empty', '', 'error')
           })
       },
+      assignSuccess(){
+        this.loadPendingBooking()
+        this.loadCarData()
+      },
+
       createBooking(){
-        this.edit_booking = {}
+        this.selected_booking = {
+          action: 'create_booking',
+          id: 0,
+          tanggal: '',
+          jam_awal: 0,
+          jam_akhir: 0,
+          destination: '',
+          purpose: '',
+          user: {
+            id: '',
+            name: '',
+          },
+        }
         $('#CreateCarBooking').modal('show');
       },
-      editItem(collection, index){
-        if(collection === 'booking_list'){
-          this.edit_booking = this.booking_list[index]
-          $('#CreateCarBooking').modal('show');
-        }
+      editBooking(item){
+        this.selected_booking = item
+        this.selected_booking.action = 'edit_booking'
+        $('#CreateCarBooking').modal('show');
       },
       deleteItem(collection, index, id){
         let text = ''

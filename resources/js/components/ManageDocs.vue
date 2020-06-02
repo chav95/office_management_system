@@ -21,7 +21,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <!-- <tr>
                   <td>
                     <router-link to="/manage-docs/1">STNK Toyota Avanza (B 5213 BMD)</router-link>
                   </td>
@@ -38,7 +38,7 @@
                       </a>
                     </div>
                   </td>
-                </tr>
+                </tr> -->
                 <template v-if="doc_list.length > 0">
                   <tr v-for="(item) in doc_list" :key="item.id">
                     <td>{{item.name}}</td>

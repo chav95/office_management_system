@@ -28,7 +28,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::select('id', 'name', 'email', 'privilege', 'hak_akses', 'created_at')
+        return User::select('id', 'name', 'email', 'privilege', 'created_at')
+            ->with('division')
             ->where('status', '=', '1')->orderBy('name', 'asc')->paginate(10);
     }
 
@@ -41,30 +42,60 @@ class UserController extends Controller
     public function store(Request $request)
     {
         if($request->act){ //return $request;
-            if($request->act == 'deactivate_user'){
-                return User::where('id', $id)->update(['status' => 0]);
+            if($request->act == 'new_user'){
+                $this->validate($request, [
+                    'name' => 'required|string|max:191',
+                    'email' => 'required|string|email|max:191|unique:users',
+                    'division' => 'required|integer',
+                    'privilege' => 'required|string',
+                ]);
+                // return $request['privilege'];
+                return User::create([
+                    'name' => $request['name'],
+                    'email' => $request['email'],
+                    'division_id' => $request['division'],
+                    'password' => Hash::make('password123'),
+                    'privilege' => $request['privilege'],
+                    'api_token' => Str::random(60),
+                ]);
+                // return response()->json(array(
+                //     'success' => true,
+                // ), 200);
             }else if($request->act == 'edit_user'){
+                $this->validate($request, [
+                    'name' => 'required|string|max:191',
+                    'email' => 'required|string|email|max:191|unique:users,email,'.$request->id,
+                    'division' => 'required|integer',
+                    'privilege' => 'required|string',
+                ]);
+                
                 return User::where('id', $request->id)
                     ->update([
                         'name' => $request->name,
                         'email' => $request->email,
+                        'division_id' => $request->division,
                         'privilege' => $request->privilege,
-                        'hak_akses' => $request->hak_akses,
                     ]);
+            }else if($request->act == 'deactivate_user'){
+                return User::where('id', $id)->update(['status' => 0]);
             }
         }else{
-            $this->validate($request, [
-                'name' => 'required|string|max:191',
-                'email' => 'required|string|email|max:191|unique:users',
-                'password' => 'required|string|min:6|confirmed',
-            ]);
+            return $request['action'];
 
-            return User::create([
-                'name' => $request['name'],
-                'email' => $request['email'],
-                'password' => Hash::make($request['password']),
-                'api_token' => Str::random(60),
-            ]);
+            // $this->validate($request, [
+            //     'name' => 'required|string|max:191',
+            //     'email' => 'required|string|email|max:191|unique:users',
+            //     'password' => 'required|string|min:6|confirmed',
+            //     'privilege' => 'required|string|'
+            // ]);
+
+            // return User::create([
+            //     'name' => $request['name'],
+            //     'email' => $request['email'],
+            //     'password' => Hash::make($request['password']),
+            //     'privilege' => $request['privilege'],
+            //     'api_token' => Str::random(60),
+            // ]);
         }
     }
 
@@ -76,7 +107,13 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        if($id == 'getUserLogin'){ 
+        if($id == 'getUserList'){
+            return User::with('division')
+                ->with('division')
+                ->where('status', '=', '1')
+                ->orderBy('name', 'asc')
+                ->paginate(10);
+        }else if($id == 'getUserLogin'){
             return auth('api')->user();
         }else if($id == 'getLoggedUserAccess'){
              
@@ -103,6 +140,9 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        return User::where('id', $id)->update(['status' => -1]);
+        return response()->json(array(
+            'success' => true, 
+            'result' => User::where('id', $id)->delete()
+        ), 200);
     }
 }

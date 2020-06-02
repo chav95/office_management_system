@@ -14,6 +14,9 @@ class User extends Authenticatable
     public function room(){
         return $this->hasManyThrough('App\Room', 'App\RoomBooking', 'booked_by', 'id');
     }
+    public function division(){
+        return $this->belongsTo('App\Division');
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -21,7 +24,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'api_token',
+        'name', 'email', 'password', 'division_id', 'privilege', 'api_token',
     ];
 
     /**

@@ -509,6 +509,8 @@ class ComposerStaticInitae15b551b157e0cdd0c024dfd09c73a7
         'App\\Log' => __DIR__ . '/../..' . '/app/Log.php',
         'App\\Mail\\BookCarNotif' => __DIR__ . '/../..' . '/app/Mail/BookCarNotif.php',
         'App\\Mail\\BookRoomNotif' => __DIR__ . '/../..' . '/app/Mail/BookRoomNotif.php',
+        'App\\Mail\\NewDocNotif' => __DIR__ . '/../..' . '/app/Mail/NewDocNotif.php',
+        'App\\Mail\\UpcomingDocNotif' => __DIR__ . '/../..' . '/app/Mail/UpcomingDocNotif.php',
         'App\\Music' => __DIR__ . '/../..' . '/app/Music.php',
         'App\\Playlist' => __DIR__ . '/../..' . '/app/Playlist.php',
         'App\\PlaylistDetail' => __DIR__ . '/../..' . '/app/PlaylistDetail.php',

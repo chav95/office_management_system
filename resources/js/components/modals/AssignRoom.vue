@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="AssignRoomLabel">Assign Car</h5>
+              <h5 class="modal-title font-weight-bold" id="AssignRoomLabel">Assign Room</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -19,6 +19,7 @@
                   <strong>Participants</strong> <br>
                   <strong>Division</strong> <br>
                   <strong>Booked By</strong> <br>
+                  <strong>Exta(s)</strong>
                 </div>
 
                 <div class="col-sm-8">
@@ -27,6 +28,10 @@
                   {{bookingItem.participant}} People <br>
                   {{bookingItem.division.name}} Division <br>
                   {{bookingItem.user.name}} <br>
+                  <ul v-if="bookingItem.options.length > 0">
+                    <li v-for="(option, index) in bookingItem.options" :key="index">{{option}}</li>
+                  </ul>
+                  <span v-else>-</span>
                 </div>
               </div>
                   
@@ -35,7 +40,7 @@
                   <label for="room_select">Select Room To Assign</label>
                   <select v-model="room_id" class="form-control" id="room_select">
                     <option value="0" disabled>{{available_room.length > 0 ? 'Choose Room' : 'No Room Available'}}</option>
-                    <option v-for="room in available_room" :key="room.id" :value="room.id">{{room.name}} (Capacity: {{room.capacity}}</option>
+                    <option v-for="room in available_room" :key="room.id" :value="room.id">{{room.name}} (Capacity: {{room.capacity}})</option>
                   </select>
                   <label for="notes">Notes (Optional)</label>
                   <textarea v-model="notes" id="notes" class="form-control" rows="4" placeholder="Notes (Optional)"></textarea>
@@ -45,7 +50,7 @@
 
             <div class="modal-footer">
               <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="assignRoom()" class="btn btn-primary">Create</button>
+              <button type="button" @click="assignRoom()" class="btn btn-primary">Assign</button>
             </div>
           </form>
         </div>
@@ -121,27 +126,30 @@
 
       fill_available_room(){
         let arr = []
-        if(
-          (this.bookingItem.jam_akhir != 0 && this.bookingItem.jam_akhir != 0) 
-          && parseInt(this.bookingItem.jam_akhir) <= parseInt(this.bookingItem.jam_awal)
-        ){
-          this.$alert('Jam Akhir Tidak Boleh Lebih Kecil / Sama Dengan Jam Awal Booking', '', 'error')
-          this.bookingItem.jam_akhir = 0
-        }else{
-          this.roomData.forEach(item => {
-            if(item.today_booking.length > 0){
-              item.today_booking.forEach(booking => {
-                if(booking.tanggal != this.bookingItem.tanggal){
-                  arr.push(item)
-                }else if(this.bookingItem.jam_awal >= booking.jam_akhir + 1){
-                  arr.push(item)
+        this.roomData.forEach(room => {
+          if(room.today_booking.length > 0){
+            let valid = true
+            room.today_booking.forEach(booking => {
+              if(this.bookingItem.tanggal == booking.tanggal && booking.status == 1){
+                if(this.bookingItem.jam_awal <= booking.jam_akhir && this.bookingItem.jam_awal >= booking.jam_awal){
+                  valid = false
+                }else if(this.bookingItem.jam_akhir <= booking.jam_akhir && this.bookingItem.jam_akhir >= booking.jam_awal - 1){
+                  valid = false
+                }else if(this.bookingItem.jam_awal < booking.jam_awal && this.bookingItem.jam_akhir > booking.jam_akhir){
+                  valid = false
                 }
-              });
-            }else if(item.capacity >= parseInt(this.bookingItem.participant)){
-              arr.push(item)
+              }else if(room.capacity < this.bookingItem.participant){
+                valid = false
+              }
+            });
+
+            if(valid == true){
+              arr.push(room)
             }
-          });
-        }
+          }else if(room.capacity >= parseInt(this.bookingItem.participant)){
+            arr.push(room)
+          }
+        });
         this.available_room = arr;
       },
       
@@ -160,7 +168,7 @@
                 this.$emit('success')
                 this.$alert('Assign Room Success', '', 'success')
                 $('#AssignRoom').modal('hide');
-
+                
                 this.room_id = 0
                 this.driver_id = 0
               }else{ //console.log(res)

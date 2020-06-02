@@ -38,8 +38,8 @@
             </div>
 
             <div class="modal-footer">
-              <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="submitNewRoom()" class="btn btn-primary">Create</button>
+              <button type="reset" :disabled="loading" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+              <button type="button" :disabled="loading" @click="submitNewRoom()" class="btn btn-primary">{{loading ? 'Please Wait...' : 'Create'}}</button>
             </div>
           </form>
         </div>
@@ -68,7 +68,9 @@
           name: '',
           notif_date: '',
           due_date: '',
-        }
+        },
+
+        loading: false,
       }
     },
     computed: {
@@ -81,9 +83,13 @@
     },
     methods: {
       submitNewRoom(){
-        if(this.completed === true){          
+        if(this.completed === true){
+          this.loading = true
+
           axios.post(window.location.origin+'/api/doc', this.postToDoc)
             .then(res => {
+              this.loading = false
+              
               if(res.data.success === true){
                 this.$emit('success')
                 this.$alert('Add New Doc / Maintanance Success', '', 'success')
@@ -97,6 +103,8 @@
               }
             })
             .catch((error) => {
+              this.loading = false
+              
               this.$alert(error, '', 'error')
             });
         }else{

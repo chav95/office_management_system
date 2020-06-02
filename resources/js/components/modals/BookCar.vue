@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="CreateCarBookingLabel">Book A Car</h5>
+              <h5 class="modal-title font-weight-bold" id="CreateCarBookingLabel">{{this.postToCar.action == 'create_booking' ? 'Book A Car' : 'Edit Booking'}}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -44,21 +44,20 @@
                   </select>
                   <input v-model="postToCar.destination" type="text" class="form-control" placeholder="Destination"/>
                   <input v-model="postToCar.purpose" type="text" class="form-control" placeholder="Booking Purpose"/>
-                  <!-- <select v-model="postToCar.division" class="form-control">
-                    <option value="0" disabled>{{"Choose Room User's Division"}}</option>
-                    <option v-for="div in divisionList" :key="div.id" :value="div.id">{{div.name}}</option>
-                  </select> -->
-                  <!-- <select v-model="postToCar.car" v-show="show_car_select" class="form-control car-select">
-                    <option value="0" disabled>{{available_car.length > 0 ? 'Choose Car' : 'No Car Available'}}</option>
-                    <option v-for="car in available_car" :key="car.id" :value="car.id">{{car.type}} / {{car.police_number}}</option>
-                  </select> -->
                 </div>
               </div>
             </div>
 
             <div class="modal-footer">
-              <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="submitBooking" class="btn btn-primary">Create</button>
+              <button type="reset" :disabled="loading" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+              <button type="button" :disabled="loading" @click="submitBooking" class="btn btn-primary">
+                {{loading 
+                  ? 'Please Wait...' 
+                  : postToCar.action == 'create_booking'
+                    ? 'Create'
+                    : 'Submit Edit'
+                }}
+              </button>
             </div>
           </form>
         </div>
@@ -79,16 +78,16 @@
       Datepicker
     },
     props: {
-      edit_booking: {
+      bookingItem: {
         type: Object,
       },
       carData: {
         type: Array,
         default: []
       },
-      divisionList: {
-        type: Array,
-      },
+      // divisionList: {
+      //   type: Array,
+      // },
       module: {
         type: String,
         default: ''
@@ -102,76 +101,37 @@
         available_car: [],
         
         postToCar: {
-          action: 'create_booking',
+          action: '',
+          id: 0,
           tanggal: '',
           jam_awal: 0,
           jam_akhir: 0,
           destination: '',
           purpose: '',
-          division: 0,
+          // division: 0,
           // car: 0
-        }
+        },
+
+        loading: false
       }
     },
-    mounted(){
-      
-    },
     watch: {
-      // postToCar: {
-      //   handler: function(newVal, oldVal) { //console.log('triggered')
-      //     this.fill_available_car()
-      //   },
-      //   deep: true
-      // },
-      // edit_booking:{
-      //   immediate: true,
-      //   handler: function(newVal, oldVal){
-      //     if(Object.keys(edit_booking).length === 0 && edit_booking.constructor === Object){
-      //       this.action = 'create_booking'
-      //       this.postToCar.tanggal = ''
-      //       this.postToCar.jam_awal = 0
-      //       this.postToCar.jam_akhir = 0
-      //       this.postToCar.destination = ''
-      //       this.postToCar.purpose = ''
-      //       this.postToCar.division = 0
-      //     }else{
-      //       this.action = 'edit_booking'
-      //       this.postToCar.tanggal = this.edit_booking.tanggal
-      //       this.postToCar.jam_awal = this.edit_booking.jam_awal
-      //       this.postToCar.jam_akhir = this.edit_booking.jam_akhir
-      //       this.postToCar.destination = this.edit_booking.destination
-      //       this.postToCar.purpose = this.edit_booking.purpose
-      //       this.postToCar.division = this.edit_booking.division
-      //     }
-      //   }
-      // },
+      bookingItem: {
+        handler: function(newVal, oldVal) {
+          this.postToCar.action = this.bookingItem.action
+          this.postToCar.id = this.bookingItem.id
+          this.postToCar.tanggal = this.bookingItem.tanggal
+          this.postToCar.jam_awal = this.bookingItem.jam_awal
+          this.postToCar.jam_akhir = this.bookingItem.jam_akhir
+          this.postToCar.destination = this.bookingItem.destination
+          this.postToCar.purpose = this.bookingItem.purpose
+        },
+        immediate: true,
+        deep: true,
+      },
       'postToCar.tanggal'(newVal, oldVal) { //console.log(newVal)
         this.postToCar.tanggal = moment(String(newVal)).format('YYYY-MM-DD');
       },
-      // available_car(){
-      //   let valid = false
-      //   this.available_car.forEach(item => {
-      //     if(item.id == this.postToCar.car){
-      //       valid = true
-      //     }
-      //   });
-
-      //   if(valid === false){
-      //     this.postToCar.car = 0
-      //   }
-      // }
-    },
-    computed: {
-      // show_car_select(){
-      //   if(
-      //     this.postToCar.tanggal != '' 
-      //     && this.postToCar.jam_awal > 0 
-      //     && this.postToCar.jam_akhir > 0 
-      //   ){
-      //     return true
-      //   }
-      //   return false
-      // }
     },
     methods:{
       formatDatetime(datetime){
@@ -183,33 +143,6 @@
       DatetimeStringFormat(datetime){
         return moment(String(datetime)).format('ll');
       },
-      // fill_available_car(){
-      //   let arr = []
-      //   if(
-      //     (this.postToCar.jam_akhir != 0 && this.postToCar.jam_akhir != 0) 
-      //     && parseInt(this.postToCar.jam_akhir) <= parseInt(this.postToCar.jam_awal)
-      //   ){
-      //     this.$alert('Jam Akhir Tidak Boleh Lebih Kecil / Sama Dengan Jam Awal Booking', '', 'error')
-      //     this.postToCar.jam_akhir = 0
-      //   }else{
-      //     this.carData.forEach(item => {
-      //       if(item.police_number === '-'){
-      //         arr.push(item)
-      //       }else if(item.today_booking.length > 0){
-      //         item.today_booking.forEach(booking => {
-      //           if(booking.tanggal != this.postToCar.tanggal){
-      //             arr.push(item)
-      //           }else if(this.postToCar.jam_awal >= booking.jam_akhir + 1){
-      //             arr.push(item)
-      //           }
-      //         });
-      //       }else{ /* if(item.capacity >= parseInt(this.postToCar.participant)){ */
-      //         arr.push(item)
-      //       }
-      //     });
-      //   }
-      //   this.available_car = arr;
-      // },
       submitBooking(){
         if(this.postToCar.tanggal === ''){
           this.$alert('Booking Date Cannot Be Empty', '', 'warning')
@@ -219,15 +152,13 @@
           this.$alert('Booking Destination Cannot Be Empty', '', 'warning')
         }else if(this.postToCar.purpose === ''){
           this.$alert('Booking Purpose Cannot Be Empty', '', 'warning')
-        // }else if(this.postToCar.division === 0){
-        //   this.$alert("Please Choose Car User's Division", '', 'warning')
-        // }else if(this.postToCar.car == 0 && this.available_car.length > 0){
-        //   this.$alert('Please Choose A car To Book', '', 'warning');
-        // }else if(this.available_car.length == 0){
-        //   this.$alert('No car Available For Choosen Date & Time', '', 'error');
         }else{
+          this.loading = true
+          
           axios.post(window.location.origin+'/api/car', this.postToCar)
             .then(res => {
+              this.loading = false
+              
               if(res.data.success === true){
                 this.$emit('success')
                 this.$alert('Book Car Success', '', 'success')
@@ -238,7 +169,7 @@
                 this.postToCar.jam_akhir = 0
                 this.postToCar.destination = ''
                 this.postToCar.purpose = ''
-                this.postToCar.division = 0
+                // this.postToCar.division = 0
                 // this.postToCar.car = 0
               }else{ //console.log(res)
                 const data = res.data
@@ -246,6 +177,8 @@
               }
             })
             .catch((error) => {
+              this.loading = false
+              
               this.$alert(error, '', 'error')
             });            
         }

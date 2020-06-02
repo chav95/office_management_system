@@ -28,7 +28,7 @@
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
       <!-- Messages Dropdown Menu -->
-      <li class="nav-item dropdown">
+      {{-- <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-comments"></i>
           <span class="badge badge-danger navbar-badge">3</span>
@@ -84,9 +84,9 @@
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
         </div>
-      </li>
+      </li> --}}
       <!-- Notifications Dropdown Menu -->
-      <li class="nav-item dropdown">
+      {{-- <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="far fa-bell"></i>
           <span class="badge badge-warning navbar-badge">15</span>
@@ -111,7 +111,7 @@
           <div class="dropdown-divider"></div>
           <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
         </div>
-      </li>
+      </li> --}}
       <li class="nav-item">
         <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#"><i
             class="fas fa-th-large"></i></a>
@@ -210,6 +210,12 @@
             {{-- <playlist-sidebar :playlist="{{$playlist}}"></playlist-sidebar>--}}
           </li>
           <li class="nav-item has-treeview">
+            <router-link to="/maintenance" class="nav-link">
+              <i class="nav-icon fas fa-recycle color-green"></i>
+              <p>Maintenance</p>
+            </router-link>
+          </li>
+          <li class="nav-item has-treeview">
             <router-link to="/hrd" class="nav-link">
               <i class="nav-icon fas fa-users color-light-red"></i>
               <p>Human Resource <i class="right fas fa-angle-left"></i></p>
@@ -223,20 +229,22 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item has-treeview">
-            <router-link to="/manage-users" class="nav-link">
-              <i class="fas fa-user-cog nav-icon color-yellow"></i>
-              <p>Manage Users</p>
-            </router-link>
-          </li>
-          @if(Auth::user()->privilege == 'admin')
+          @if(Auth::user()->privilege == 'admin' || Auth::user()->privilege == 'super_admin')
+            <li class="nav-item has-treeview">
+              <router-link to="/manage-users" class="nav-link">
+                <i class="fas fa-user-cog nav-icon color-yellow"></i>
+                <p>Manage Users</p>
+              </router-link>
+            </li>
+          @endif
+          {{-- @if(Auth::user()->privilege == 'admin')
             <li class="nav-item">
               <router-link to="/app-settings" class="nav-link">
                 <i class="nav-icon fas fa-cog color-green"></i>
                 <p>Settings</p>
               </router-link>
             </li>
-          @endif
+          @endif --}}
           <li class="nav-item">
             <a class="nav-link" href="{{ route('logout') }}"
               onclick="event.preventDefault();

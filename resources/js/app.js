@@ -43,6 +43,7 @@ let routes = [
 
     // Document Routes
     {path: '/manage-docs', component: require('./components/ManageDocs.vue').default},
+    {path: '/maintenance', component: require('./components/Maintenance.vue').default},
     {path: '/manage-docs/:id', component: require('./components/DetailDocs.vue').default},
 
     // HRD Routes
@@ -62,6 +63,20 @@ const router = new VueRouter({
 Vue.filter('upText', function(text){
     return text.charAt(0).toUpperCase() + value.slice(1) ;
 });
+Vue.filter('ucwords', function(text){
+    return text
+        .split(' ')
+        .map(w => w[0].toUpperCase() + w.substr(1).toLowerCase())
+        .join(' ')
+})
+// Vue.filter('capitalize', function (str) {
+//     let splitStr = str.toLowerCase().split(' ');
+//     for (var i = 0; i < splitStr.length; i++) {
+//        splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
+//     }
+    
+//     return splitStr.join(' '); 
+// })
 
 Vue.component('pagination', require('laravel-vue-pagination'));
 Vue.component('apexchart', VueApexCharts);
@@ -102,15 +117,6 @@ let store = new Vuex.Store({
         }
     }
 });
-
-Vue.filter('capitalize', function (str) {
-    let splitStr = str.toLowerCase().split(' ');
-    for (var i = 0; i < splitStr.length; i++) {
-       splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);     
-    }
-    
-    return splitStr.join(' '); 
-})
 
 const app = new Vue({
     el: '#app',

@@ -14,7 +14,7 @@
             <div class="modal-body">
               <div class="form-group">
                 <div class="form-group">
-                  <select v-model="company" class="form-control">
+                  <select v-model="selected_car.company_id" class="form-control">
                     <option value="0" disabled>Select Company</option>
                     <template v-if="company_data.length > 0">
                       <option v-for="item in company_data" :key="item.id" :value="item.id">{{item.name}}</option>
@@ -23,12 +23,12 @@
                   <input type="text" v-model="type" class="form-control" placeholder="Car Model/Type">
                   <input type="number" v-model="engine" class="form-control width-35" placeholder="Engine CC">
                   <input type="text" v-model="police_number" class="form-control width-65" placeholder="Police Number">
-                  <select v-model="driver" class="form-control">
+                  <!-- <select v-model="driver" class="form-control">
                     <option value="0" disabled>Select Driver</option>
                     <template v-if="driver_data.length > 0">
                       <option v-for="item in driver_data" :key="item.id" :value="item.id">{{item.name}}</option>
                     </template>
-                  </select>
+                  </select> -->
                   <datepicker v-model="lease_start" placeholder="Lease Start Date" 
                     :language="id" input-class="input-datepicker" wrapper-class="width-50"
                   ></datepicker>
@@ -73,6 +73,12 @@
       Datepicker
     },
     props: {
+      action: {
+        type: String
+      },
+      selected_car: {
+        type: Object
+      },
       company_data: {
         type: Array
       },
@@ -103,10 +109,28 @@
         division: 0,
       }
     },
+    watch: {
+      selected_car: {
+        handler: function(newVal, oldVal) { //console.log('triggered')
+          this.company = this.selected_car.company_id
+          this.type = this.selected_car.type
+          this.engine = parseInt(this.selected_car.engine_cc) == 0 ? '' : parseInt(this.selected_car.engine_cc)
+          this.police_number = this.selected_car.police_number
+          this.driver = this.selected_car.driver_id
+          this.lease_start = this.selected_car.lease_start
+          this.lease_due = this.selected_car.lease_due
+          this.lease_price = parseInt(this.selected_car.lease_price) == 0 ? '' : parseInt(this.selected_car.lease_price)
+          this.vendor = this.selected_car.vendor_id
+          this.division = this.selected_car.division_id
+        },
+        immediate: true,
+        deep: true,
+      },
+    },
     computed: {
       completed(){
         if(
-          this.company > 0 && this.type !== '' && parseInt(this.engine) > 0 && this.police_number !== '' && this.driver > 0 &&
+          this.company > 0 && this.type !== '' && parseInt(this.engine) > 0 && this.police_number !== '' && //this.driver > 0 &&
           this.lease_start !== '' && this.lease_due !== '' && parseInt(this.lease_price) > 0 && this.vendor > 0 && this.division > 0
         ){
           return true
@@ -118,7 +142,8 @@
       submitNewCar(){
         if(this.completed === true){
           let postToCar = {
-            action: 'create_car',
+            action: `${this.action}_car`,
+            id: this.selected_car.id,
             company: this.company,
             type: this.type,
             engine: parseInt(this.engine),

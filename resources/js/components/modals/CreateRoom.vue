@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="CreateRoomLabel">Add New Room</h5>
+              <h5 class="modal-title font-weight-bold" id="CreateRoomLabel">{{action == 'create' ? 'Add New Room' : 'Edit Room'}}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -25,7 +25,7 @@
 
             <div class="modal-footer">
               <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="submitNewRoom()" class="btn btn-primary">Create</button>
+              <button type="button" @click="submitNewRoom()" class="btn btn-primary">{{action == 'create' ? 'Create' : 'Edit'}}</button>
             </div>
           </form>
         </div>
@@ -43,17 +43,37 @@
     components: {
       Datepicker
     },
+    props: {
+      action: {
+        type: String
+      },
+      selected_room: {
+        type: Object
+      },
+    },
     data(){
       return{
         id,
         en,
 
         postToRoom: {
-          action: 'create_room',
+          action: ``,
+          id: 0,
           name: '',
           capacity: 0,
         }
       }
+    },
+    watch: {
+      selected_room: {
+        handler: function(newVal, oldVal) { //console.log('triggered')
+          this.postToRoom.id = this.selected_room.id
+          this.postToRoom.name = this.selected_room.name
+          this.postToRoom.capacity = this.selected_room.capacity
+        },
+        immediate: true,
+        deep: true,
+      },
     },
     computed: {
       completed(){
@@ -65,7 +85,8 @@
     },
     methods: {
       submitNewRoom(){
-        if(this.completed === true){          
+        if(this.completed === true){
+          this.postToRoom.action = `${this.action}_room`
           axios.post(window.location.origin+'/api/room', this.postToRoom)
             .then(res => {
               if(res.data.success === true){

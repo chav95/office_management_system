@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Division extends Model
 {
+    public function user(){
+        return $this->hasMany('App\User');
+    }
     public function car(){
         return $this->hasMany('App\Car');
     }

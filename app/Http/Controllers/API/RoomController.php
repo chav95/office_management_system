@@ -45,7 +45,24 @@ class RoomController extends Controller
     public function store(Request $request)
     {
         if($request->action){
-            if($request->action === 'create_booking'){
+            if($request->action === 'create_room'){
+                $room = new Room;
+                $room->name = $request->name;
+                $room->capacity = $request->capacity;
+                $room->created_by = auth('api')->user()->id;
+                $room->save();
+
+                return response()->json(array('success' => true, 'last_insert_id' => $room->id), 200);
+            }else if($request->action === 'edit_room'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        Room::where('id', $request->id)->update([
+                            'name' => $request->name,
+                            'capacity' => $request->capacity,
+                        ])
+                ), 200);
+            }else if($request->action === 'create_booking'){
                 $check_existing_booking = RoomBooking::with('room', 'user')
                     ->where('tanggal', '=', date('Y-m-d', strtotime($request->tanggal)))
                     ->where('room_id', '=', $request->room)
@@ -79,6 +96,21 @@ class RoomController extends Controller
                 Mail::to('chavinpradana@gmail.com')->send(new BookRoomNotif($booking));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
+            }else if($request->action === 'edit_booking'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        RoomBooking::where('id', $request->id)->update([
+                            'tanggal' => date('Y-m-d', strtotime($request->tanggal)),
+                            'jam_awal' => $request->jam_awal,
+                            'jam_akhir' => $request->jam_akhir,
+                            'participant' => $request->participant,
+                            'purpose' => $request->purpose,
+                            'division' => $request->division,
+                            'room_id' => $request->room,
+                            'options' => $request->options,
+                        ])
+                ), 200);
             }else if($request->action === 'assign'){
                 return response()->json(array(
                     'success' => true, 
@@ -98,14 +130,6 @@ class RoomController extends Controller
                             'status' => -1,
                         ])
                 ), 200);
-            }else if($request->action === 'create_room'){
-                $room = new Room;
-                $room->name = $request->name;
-                $room->capacity = $request->capacity;
-                $room->created_by = auth('api')->user()->id;
-                $room->save();
-
-                return response()->json(array('success' => true, 'last_insert_id' => $room->id), 200);
             }
         }
     }

@@ -45,14 +45,47 @@ class CarController extends Controller
     public function store(Request $request)
     {
         if($request->action){
-            if($request->action === 'create_booking'){
+            if($request->action == 'create_car'){
+                $car = new Car;
+                $car->company_id = $request->company;
+                $car->type = $request->type;
+                $car->engine_cc = $request->engine;
+                $car->police_number = $request->police_number;
+                $car->driver_id = 0; //$request->driver;
+                $car->lease_start = date('Y-m-d H:i:s', strtotime($request->lease_start));
+                $car->lease_due = date('Y-m-d H:i:s', strtotime($request->lease_due));
+                $car->lease_price = $request->lease_price;
+                $car->vendor_id = $request->vendor;
+                $car->division_id = $request->division;
+                $car->created_by = auth('api')->user()->id;
+                $car->save();
+
+                return response()->json(array('success' => true, 'last_insert_id' => $car->id), 200);
+            }else if($request->action == 'edit_car'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        Car::where('id', $request->id)->update([
+                            'company_id' => $request->company,
+                            'type' => $request->type,
+                            'engine_cc' => intval($request->engine),
+                            'police_number' => $request->police_number,
+                            // 'driver_id' => $request->driver_id,
+                            'lease_start' => date('Y-m-d H:i:s', strtotime($request->lease_start)),
+                            'lease_due' => date('Y-m-d H:i:s', strtotime(intval($request->lease_due))),
+                            'lease_price' => intval($request->lease_price),
+                            'vendor_id' => $request->vendor,
+                            'division_id' => $request->division
+                        ])
+                ), 200);
+            }else if($request->action === 'create_booking'){
                 $booking = new CarBooking;
                 $booking->tanggal = date('Y-m-d H:i:s', strtotime($request->tanggal));
                 $booking->jam_awal = $request->jam_awal;
                 $booking->jam_akhir = $request->jam_akhir;
                 $booking->destination = $request->destination;
                 $booking->purpose = $request->purpose;
-                $booking->division = $request->division;
+                $booking->division = 0; //$request->division;
                 $booking->car_id = 0; //$request->car;
                 $booking->booked_by = auth('api')->user()->id;
                 $booking->save();
@@ -61,6 +94,18 @@ class CarController extends Controller
                 Mail::to('chavinpradana@gmail.com')->send(new BookCarNotif($booking));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
+            }else if($request->action === 'edit_booking'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        CarBooking::where('id', $request->id)->update([
+                            'tanggal' => date('Y-m-d H:i:s', strtotime($request->tanggal)),
+                            'jam_awal' => $request->jam_awal,
+                            'jam_akhir' => $request->jam_akhir,
+                            'destination' => $request->destination,
+                            'purpose' => $request->purpose,
+                        ])
+                ), 200);
             }else if($request->action === 'assign'){
                 // $selected_car = Car::find($request->car);
                 // // return response()->json(array('success' => true, 'item' => $selected_car), 200);
@@ -103,22 +148,6 @@ class CarController extends Controller
                             'status' => -1,
                         ])
                 ), 200);
-            }else if($request->action == 'create_car'){
-                $car = new Car;
-                $car->company_id = $request->company;
-                $car->type = $request->type;
-                $car->engine_cc = $request->engine;
-                $car->police_number = $request->police_number;
-                $car->driver_id = $request->driver;
-                $car->lease_start = date('Y-m-d H:i:s', strtotime($request->lease_start));
-                $car->lease_due = date('Y-m-d H:i:s', strtotime($request->lease_due));
-                $car->lease_price = $request->lease_price;
-                $car->vendor_id = $request->vendor;
-                $car->division_id = $request->division;
-                $car->created_by = auth('api')->user()->id;
-                $car->save();
-
-                return response()->json(array('success' => true, 'last_insert_id' => $car->id), 200);
             }
         }
     }

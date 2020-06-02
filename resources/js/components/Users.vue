@@ -1,10 +1,12 @@
 <template>
   <div class="container">
+    <div class="container-fluid">
     <div class="row justify-content-center mt-4 mb-4">
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <pagination :data="allUser" @pagination-change-page="getResults"></pagination>
+            <h3 class="card-title"><strong>User List</strong></h3>
+            <button class="btn btn-primary createBtn" style="float: right" id="createUserBtn" @click="createUser()">Create New User</button>
           </div>
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0" style="height: 100%;">
@@ -13,8 +15,8 @@
                 <tr>
                   <th>Name</th>
                   <th>Email</th>
+                  <th>Division</th>
                   <th>User Type</th>
-                  <th>Access Type</th>
                   <th>Registered At</th>
                   <th>Modify</th>
                 </tr>
@@ -22,14 +24,14 @@
               <tbody>
                 <template v-if="allUser.data.length > 0">
                   <tr  v-for="user in allUser.data" :key="user.id" hover:bg-blue px-4 py2>
-                    <td>{{user.name}}</td>
+                    <td>{{user.name | ucwords}}</td>
                     <td>{{user.email}}</td>
-                    <td>{{user.privilege}}</td>
-                    <td>{{user.hak_akses}}</td>
+                    <td>{{user.division.name}}</td>
+                    <td>{{user.privilege.replace('_', ' ') | ucwords}}</td>
                     <td>{{formatDatetime(user.created_at)}}</td>
                     <td>
                       <div class="modify-btn-container">
-                        <a class="modify-btn" title="Edit" v-on:click="editUser(user)">
+                        <a class="modify-btn" title="Edit" v-on:click="editUser(user.id, user.name, user.email, user.division_id, user.privilege)">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
                         <a class="modify-btn" title="Delete" v-on:click="deleteUser(user.id, user.name)">
@@ -56,9 +58,9 @@
       <div class="modal fade" id="modifyModal" tabindex="-1" role="dialog" aria-labelledby="modifyModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
           <div class="modal-content">
-            <form @submit.prevent="submitEdit">
+            <form @submit.prevent="submitUser">
               <div class="modal-header">
-                <h5 class="modal-title" id="modifyModalLabel">Add New User</h5>
+                <h5 class="modal-title" id="modifyModalLabel">{{modalTitle}}</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -78,29 +80,35 @@
                   <has-error :form="form" field="email"></has-error>
                 </div>
                 <div class="form-group">
-                  <label>User Type</label>
-                  <input v-model="form.privilege" type="text" name="password" placeholder="User User Type"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('privilege') }">
-                  <has-error :form="form" field="privilege"></has-error>
+                  <label>Division</label>
+                  <select v-model="form.division" name="division" class="form-control" :class="{ 'is-invalid': form.errors.has('division') }">
+                    <option value="0" disabled>User Division</option>
+                    <option v-for="item in division_list" :key="item.id" :value="item.id">{{item.name}}</option>
+                  </select>
+                  <has-error :form="form" field="division"></has-error>
                 </div>
                 <div class="form-group">
-                  <label>Access Type</label>
-                  <input v-model="form.hak_akses" type="text" name="hak_akses" placeholder="User Hak Akses"
-                    class="form-control" :class="{ 'is-invalid': form.errors.has('hak_akses') }">
-                  <has-error :form="form" field="hak_akses"></has-error>
+                  <label>User Type</label>
+                  <select v-model="form.privilege" name="privilege" class="form-control" :class="{ 'is-invalid': form.errors.has('privilege') }">
+                    <option value="" disabled>User Access Type</option>
+                    <option value="super_admin">Super Admin</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                  <has-error :form="form" field="privilege"></has-error>
                 </div>
               </div>
 
               <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Submit Edit</button>
+                <button type="submit" class="btn btn-primary">{{modalBtnText}}</button>
               </div>
             </form>
           </div>
         </div>
       </div>
 
-    </div>
+    </div></div>
   </div>
 </template>
 
@@ -111,73 +119,93 @@
   export default {
     data(){
       return{
-        selectedUserId: Number,
         form: new Form({
+          act: String,
+          id: Number,
           name: String,
           email: String,
+          division: Number,
           privilege: String,
-          hak_akses: String,
+          // hak_akses: String,
         }),
         allUser: {data: {}},
+        division_list: {},
+        modalTitle: '',
+        modalBtnText: '',
+        // action: '',
       }
     },
     methods: {
       loadAllUser(){
-          axios.get(window.location.origin+'/api/user').then(({data}) => (this.allUser = data));
+        axios.get(window.location.origin+'/api/user/getUserList').then(({data}) => (this.allUser = data));
+      },
+      loadDivisionData(){
+        axios.get(window.location.origin+'/api/division/getDivisionData')
+          .then(({data}) => {
+            this.division_list = data
+          })
       },
       formatDatetime(datetime){
-          return moment(String(datetime)).format('llll');
+        return moment(String(datetime)).format('llll');
       },
       getResults(page = 1) {
-          axios.get(window.location.origin+'/api/log?page=' + page)
-              .then(response => {
-                  this.allUser = response.data;
-              });
+        axios.get(window.location.origin+'/api/user/getUserList?page=' + page)
+          .then(response => {
+              this.allUser = response.data;
+          });
       },
-      editUser(selectedUser){ //console.log(selectedUser);
-        this.selectedUserId = selectedUser.id;
-        this.form.name = selectedUser.name;
-        this.form.email = selectedUser.email;
-        this.form.privilege = selectedUser.privilege;
-        this.form.hak_akses = selectedUser.hak_akses;
+      createUser(){
+        this.modalTitle = 'Create New User'
+        this.modalBtnText = 'Create New'
+        this.form.id = 0
+        this.form.act = 'new_user'
+        this.form.name = ''
+        this.form.email = ''
+        this.form.division = 0
+        this.form.privilege = ''
+        // this.form.hak_akses = '';
         $('#modifyModal').modal('show');
       },
-      submitEdit(){
-        let userEdit = {
-          'act': 'edit_user',
-          'id': this.selectedUserId,
-          'name': this.form.name,
-          'email': this.form.email,
-          'privilege': this.form.privilege,
-          'hak_akses': this.form.hak_akses,
-        };
-        
-        axios.post(window.location.origin+'/api/user', userEdit)
+      editUser(id, name, email, division, privilege){
+        this.modalTitle = 'Edit User'
+        this.modalBtnText = 'Submit Edit'
+        this.form.id = id
+        this.form.act = 'edit_user'
+        this.form.name = name
+        this.form.email = email
+        this.form.division = division
+        this.form.privilege = privilege
+        // this.form.hak_akses = selectedUser.hak_akses.id;
+        $('#modifyModal').modal('show');
+      },
+      submitUser(){
+        this.form.post(window.location.origin+'/api/user')
           .then(({response}) => {
             $('#modifyModal').modal('hide');
-            this.$alert('Edit Successful', '', 'success');
+            this.$alert(`${this.modalTitle} Successful`, '', 'success');
             this.loadAllUser();
           })
-          .catch(({error}) => this.$alert(error.message, '', 'error'));
+          .catch(err => this.$alert('Invalid Data', '', 'error'));
       },
       deleteUser(user_id, user_name){
         this.$confirm('Permanently delete user '+user_name+'?', '', 'question')
           .then( () => {
-              this.$confirm('This delete action cannot be undone!', '', 'warning')
-                .then( () => {
-                  axios.delete(window.location.origin+'/api/user/'+user_id)
-                    .then(({response}) => {
-                      this.$alert('Delete Successful', '', 'success');
-                      this.loadAllUser();
-                    })
-                    .catch(({error}) => this.$alert(error.message, '', 'error'));
-                });
+            this.$confirm('This delete action cannot be undone!', '', 'warning')
+              .then( () => {
+                axios.delete(window.location.origin+'/api/user/'+user_id)
+                  .then(({response}) => {
+                    this.$alert('Delete Successful', '', 'success');
+                    this.loadAllUser();
+                  })
+                  .catch(({error}) => this.$alert(error.message, '', 'error'));
+              });
           })
           .catch(error => console.error(error));
       }
     },
     mounted(){
-        this.loadAllUser();
+        this.loadAllUser()
+        this.loadDivisionData()
         //console.log('Component mounted.')
     }
   }

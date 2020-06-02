@@ -4,11 +4,20 @@
       <div class="row justify-content-center mt-4 mb-4 h-100">
         <div class="col-12">
           <div class="card" v-if="$route.path == '/manage-rooms' || $route.path == '/manage-rooms/booking-list' || $route.path == '/manage-rooms/pending-list'">
-            <book-room :roomData="room_list" :divisionList="division_list" v-show="can_create" @success="loadBookingData()"/>
-            <assign-room :bookingItem="selected_booking" :roomData="room_list" @success="loadPendingBooking()"/>
+            <book-room 
+              :bookingItem="selected_booking" 
+              :roomData="room_list" 
+              :divisionList="division_list" 
+              @success="$route.path == '/manage-rooms/pending-list' ? loadBookingData(): loadPendingBooking()"
+            />
+            <assign-room 
+              :bookingItem="selected_booking" 
+              :roomData="room_list" 
+              @success="assignSuccess()"
+            />
             <div class="card-header">
               <h3 class="card-title"><strong>Booking Room List</strong></h3>
-              <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateRoomBooking">Book Room</button>
+              <button class="btn btn-primary" style="float: right" @click="createBooking()">Book Room</button>
             </div>
 
             <div class="card-body">
@@ -41,7 +50,7 @@
                       <td>
                         <template v-if="$route.path == '/manage-rooms/pending-list' && booking.status == 0">
                           <div class="modify_box" v-if="booking.user.id == userLogin.id">
-                            <a class="modify-btn" @click="editItem('booking_list', index)" title="Edit Booking">
+                            <a class="modify-btn" @click="editBooking(booking)" title="Edit Booking">
                               <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                             </a>
                             <a class="modify-btn" @click="deleteItem('booking_list', index, booking.id)" title="Delete Room">
@@ -84,10 +93,10 @@
           </div>
 
           <div class="card" v-else-if="$route.path === '/manage-rooms/settings'">
-            <create-room @success="loadRoomData()"/>
+            <create-room :action="action" :selected_room="selected_room" @success="loadRoomData()"/>
             <div class="card-header">
               <h3 class="card-title"><strong>Booking Room List</strong></h3>
-              <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateRoom">Add New Room</button>
+              <button class="btn btn-primary" style="float: right" @click="createRoom()">Add New Room</button>
             </div>
             <div class="card-body">
               <table id="example1" class="table table-bordered table-striped">
@@ -107,9 +116,9 @@
                       <td class="text-green"><b>Available</b></td>
                       <td>
                         <div>
-                          <!-- <a class="modify-btn" title="Edit Room">
+                          <a class="modify-btn" @click="editRoom(room)" title="Edit Room">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                          </a> -->
+                          </a>
                           <a class="modify-btn" @click="deleteItem('room_list', index, room.id)" title="Delete Room">
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
@@ -152,22 +161,32 @@
         division_list: [],
         
         selected_booking: {
+          action: '',
           tanggal: '',
           jam_awal: 0,
           jam_akhir: 0,
           participant: '',
           id: 0,
           purpose: '',
+          options: [],
           room: {
             id: 0,
           },
           division: {
+            id: 0,
             name: '',
           },
           user: {
             name: '',
           },
         },
+
+        action: '',
+        selected_room: {
+          id: 0,
+          name: '',
+          capacity: 0,
+        }
       }
     },
     mounted(){
@@ -232,8 +251,53 @@
           })
       },
 
+      createRoom(){
+        this.action = 'create'
+        this.selected_room = {
+          id: 0,
+          name: '',
+          capacity: 0,
+        }
+        $('#CreateRoom').modal('show');
+      },
+      editRoom(item){
+        this.action = 'edit'
+        this.selected_room = item
+        $('#CreateRoom').modal('show');
+      },
+
+      createBooking(){
+        this.selected_booking = {
+          action: 'create_booking',
+          tanggal: '',
+          jam_awal: 0,
+          jam_akhir: 0,
+          participant: '',
+          id: 0,
+          purpose: '',
+          options: [],
+          room: {
+            id: 0,
+          },
+          division: {
+            id: 0,
+            name: '',
+          },
+          user: {
+            name: '',
+          },
+        }
+        $('#CreateRoomBooking').modal('show')
+      },
+      editBooking(item){
+        this.selected_booking = item
+        this.selected_booking.action = 'edit_booking'
+        $('#CreateRoomBooking').modal('show')
+      },
+
       assign(item){
         this.selected_booking = item
+        // this.selected_booking.options = this.selected_booking.options != '' && this.selected_booking.options !== null ? this.selected_booking.options.split(',') : []
         $('#AssignRoom').modal('show');
       },
       reject(item){
@@ -287,7 +351,12 @@
               });
             })
           .catch(error => console.error(error));
-      }
+      },
+
+      assignSuccess(){
+        this.loadPendingBooking()
+        this.loadRoomData()
+      },
     },
   }
 </script>

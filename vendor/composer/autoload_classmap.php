@@ -42,6 +42,8 @@ return array(
     'App\\Log' => $baseDir . '/app/Log.php',
     'App\\Mail\\BookCarNotif' => $baseDir . '/app/Mail/BookCarNotif.php',
     'App\\Mail\\BookRoomNotif' => $baseDir . '/app/Mail/BookRoomNotif.php',
+    'App\\Mail\\NewDocNotif' => $baseDir . '/app/Mail/NewDocNotif.php',
+    'App\\Mail\\UpcomingDocNotif' => $baseDir . '/app/Mail/UpcomingDocNotif.php',
     'App\\Music' => $baseDir . '/app/Music.php',
     'App\\Playlist' => $baseDir . '/app/Playlist.php',
     'App\\PlaylistDetail' => $baseDir . '/app/PlaylistDetail.php',

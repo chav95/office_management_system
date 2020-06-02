@@ -272,24 +272,6 @@
                         </tr>
                       </tbody>
                     </table>
-
-                    <!-- <div class="rincian section-left" style="text-align: left">
-                      <h5 style="margin-top: 8px"><strong>Rincian Penerimaan Lain-lain</strong></h5>
-                      <ul style="text-align: left; font-size: 1.4em">
-                        <li>Rapel Kenaikan Gaji <span style="float: right;">100.000</span></li>
-                      </ul>
-                    </div>
-                    <div class="v-line"></div>
-                    <div class="rincian section-right">
-                      <h5 style="margin-top: 8px"><strong>Rincian Potongan Lain-lain</strong></h5>
-                      <ul style="text-align: left; font-size: 1.4em">
-                        <li>Iuran Dapen JM <span style="float: right;">100.000</span></li>
-                        <li>Iuran Purnakarya JM <span style="float: right;">100.000</span></li>
-                        <li>Iuran Anggota SKJM <span style="float: right;">100.000</span></li>
-                        <li>Santunan Kedukaan Anggota <span style="float: right;">100.000</span></li>
-                        <li>DPLK Program Iuran Pasti <span style="float: right;">100.000</span></li>
-                      </ul>
-                    </div> -->
                   </div>
                 </div>
               </div>
