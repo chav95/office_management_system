@@ -50,7 +50,7 @@
 
             <div class="modal-footer">
               <button type="reset" :disabled="loading" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" :disabled="loading" @click="submitBooking" class="btn btn-primary">
+              <button type="button" :disabled="loading" @click="submitBooking()" class="btn btn-primary">
                 {{loading 
                   ? 'Please Wait...' 
                   : postToCar.action == 'create_booking'

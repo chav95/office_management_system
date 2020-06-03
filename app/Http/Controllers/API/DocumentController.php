@@ -42,11 +42,11 @@ class DocumentController extends Controller
         if($request->action){
             if($request->action == 'create_doc'){
                 $doc = new Document;
-                $doc->type = $request->type;
                 $doc->name = $request->name;
-                $doc->created_by = auth('api')->user()->id;
-                $doc->notif_date = date('Y-m-d', strtotime($request->notif_date));
                 $doc->due_date = date('Y-m-d', strtotime($request->due_date));
+                $doc->notif_date = date('Y-m-d', strtotime($request->notif_date));
+                $doc->description = $request->description;
+                $doc->created_by = auth('api')->user()->id;
                 $doc->save();
                 
                 // Mail::to('om@jtd.co.id')->send(new BookCarNotif($booking));
@@ -57,6 +57,24 @@ class DocumentController extends Controller
                 }
 
                 return response()->json(array('success' => true, 'last_insert_id' => $doc->id), 200);
+            }else if($request->action == 'edit_doc'){
+                // if(date('Y-m-d') >= $request->notif_date){
+                //     Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif(Document::find($request->id)));
+                // }
+
+                return response()->json(array(
+                    'success' => true, 
+                    'mail' => date('Y-m-d') >= $request->notif_date && date('Y-m-d') <= $request->due_date
+                        ? Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif(Document::find($request->id)))
+                        : null,
+                    'result' => 
+                        Document::where('id', $request->id)->update([
+                            'name' => $request->name,
+                            'due_date' => date('Y-m-d', strtotime($request->due_date)),
+                            'notif_date' => date('Y-m-d', strtotime($request->notif_date)),
+                            'description' => $request->description,
+                        ])
+                ), 200);
             }
         }
     }
@@ -70,7 +88,7 @@ class DocumentController extends Controller
     public function show($id)
     {
         if($id === 'getDocData'){
-            $result = Document::orderBy('notif_date', 'ASC')->get();
+            $result = Document::with('user')->orderBy('notif_date', 'ASC')->paginate(10);
         }
 
         return $result;
@@ -107,6 +125,9 @@ class DocumentController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return response()->json(array(
+            'success' => true,
+            'result' => Document::where('id', $id)->delete()
+        ), 200);
     }
 }

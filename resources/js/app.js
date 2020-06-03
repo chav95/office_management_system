@@ -43,7 +43,7 @@ let routes = [
 
     // Document Routes
     {path: '/manage-docs', component: require('./components/ManageDocs.vue').default},
-    {path: '/maintenance', component: require('./components/Maintenance.vue').default},
+    {path: '/maintenance', component: require('./components/ManageMaintenance.vue').default},
     {path: '/manage-docs/:id', component: require('./components/DetailDocs.vue').default},
 
     // HRD Routes

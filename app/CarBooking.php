@@ -15,7 +15,7 @@ class CarBooking extends Model
     }
 
     public function user(){
-        return $this->belongsTo('App\USer', 'booked_by');
+        return $this->belongsTo('App\User', 'booked_by');
     }
     
     public function division(){

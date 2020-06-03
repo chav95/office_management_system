@@ -91,8 +91,15 @@
         </div>
 
         <div class="card" v-else-if="$route.path === '/manage-cars/settings'">
-          <create-car :action="action" :selected_car="selected_car" :company_data="company_list" :driver_data="driver_list" 
-          :vendor_data="vendor_list" :division_data="division_list" @success="loadCarData()"/>
+          <create-car 
+            :action="action" 
+            :selected_car="selected_car" 
+            :company_data="company_list" 
+            :driver_data="driver_list" 
+            :vendor_data="vendor_list" 
+            :division_data="division_list" 
+            @success="loadCarData()"
+          />
           <div class="card-header">
             <h3 class="card-title"><strong>Car List</strong></h3>
             <button class="btn btn-primary" style="float: right" @click="createCar()">Create Car</button>

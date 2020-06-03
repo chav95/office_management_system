@@ -17,6 +17,7 @@ Route::apiResources([
     'room' => 'API\RoomController',
     'car' => 'API\CarController',
     'doc' => 'API\DocumentController',
+    'maintenance' => 'API\MaintenanceController',
     'log' => 'API\LogController',
     'wishlist' => 'API\WishlistController',
     'user' => 'API\UserController',

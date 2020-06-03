@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="CreateDocLabel">Add New Doc / Maintanance</h5>
+              <h5 class="modal-title font-weight-bold" id="CreateDocLabel">{{selected_doc.action == 'create_doc' ? 'Add New Document' : 'Edit Document'}}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -14,32 +14,37 @@
             <div class="modal-body">
               <div class="form-group">
                 <div class="form-group">
-                  <label for="type">Type</label>
-                  <select v-model="postToDoc.type" id="type" class="form-control">
-                    <option value="" disabled>Select Type</option>
-                    <option value="Maintenance">Maintenance</option>
-                    <option value="Document">Document</option>
-                  </select>
+                  <label>Name</label>
+                  <input type="text" v-model="selected_doc.name" class="form-control" placeholder="Document Name">
 
-                  <label for="name">Name</label>
-                  <input type="text" v-model="postToDoc.name" class="form-control" id="name"  placeholder="Doc / Maintenance Name">
-
-                  <label for="notif_date">Notification Date</label>
-                  <datepicker v-model="postToDoc.notif_date" placeholder="Notification Date" 
-                    :language="id" id="notif_date" input-class="input-datepicker"
+                  <label>Due Date</label>
+                  <datepicker v-model="selected_doc.due_date" placeholder="Due Date" 
+                    :language="id" input-class="input-datepicker" 
+                    :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                   ></datepicker>
 
-                  <label for="notif_date">Due Date</label>
-                  <datepicker v-model="postToDoc.due_date" placeholder="Due Date" 
-                    :language="id" id="notif_date" input-class="input-datepicker"
+                  <label>Notification Date</label>
+                  <datepicker v-model="selected_doc.notif_date" placeholder="Notification Date" 
+                    :language="id" input-class="input-datepicker" 
+                    :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1)), from: notif_max_date}"
                   ></datepicker>
+
+                  <label>Description (Optional)</label>
+                  <textarea v-model="selected_doc.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea>
                 </div>
               </div>
             </div>
 
             <div class="modal-footer">
               <button type="reset" :disabled="loading" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" :disabled="loading" @click="submitNewRoom()" class="btn btn-primary">{{loading ? 'Please Wait...' : 'Create'}}</button>
+              <button type="button" :disabled="loading" @click="submitDoc()" class="btn btn-primary">
+                {{loading 
+                  ? 'Please Wait...' 
+                  : selected_doc.action == 'create_doc'
+                    ? 'Create'
+                    : 'Submit Edit'
+                }}
+              </button>
             </div>
           </form>
         </div>
@@ -57,46 +62,47 @@
     components: {
       Datepicker
     },
+    props: {
+      selected_doc: Object,
+    },
     data(){
       return{
         id,
         en,
-
-        postToDoc: {
-          action: 'create_doc',
-          type: '',
-          name: '',
-          notif_date: '',
-          due_date: '',
-        },
 
         loading: false,
       }
     },
     computed: {
       completed(){
-        if(this.postToDoc.type !== '' && this.postToDoc.name !== '' && this.postToDoc.notif_date != '' && this.postToDoc.due_date != ''){
+        if(this.selected_doc.descripton !== '' && this.selected_doc.name !== '' && this.selected_doc.notif_date != '' && this.selected_doc.due_date != ''){
           return true
         }
         return false
-      }
+      },
+      notif_max_date(){
+        if(this.selected_doc.due_date != ''){
+          return new Date(this.selected_doc.due_date + 1)
+        }
+        return 0
+      },
     },
     methods: {
-      submitNewRoom(){
+      submitDoc(){
         if(this.completed === true){
           this.loading = true
+          let text = this.selected_maintenance.action == 'create_doc'
+            ? 'Add New'
+            : 'Edit'
 
-          axios.post(window.location.origin+'/api/doc', this.postToDoc)
+          axios.post(window.location.origin+'/api/doc', this.selected_doc)
             .then(res => {
               this.loading = false
               
               if(res.data.success === true){
                 this.$emit('success')
-                this.$alert('Add New Doc / Maintanance Success', '', 'success')
+                this.$alert('Add New Document Success', '', 'success')
                 $('#CreateDoc').modal('hide');
-
-                this.postToDoc.name = ''
-                this.postToDoc.capacity = ''
               }else{ //console.log(res)
                 const data = res.data
                 this.$alert(data.msg, '', 'warning')

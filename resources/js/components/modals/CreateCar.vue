@@ -5,7 +5,7 @@
         <div class="modal-content">
           <form @submit.prevent>
             <div class="modal-header">
-              <h5 class="modal-title font-weight-bold" id="CreateCarLabel">Add New Car</h5>
+              <h5 class="modal-title font-weight-bold" id="CreateCarLabel">{{action == 'create' ? 'Add New Car' : 'Edit Car'}}</h5>
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -54,7 +54,12 @@
 
             <div class="modal-footer">
               <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="submitNewCar()" class="btn btn-primary">Create</button>
+              <button type="button" @click="submitNewCar()" class="btn btn-primary">
+                {{action == 'create'
+                  ? 'Create'
+                  : 'Submit Edit'
+                }}
+              </button>
             </div>
           </form>
         </div>

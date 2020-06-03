@@ -4,19 +4,23 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card">
-          <create-doc @success="loadDocData()"/>
+          <create-doc
+            :selected_doc="selected_doc"   
+            @success="loadDocData()"
+          />
           <div class="card-header">
-            <h3 class="card-title"><strong>Document / Maintanance List</strong></h3>
-            <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateDoc">New Document</button>
+            <h3 class="card-title"><strong>Document List</strong></h3>
+            <button class="btn btn-primary" style="float: right" @click="createItem()">New Document</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Type</th>
                   <th>Notification Date</th>
                   <th>Due Date</th>
+                  <th>Description</th>
+                  <th>Created By</th>
                   <th></th>
                 </tr>
               </thead>
@@ -39,29 +43,33 @@
                     </div>
                   </td>
                 </tr> -->
-                <template v-if="doc_list.length > 0">
-                  <tr v-for="(item) in doc_list" :key="item.id">
+                <template v-if="doc_list.data.length > 0">
+                  <tr v-for="(item) in doc_list.data" :key="item.id">
                     <td>{{item.name}}</td>
-                    <td>{{item.type}}</td>
                     <td>{{formatDatetime(item.notif_date)}}</td>
                     <td>{{formatDatetime(item.due_date)}}</td>
+                    <td><pre class="doc_description">{{item.description}}</pre></td>
+                    <td>{{item.user.name | ucwords}}</td>
                     <td>
-                    <div>
-                      <a class="modify-btn" title="Edit Document">
-                        <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                      </a>
-                      <a class="modify-btn" @click="deleteItem(item.name)" title="Delete Document">
-                        <i class="fa fa-trash color-red fa-fw fa-lg"></i>
-                      </a>
-                    </div>
-                  </td>
+                      <div v-if="userLogin.id === item.created_by">
+                        <a class="modify-btn" @click="editItem(item)" title="Edit Document">
+                          <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
+                        </a>
+                        <a class="modify-btn" @click="deleteItem(item)" title="Delete Document">
+                          <i class="fa fa-trash color-red fa-fw fa-lg"></i>
+                        </a>
+                      </div>
+                    </td>
                   </tr>
                 </template>
                 <template v-else>
-                  <tr><td colspan="100%"><h5 class="text-center">No Document / Notification</h5></td></tr>
+                  <tr><td colspan="100%"><h5 class="text-center">No Document</h5></td></tr>
                 </template>
               </tbody>
             </table>
+          </div>
+          <div class="card-footer">
+            <pagination :data="doc_list" @pagination-change-page="getPageContent"></pagination>
           </div>
         </div>
       </div>
@@ -85,7 +93,18 @@
           id: 0,
           privilege: ''
         },
-        doc_list: [],
+        doc_list: {
+          data: []
+        },
+
+        selected_doc: {
+          action: '',
+          id: 0,
+          name: '',
+          notif_date: '',
+          due_date: '',
+          description: '',
+        },
       }
     },
     methods:{
@@ -98,22 +117,50 @@
             this.doc_list = data
           })
       },
-      deleteItem(name){
-        this.$confirm(`Delete ${name}?`, '', 'question')
+      getPageContent(page = 1) {
+        axios.get(window.location.origin+'/api/doc/getDocData?page=' + page)
+          .then(response => {
+            this.doc_list = response.data;
+          });
+      },
+
+      createItem(){
+        this.selected_doc = {
+          action: 'create_doc',
+          id: 0,
+          name: '',
+          notif_date: '',
+          due_date: '',
+          description: '',
+        }
+        $('#CreateDoc').modal('show')
+      },
+      editItem(item){
+        this.selected_doc.id = item.id
+        this.selected_doc.name = item.name
+        this.selected_doc.due_date = item.due_date
+        this.selected_doc.notif_date = item.notif_date
+        this.selected_doc.description = item.description
+        this.selected_doc.action = 'edit_doc'
+        $('#CreateDoc').modal('show')
+      },
+      deleteItem(item){
+        this.$confirm(`Delete ${item.name}?`, '', 'question')
           .then( ()=> {
             this.$confirm('This delete action cannot be undone!', '', 'warning')
               .then( ()=> {
-                this.$alert('Delete Successful', '', 'success');
-                this.loadMusics();
+                axios.delete(`${window.location.origin}/api/doc/${item.id}`)
+                  .then(res => {
+                    this.$alert('Delete Successful', '', 'success');
+                    this.loadDocData()
+                  })
+                  .catch(err => {
+                    this.$alert(err, '', 'error')
+                  })
               });
-            })
+          })
           .catch(error => console.error(error));
       }
-    },
-    watch: {
-      // '$route.params.playlist_id': function(playlist_id){
-      //   this.loadWishlist();
-      // }
     },
     mounted() {
       axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
@@ -127,5 +174,11 @@
 <style scoped>
   .card-tools{
     text-align: right;
+  }
+  .doc_description{
+    padding: 0;
+    margin-bottom: 0;
+    font-family: inherit;
+    font-size: inherit;
   }
 </style>
