@@ -29,7 +29,7 @@
                   <th>Purpose</th>
                   <th>Book Time</th>
                   <th>Booked By</th>
-                  <th></th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -43,7 +43,8 @@
 
                     <td>{{booking.destination}}</td>
                     <td>{{booking.purpose}}</td>
-                    <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td>
+                    <td>{{booktime(booking)}}</td>
+                    <!-- <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td> -->
                     <td>{{booking.user.name}}</td>
                     <td>
                       <template v-if="$route.path == '/manage-cars/pending-list' && booking.status == 0">
@@ -66,17 +67,29 @@
                       </template>
                       <template v-if="$route.path == '/manage-cars/pending-list' && booking.status == -1">
                         <div>
-                          <span class="rejected">Rejected</span>
+                          <span class="status status-rejected">Rejected</span>
                           <button class="btn notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
                             Notes
                           </button>
                         </div>
                       </template>
-                      <template v-else>
-                        <div v-if="booking.notes !== null && booking.notes !== ''">
-                          <button class="btn notes-btn" title="See Notes From Dian" @click="$alert(booking.notes)">
+                      <template v-if="$route.path != '/manage-cars/pending-list'">
+                        <div class="text-center">
+                          <span v-if="booking.status == -2" class="status status-rejected">Canceled</span>
+                          <span v-else-if="booking.status == 2" class="status status-finished">Finished</span>
+
+                          <button v-if="booking.notes !== null" class="btn btn-primary notes-btn" title="See Notes" @click="$alert(booking.notes)">
                             Notes
                           </button>
+
+                          <template v-if="userLogin.id == booking.booked_by && booking.status == 1">
+                            <button class="btn btn-success notes-btn" title="Finish Booking" @click="finish(booking)">
+                              Finish
+                            </button>
+                            <button class="btn btn-danger notes-btn" title="Cancel Booking" @click="cancel(booking)">
+                              Cancel
+                            </button>
+                          </template>
                         </div>
                       </template>
                     </td>
@@ -116,7 +129,7 @@
                   <th>Lease Duration</th>
                   <th>Vendor</th>
                   <th>User</th>
-                  <th></th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,7 +145,7 @@
                       <td>{{car.vendor.name}}</td>
                       <td>{{car.division.name}}</td>
                       <td>
-                        <div>
+                        <div class="modify_box">
                           <a class="modify-btn" @click="editCar(car)" title="Edit Car">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                           </a>
@@ -224,17 +237,6 @@
       this.loadDivisionData()
     },
     computed:{
-      can_create(){
-        if(this.userLogin.privilege == 'super_admin' 
-          || this.userLogin.id == 3 
-          || this.userLogin.id == 4 
-          || this.userLogin.id == 5 
-          || this.userLogin.id == 6)
-        {
-          return true
-        }
-        return false
-      },
       car_content(){
         return this.car_id == 0
           ? '-'
@@ -249,6 +251,16 @@
     methods:{
       formatDatetime(datetime){
         return moment(String(datetime)).format('ll');
+      },
+      formatTime(datetime){
+        moment.locale('id');
+        return moment(String(datetime)).format('LT');
+      },
+      booktime(item){
+        if(item.jam_akhir == null){
+          return `${this.formatDatetime(item.tanggal)} - ${item.jam_awal}.00`
+        }
+        return `${this.formatDatetime(item.tanggal)} - ${item.jam_awal}.00 s/d ${this.formatTime(item.jam_akhir)}`
       },
       
       createCar(){
@@ -277,6 +289,10 @@
         this.selected_booking = item
         $('#AssignCar').modal('show');
       },
+      assignSuccess(){
+        this.loadPendingBooking()
+        this.loadCarData()
+      },
       reject(item){
         this.$prompt('State Reason For Rejection')
           .then(reject_notes => {
@@ -301,11 +317,47 @@
             this.$alert('Reason For Rejection Cannot Be Empty', '', 'error')
           })
       },
-      assignSuccess(){
-        this.loadPendingBooking()
-        this.loadCarData()
+      finish(item){
+        this.$confirm(`Confirm Finish '${item.purpose}' Booking?`, '', 'warning')
+          .then(()=> {
+            let finish_data = {
+              action: 'finish',
+              booking_id: item.id,
+            }
+            axios.post(`${window.location.origin}/api/car`, finish_data)
+              .then(res => {
+                this.$alert('Mark Booking As Finished', '', 'success');
+                this.loadBookingData()
+              })
+              .catch(err => {
+                this.$alert(err, '', 'error')
+              })
+          })
       },
-
+      cancel(item){
+        this.$prompt('State Reason For Cancel Booking')
+          .then(cancel_notes => {
+            this.$confirm(`Confirm Cancel '${item.purpose}' Booking?`, '', 'warning')
+              .then(()=> {
+                let cancel_data = {
+                  action: 'cancel',
+                  booking_id: item.id,
+                  notes: cancel_notes
+                }
+                axios.post(`${window.location.origin}/api/car`, cancel_data)
+                  .then(res => {
+                    this.$alert('Cancel Successful', '', 'success')
+                    this.loadBookingData()
+                  })
+                  .catch(err => {
+                    this.$alert(err, '', 'error')
+                  })
+              })
+          })
+          .catch(err => {
+            this.$alert('Reason For Cancel Booking Cannot Be Empty', '', 'error')
+          })
+      },
       createBooking(){
         this.selected_booking = {
           action: 'create_booking',
@@ -402,7 +454,7 @@
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .card-tools{
     text-align: right;
   }
@@ -416,15 +468,22 @@
     display: block;
     width: 65px;
     padding: 0.25rem 0.5rem;
+    margin-bottom: 5px;
     color: white;
-    background-color: cornflowerblue;
+    /* background-color: cornflowerblue; */
   }
 
-  .rejected{
+  .status{
     display: block;
     text-align: center;
     font-weight: bold;
     margin-bottom: 5px;
-    color: crimson;
+
+    &-rejected{
+      color: crimson;
+    }
+    &-finished{
+      color: green;
+    }
   }
 </style>

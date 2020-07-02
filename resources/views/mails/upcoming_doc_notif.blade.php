@@ -1,8 +1,8 @@
 @component('mail::message')
-# Upcoming Document / Maintenance
+# Upcoming Document
 
 @component('mail::panel')
-A Document / Maintenance need to be processed.<br>
+A Documentneed to be processed.<br>
 Name: {{$doc->name}}<br>
 Due Date: {{date('l, j F Y', strtotime($doc->due_date))}}<br>
 

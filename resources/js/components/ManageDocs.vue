@@ -17,11 +17,11 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Notification Date</th>
+                  <!-- <th>Notification Date</th> -->
                   <th>Due Date</th>
                   <th>Description</th>
                   <th>Created By</th>
-                  <th></th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -46,12 +46,12 @@
                 <template v-if="doc_list.data.length > 0">
                   <tr v-for="(item) in doc_list.data" :key="item.id">
                     <td>{{item.name}}</td>
-                    <td>{{formatDatetime(item.notif_date)}}</td>
+                    <!-- <td>{{formatDatetime(item.notif_date)}}</td> -->
                     <td>{{formatDatetime(item.due_date)}}</td>
                     <td><pre class="doc_description">{{item.description}}</pre></td>
                     <td>{{item.user.name | ucwords}}</td>
                     <td>
-                      <div v-if="userLogin.id === item.created_by">
+                      <div class="modify_box" v-if="userLogin.id === item.created_by">
                         <a class="modify-btn" @click="editItem(item)" title="Edit Document">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
@@ -79,13 +79,12 @@
 </template>
 
 <script>
-  import CreateModal from './reusables/CreateNewModal.vue';
   import CreateDoc from './modals/CreateDoc'
   import moment from 'moment'
 
   export default {
     components: {
-      CreateModal, CreateDoc
+      CreateDoc
     },
     data(){
       return{
@@ -139,7 +138,7 @@
         this.selected_doc.id = item.id
         this.selected_doc.name = item.name
         this.selected_doc.due_date = item.due_date
-        this.selected_doc.notif_date = item.notif_date
+        // this.selected_doc.notif_date = item.notif_date
         this.selected_doc.description = item.description
         this.selected_doc.action = 'edit_doc'
         $('#CreateDoc').modal('show')
@@ -174,6 +173,11 @@
 <style scoped>
   .card-tools{
     text-align: right;
+  }
+
+  .modify_box{
+    width: 52px;
+    margin-bottom: 10px;
   }
   .doc_description{
     padding: 0;

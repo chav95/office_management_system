@@ -148,6 +148,24 @@ class CarController extends Controller
                             'status' => -1,
                         ])
                 ), 200);
+            }else if($request->action == 'finish'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        CarBooking::where('id', $request->booking_id)->update([
+                            'jam_akhir' => date('Y-m-d H:i:s'),
+                            'status' => 2,
+                        ])
+                ), 200);
+            }else if($request->action == 'cancel'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        CarBooking::where('id', $request->booking_id)->update([
+                            'notes' => $request->notes,
+                            'status' => -2,
+                        ])
+                ), 200);
             }
         }
     }

@@ -50,11 +50,11 @@ class DocumentController extends Controller
                 $doc->save();
                 
                 // Mail::to('om@jtd.co.id')->send(new BookCarNotif($booking));
-                Mail::to('chavinpradana@gmail.com')->send(new NewDocNotif($doc));
+                // Mail::to('chavinpradana@gmail.com')->send(new NewDocNotif($doc));
 
-                if(date('Y-m-d') >= $doc->notif_date){
-                    Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif($doc));
-                }
+                // if(date('Y-m-d') >= $doc->notif_date){
+                //     Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif($doc));
+                // }
 
                 return response()->json(array('success' => true, 'last_insert_id' => $doc->id), 200);
             }else if($request->action == 'edit_doc'){
@@ -88,7 +88,17 @@ class DocumentController extends Controller
     public function show($id)
     {
         if($id === 'getDocData'){
-            $result = Document::with('user')->orderBy('notif_date', 'ASC')->paginate(10);
+            $result = Document::with('user')
+                ->where('due_date', '>=', date('Y-m-d'))
+                ->orderBy('due_date', 'ASC')->paginate(10);
+
+            // $four_weeks = date('Y-m-d', strtotime("+ 28 days"));
+            // $result = Document::with('user')
+            //     ->where('due_date', '<=', $four_weeks)
+            //     ->where('due_date', '>', date('Y-m-d'))
+            //     ->whereRaw("MOD(DATEDIFF(due_date, '$four_weeks'), 7) = 0")
+            //     ->paginate(10);
+            //     // ->toSql();
         }
 
         return $result;
@@ -127,7 +137,8 @@ class DocumentController extends Controller
     {
         return response()->json(array(
             'success' => true,
-            'result' => Document::where('id', $id)->delete()
+            'result' => Document::destroy($id)
+            // 'result' => Document::where('id', $id)->delete()
         ), 200);
     }
 }

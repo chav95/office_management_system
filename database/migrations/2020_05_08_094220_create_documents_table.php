@@ -17,7 +17,7 @@ class CreateDocumentsTable extends Migration
             $table->bigIncrements('id');
             $table->string('type');
             $table->string('name');
-            $table->date('notif_date');
+            $table->date('notif_date')->nullalbe();
             $table->date('due_date');
             $table->timestamps();
         });

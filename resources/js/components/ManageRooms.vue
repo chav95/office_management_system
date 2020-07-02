@@ -8,7 +8,7 @@
               :bookingItem="selected_booking" 
               :roomData="room_list" 
               :divisionList="division_list" 
-              @success="$route.path == '/manage-rooms/pending-list' ? loadBookingData(): loadPendingBooking()"
+              @success="$route.path == '/manage-rooms/pending-list' ? loadPendingBooking() : loadBookingData()"
             />
             <assign-room 
               :bookingItem="selected_booking" 
@@ -30,7 +30,7 @@
                     <th>Book Time</th>
                     <th>Extra(s)</th>
                     <th>Booked By</th>
-                    <th></th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -68,17 +68,29 @@
                         </template>
                         <template v-if="$route.path == '/manage-rooms/pending-list' && booking.status == -1">
                           <div>
-                            <span class="rejected">Rejected</span>
-                            <button class="btn notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
+                            <span class="status status-rejected">Rejected</span>
+                            <button class="btn btn-primary notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
                               Notes
                             </button>
                           </div>
                         </template>
-                        <template v-else>
-                          <div v-if="booking.notes !== null && booking.notes !== ''">
-                            <button class="btn notes-btn" title="See Notes From Dian" @click="$alert(booking.notes)">
+                        <template v-if="$route.path != '/manage-rooms/pending-list'">
+                          <div class="text-center">
+                            <span v-if="booking.status == -2" class="status status-rejected">Canceled</span>
+                            <!-- <span v-else-if="booking.status == 2" class="status status-finished">Finished</span> -->
+
+                            <button v-if="booking.notes !== null" class="btn btn-primary notes-btn" title="See Notes" @click="$alert(booking.notes)">
                               Notes
                             </button>
+
+                            <template v-if="userLogin.id == booking.booked_by && booking.status == 1">
+                              <!-- <button class="btn btn-success notes-btn" title="Finish Booking" @click="finish(booking)">
+                                Finish
+                              </button> -->
+                              <button class="btn btn-danger notes-btn" title="Cancel Booking" @click="cancel(booking)">
+                                Cancel
+                              </button>
+                            </template>
                           </div>
                         </template>
                       </td>
@@ -105,7 +117,7 @@
                     <th>Room</th>
                     <th>Capacity</th>
                     <th>Status</th>
-                    <th></th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -300,6 +312,10 @@
         // this.selected_booking.options = this.selected_booking.options != '' && this.selected_booking.options !== null ? this.selected_booking.options.split(',') : []
         $('#AssignRoom').modal('show');
       },
+      assignSuccess(){
+        this.loadPendingBooking()
+        this.loadRoomData()
+      },
       reject(item){
         this.$prompt('State Reason For Rejection')
           .then(reject_notes => {
@@ -324,6 +340,47 @@
             this.$alert('Reason For Rejection Cannot Be Empty', '', 'error')
           })
       },
+      finish(item){
+        this.$confirm(`Confirm Finish '${item.purpose}' Booking?`, '', 'warning')
+          .then(()=> {
+            let finish_data = {
+              action: 'finish',
+              booking_id: item.id,
+            }
+            axios.post(`${window.location.origin}/api/room`, finish_data)
+              .then(res => {
+                this.$alert('Mark Booking As Finished', '', 'success');
+                this.loadBookingData()
+              })
+              .catch(err => {
+                this.$alert(err, '', 'error')
+              })
+          })
+      },
+      cancel(item){
+        this.$prompt('State Reason For Cancel Booking')
+          .then(cancel_notes => {
+            this.$confirm(`Confirm Cancel '${item.purpose}' Booking?`, '', 'warning')
+              .then(()=> {
+                let cancel_data = {
+                  action: 'cancel',
+                  booking_id: item.id,
+                  notes: cancel_notes
+                }
+                axios.post(`${window.location.origin}/api/room`, cancel_data)
+                  .then(res => {
+                    this.$alert('Cancel Successful', '', 'success')
+                    this.loadBookingData()
+                  })
+                  .catch(err => {
+                    this.$alert(err, '', 'error')
+                  })
+              })
+          })
+          .catch(err => {
+            this.$alert('Reason For Cancel Booking Cannot Be Empty', '', 'error')
+          })
+      },
       deleteItem(collection, index, id){
         let text = ''
         let url = ''
@@ -342,7 +399,11 @@
                 axios.delete(`${window.location.origin}/api/room/${url}-${id}`)
                   .then(res => {
                     this.$alert('Delete Successful', '', 'success');
-                    collection == 'booking_list' ? this.loadBookingData() : this.loadRoomData()
+                    if(collection == 'booking_list'){
+                      this.loadPendingBooking()
+                    }else{
+                      this.loadRoomData()
+                    }
                   })
                   .catch(err => {
                     this.$alert(err, '', 'error')
@@ -352,16 +413,11 @@
             })
           .catch(error => console.error(error));
       },
-
-      assignSuccess(){
-        this.loadPendingBooking()
-        this.loadRoomData()
-      },
     },
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .card-tools{
     text-align: right;
   }
@@ -375,15 +431,22 @@
     display: block;
     width: 65px;
     padding: 0.25rem 0.5rem;
+    margin-bottom: 5px;
     color: white;
-    background-color: cornflowerblue;
+    /* background-color: cornflowerblue; */
   }
 
-  .rejected{
+  .status{
     display: block;
     text-align: center;
     font-weight: bold;
     margin-bottom: 5px;
-    color: crimson;
+
+    &-rejected{
+      color: crimson;
+    }
+    &-finished{
+      color: green;
+    }
   }
 </style>

@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Maintenance;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NewDocNotif;
-use App\Mail\UpcomingDocNotif;
+use App\Mail\NewMaintainNotif;
+use App\Mail\UpcomingMaintainNotif;
 
 class MaintenanceController extends Controller
 {
@@ -50,22 +50,22 @@ class MaintenanceController extends Controller
                 $maintenance->save();
                 
                 // Mail::to('om@jtd.co.id')->send(new BookCarNotif($booking));
-                // Mail::to('chavinpradana@gmail.com')->send(new NewDocNotif($maintenance));
+                // Mail::to('chavinpradana@gmail.com')->send(new NewMaintainNotif($maintenance));
 
                 // if(date('Y-m-d') >= $maintenance->notif_date){
-                //     Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif($maintenance));
+                //     Mail::to('chavinpradana@gmail.com')->send(new UpcomingMaintainNotif($maintenance));
                 // }
 
                 return response()->json(array('success' => true, 'last_insert_id' => $maintenance->id), 200);
             }else if($request->action == 'edit_maintenance'){
                 // if(date('Y-m-d') >= $request->notif_date){
-                //     Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif(Maintenance::find($request->id)));
+                //     Mail::to('chavinpradana@gmail.com')->send(new UpcomingMaintainNotif(Maintenance::find($request->id)));
                 // }
 
                 return response()->json(array(
                     'success' => true, 
                     // 'mail' => date('Y-m-d') >= $request->notif_date && date('Y-m-d') <= $request->due_date
-                    //     ? Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif(Maintenance::find($request->id)))
+                    //     ? Mail::to('chavinpradana@gmail.com')->send(new UpcomingMaintainNotif(Maintenance::find($request->id)))
                     //     : null,
                     'result' => 
                         Maintenance::where('id', $request->id)->update([
@@ -88,7 +88,9 @@ class MaintenanceController extends Controller
     public function show($id)
     {
         if($id === 'getMaintenanceData'){
-            $result = Maintenance::with('user')->orderBy('notif_date', 'ASC')->paginate(10);
+            $result = Maintenance::with('user')
+            ->where('due_date', '>=', date('Y-m-d'))
+            ->orderBy('due_date', 'ASC')->paginate(10);
         }
 
         return $result;

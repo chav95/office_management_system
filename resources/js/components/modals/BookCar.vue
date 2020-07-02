@@ -15,7 +15,7 @@
               <div class="form-group">
                 <div class="form-group">
                   <datepicker v-model="postToCar.tanggal" placeholder="Choose Booking Date" 
-                    :language="id" :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
+                    :language="id" :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() + 1))}"
                     input-class="car-datepicker" wrapper-class="car-datepicker-div"
                   ></datepicker>
                   <select v-model="postToCar.jam_awal" class="form-control" style="display: inline-block; width: 95px">

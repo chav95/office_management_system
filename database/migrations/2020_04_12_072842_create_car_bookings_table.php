@@ -17,7 +17,7 @@ class CreateCarBookingsTable extends Migration
             $table->bigIncrements('id');
             $table->date('tanggal');
             $table->integer('jam_awal');
-            $table->integer('jam_akhir');
+            $table->dateTime('jam_akhir', 0)->nullable();
             $table->string('destination');
             $table->string('purpose');
             $table->integer('car_id');

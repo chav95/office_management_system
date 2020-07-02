@@ -48,7 +48,7 @@
 
             <div class="modal-footer">
               <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="assignCar()" class="btn btn-primary">Create</button>
+              <button type="button" @click="assignCar()" class="btn btn-primary">Assign</button>
             </div>
           </form>
         </div>
@@ -142,41 +142,41 @@
       fill_available_car(){
         let arr = []
         this.carData.forEach(item => {
-          if(item.police_number === '-'){
+          // if(item.police_number === '-'){
+          //   arr.push(item)
+          // }else if(item.today_booking.length > 0){
+          //   item.today_booking.forEach(booking => {
+          //     if(booking.tanggal != this.bookingItem.tanggal){
+          //       arr.push(item)
+          //     }else if(this.bookingItem.jam_awal > booking.jam_akhir){
+          //       arr.push(item)
+          //     }else if(this.bookingItem.jam_akhir < booking.jam_awal){
+          //       arr.push(item)
+          //     }
+          //   });
+          // }else{
             arr.push(item)
-          }else if(item.today_booking.length > 0){
-            item.today_booking.forEach(booking => {
-              if(booking.tanggal != this.bookingItem.tanggal){
-                arr.push(item)
-              }else if(this.bookingItem.jam_awal > booking.jam_akhir){
-                arr.push(item)
-              }else if(this.bookingItem.jam_akhir < booking.jam_awal){
-                arr.push(item)
-              }
-            });
-          }else{
-            arr.push(item)
-          }
-          });
+          // }
+        });
         this.available_car = arr;
       },
       fill_available_driver(){
         let arr = []
         this.driverData.forEach(item => {
-          if(item.today_booking.length > 0){
-            item.today_booking.forEach(booking => {
-              if(booking.tanggal != this.bookingItem.tanggal){
-                arr.push(item)
-              }else if(this.bookingItem.jam_awal > booking.jam_akhir){
-                arr.push(item)
-              }else if(this.bookingItem.jam_akhir < booking.jam_awal){
-                arr.push(item)
-              }
-            });
-          }else{
+        //   if(item.today_booking.length > 0){
+        //     item.today_booking.forEach(booking => {
+        //       if(booking.tanggal != this.bookingItem.tanggal){
+        //         arr.push(item)
+        //       }else if(this.bookingItem.jam_awal > booking.jam_akhir){
+        //         arr.push(item)
+        //       }else if(this.bookingItem.jam_akhir < booking.jam_awal){
+        //         arr.push(item)
+        //       }
+        //     });
+        //   }else{
             arr.push(item)
-          }
-          });
+          // }
+        });
         this.available_driver = arr;
       },
       

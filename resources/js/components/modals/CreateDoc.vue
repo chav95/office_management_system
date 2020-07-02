@@ -23,11 +23,11 @@
                     :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                   ></datepicker>
 
-                  <label>Notification Date</label>
+                  <!-- <label>Notification Date</label>
                   <datepicker v-model="selected_doc.notif_date" placeholder="Notification Date" 
                     :language="id" input-class="input-datepicker" 
                     :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1)), from: notif_max_date}"
-                  ></datepicker>
+                  ></datepicker> -->
 
                   <label>Description (Optional)</label>
                   <textarea v-model="selected_doc.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea>
@@ -75,7 +75,7 @@
     },
     computed: {
       completed(){
-        if(this.selected_doc.descripton !== '' && this.selected_doc.name !== '' && this.selected_doc.notif_date != '' && this.selected_doc.due_date != ''){
+        if(this.selected_doc.descripton !== '' && this.selected_doc.name !== '' /*&& this.selected_doc.notif_date != ''*/ && this.selected_doc.due_date != ''){
           return true
         }
         return false
@@ -91,7 +91,7 @@
       submitDoc(){
         if(this.completed === true){
           this.loading = true
-          let text = this.selected_maintenance.action == 'create_doc'
+          let text = this.selected_doc.action == 'create_doc'
             ? 'Add New'
             : 'Edit'
 

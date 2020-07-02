@@ -15,7 +15,7 @@
               <div class="form-group">
                 <div class="form-group">
                   <datepicker v-model="postToRoom.tanggal" placeholder="Choose Booking Date"
-                    :language="id" :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
+                    :language="id" :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() + 1))}"
                     input-class="room-datepicker" wrapper-class="room-datepicker-div"
                   ></datepicker>
                   <select v-model="postToRoom.jam_awal" class="form-control" style="display: inline-block; width: 95px">

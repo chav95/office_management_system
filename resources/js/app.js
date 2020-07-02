@@ -28,6 +28,7 @@ Vue.use(VueApexCharts)
 let routes = [
     {path: '/', component: require('./components/Welcome.vue').default},
     {path: '/dashboard', component: require('./components/Dashboard.vue').default},
+    {path: '/profile', component: require('./components/Profile.vue').default},
     
     // Meeting Room Routes
     {path: '/manage-rooms', component: require('./components/ManageRooms.vue').default},

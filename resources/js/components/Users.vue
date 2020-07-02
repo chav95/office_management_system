@@ -18,7 +18,7 @@
                   <th>Division</th>
                   <th>User Type</th>
                   <th>Registered At</th>
-                  <th>Modify</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -30,9 +30,12 @@
                     <td>{{user.privilege.replace('_', ' ') | ucwords}}</td>
                     <td>{{formatDatetime(user.created_at)}}</td>
                     <td>
-                      <div class="modify-btn-container">
+                      <div v-if="user.privilege != 'super_admin' || userLogin.id == user.id" class="modify-btn-container">
                         <a class="modify-btn" title="Edit" v-on:click="editUser(user.id, user.name, user.email, user.division_id, user.privilege)">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
+                        </a>
+                        <a class="modify-btn" title="Reset Password" v-on:click="resetPassword(user.id, user.name)">
+                          <i class="fa fa-undo-alt color-green fa-fw fa-lg"></i>
                         </a>
                         <a class="modify-btn" title="Delete" v-on:click="deleteUser(user.id, user.name)">
                           <i class="fa fa-trash color-red fa-fw fa-lg"></i>
@@ -91,7 +94,7 @@
                   <label>User Type</label>
                   <select v-model="form.privilege" name="privilege" class="form-control" :class="{ 'is-invalid': form.errors.has('privilege') }">
                     <option value="" disabled>User Access Type</option>
-                    <option value="super_admin">Super Admin</option>
+                    <option v-if="userLogin.privilege == 'super_admin'" value="super_admin">Super Admin</option>
                     <option value="admin">Admin</option>
                     <option value="user">User</option>
                   </select>
@@ -119,6 +122,10 @@
   export default {
     data(){
       return{
+        userLogin: {
+          id: 0,
+        },
+
         form: new Form({
           act: String,
           id: Number,
@@ -135,7 +142,17 @@
         // action: '',
       }
     },
+    mounted(){
+      this.loadUserlogin()
+      this.loadAllUser()
+      this.loadDivisionData()
+    },
     methods: {
+      loadUserlogin(){
+        axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
+          this.userLogin = data;
+        })
+      },
       loadAllUser(){
         axios.get(window.location.origin+'/api/user/getUserList').then(({data}) => (this.allUser = data));
       },
@@ -182,8 +199,9 @@
         this.form.post(window.location.origin+'/api/user')
           .then(({response}) => {
             $('#modifyModal').modal('hide');
-            this.$alert(`${this.modalTitle} Successful`, '', 'success');
-            this.loadAllUser();
+            this.$alert(`${this.modalTitle} Successful`, '', 'success')
+            this.loadUserlogin()
+            this.loadAllUser()
           })
           .catch(err => this.$alert('Invalid Data', '', 'error'));
       },
@@ -201,12 +219,23 @@
               });
           })
           .catch(error => console.error(error));
-      }
+      },
+      resetPassword(user_id, user_name){
+        this.$confirm('Reset Password For User '+user_name+'?', '', 'question')
+          .then( () => {
+            let reset = {
+              act: 'reset_password',
+              id: user_id,
+            }
+
+            axios.post(window.location.origin+'/api/user', reset)
+              .then(({response}) => {
+                this.$alert(`Password Has Been Reset To 'password123'`, '', 'success')
+              })
+              .catch(error => this.$alert(error.data.message, '', 'error'))
+          })
+          .catch(error => console.error(error))
+      },
     },
-    mounted(){
-        this.loadAllUser()
-        this.loadDivisionData()
-        //console.log('Component mounted.')
-    }
   }
 </script>

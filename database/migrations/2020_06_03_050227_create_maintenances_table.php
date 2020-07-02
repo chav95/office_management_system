@@ -16,9 +16,9 @@ class CreateMaintenancesTable extends Migration
         Schema::create('maintenances', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->date('notif_date');
+            $table->date('notif_date')->nullable();
             $table->date('due_date');
-            $table->string('description');
+            $table->string('description')->nullable();
             $table->integer('created_by');
             $table->timestamps();
         });

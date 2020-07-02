@@ -78,6 +78,34 @@ class UserController extends Controller
                     ]);
             }else if($request->act == 'deactivate_user'){
                 return User::where('id', $id)->update(['status' => 0]);
+            }else if($request->act == 'change_password'){
+                $this->validate($request, [
+                    'current_password' => 'required|string',
+                    'new_password' => 'required|string|min:6',
+                    'confirm_new_password' => 'required|string|same:new_password',
+                ]);
+
+                $user = User::find($request->id);
+                // return response()->json(array(
+                //     'result' => Hash::check($request->current_pass, $user->password),
+                // ), 200);
+                if(Hash::check($request->current_password, $user->password)){
+                    return response()->json(array(
+                        'success' => true,
+                        'result' => 
+                            User::where('id', $request->id)->update([
+                                'password' => Hash::make($request->new_password),
+                            ]),
+                    ), 200);
+                }else{
+                    return response()->json(array(
+                        'success' => false,
+                        'message' => 'Wrong Current Password',
+                    ), 200);
+                }
+            }else if($request->act == 'reset_password'){
+                return User::where('id', $request->id)
+                    ->update(['password' => Hash::make('password123')]);
             }
         }else{
             return $request['action'];
@@ -114,7 +142,10 @@ class UserController extends Controller
                 ->orderBy('name', 'asc')
                 ->paginate(10);
         }else if($id == 'getUserLogin'){
-            return auth('api')->user();
+            // return auth('api')->user();
+            return User::with('division')
+                ->with('division')
+                ->find(auth('api')->user()->id);
         }else if($id == 'getLoggedUserAccess'){
              
         }

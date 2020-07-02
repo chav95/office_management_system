@@ -130,6 +130,23 @@ class RoomController extends Controller
                             'status' => -1,
                         ])
                 ), 200);
+            }else if($request->action == 'finish'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        RoomBooking::where('id', $request->booking_id)->update([
+                            'status' => 2,
+                        ])
+                ), 200);
+            }else if($request->action == 'cancel'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        RoomBooking::where('id', $request->booking_id)->update([
+                            'notes' => $request->notes,
+                            'status' => -2,
+                        ])
+                ), 200);
             }
         }
     }
@@ -149,15 +166,17 @@ class RoomController extends Controller
             // $result->booking = $room_last_booking;
         }else if($id === 'getBookingData'){
             $result = RoomBooking::with('room', 'user', 'division')
-                ->where('status', '=', 1)
                 ->where('tanggal', '>=', date('Y-m-d'))
+                ->where('status', '>', 0)
+                ->orWhere('status', '=', -2)
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
                 ->get();
         }else if($id === 'getPendingBooking'){
             $result = RoomBooking::with('room', 'user', 'division')
-                ->where('status', '!=', 1)
                 ->where('tanggal', '>=', date('Y-m-d'))
+                ->where('status', '=', 0)
+                ->orWhere('status', '=', -1)
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
                 ->get();

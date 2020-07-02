@@ -32,7 +32,7 @@ class NewDocNotif extends Mailable
     public function build()
     {
         return $this
-            ->subject('New Document / Maintenance')
+            ->subject('New Document')
             ->markdown('mails.new_doc_notif');
     }
 }

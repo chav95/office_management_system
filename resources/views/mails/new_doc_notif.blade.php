@@ -1,10 +1,10 @@
 @component('mail::message')
-# New Document / Maintenance
+# New Document
 
 @component('mail::panel')
-New Document / Maintenance has been created.<br>
+New Document has been created.<br>
 Name: {{$doc->name}}<br>
-To Be Notified: {{date('l, j F Y', strtotime($doc->notif_date))}}<br>
+{{-- To Be Notified: {{date('l, j F Y', strtotime($doc->notif_date))}}<br> --}}
 Due Date: {{date('l, j F Y', strtotime($doc->due_date))}}<br>
 @endcomponent
 

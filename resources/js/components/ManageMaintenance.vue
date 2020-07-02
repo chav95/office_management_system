@@ -17,23 +17,23 @@
               <thead>
                 <tr>
                   <th>Name</th>
-                  <th>Notification Date</th>
+                  <!-- <th>Notification Date</th> -->
                   <th>Due Date</th>
                   <th>Description</th>
                   <th>Created By</th>
-                  <th></th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="maintenance_list.data.length > 0">
                   <tr v-for="(item) in maintenance_list.data" :key="item.id">
                     <td>{{item.name}}</td>
-                    <td>{{formatDatetime(item.notif_date)}}</td>
+                    <!-- <td>{{formatDatetime(item.notif_date)}}</td> -->
                     <td>{{formatDatetime(item.due_date)}}</td>
                     <td><pre class="maintenance_description">{{item.description}}</pre></td>
                     <td>{{item.user.name | ucwords}}</td>
                     <td>
-                      <div v-if="userLogin.id === item.created_by">
+                      <div class="modify_box" v-if="userLogin.id === item.created_by">
                         <a class="modify-btn" @click="editItem(item)" title="Edit Maintenance">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
@@ -120,7 +120,7 @@
         this.selected_maintenance.id = item.id
         this.selected_maintenance.name = item.name
         this.selected_maintenance.due_date = item.due_date
-        this.selected_maintenance.notif_date = item.notif_date
+        // this.selected_maintenance.notif_date = item.notif_date
         this.selected_maintenance.description = item.description
         this.selected_maintenance.action = 'edit_maintenance'
         $('#CreateMaintenance').modal('show')
@@ -155,6 +155,11 @@
 <style scoped>
   .card-tools{
     text-align: right;
+  }
+
+  .modify_box{
+    width: 52px;
+    margin-bottom: 10px;
   }
   .maintenance_description{
     padding: 0;
