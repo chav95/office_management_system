@@ -6,13 +6,13 @@
           <div class="card" v-if="$route.path == '/manage-rooms' || $route.path == '/manage-rooms/booking-list' || $route.path == '/manage-rooms/pending-list'">
             <book-room 
               :bookingItem="selected_booking" 
-              :roomData="room_list" 
+              :roomData="total_room" 
               :divisionList="division_list" 
               @success="$route.path == '/manage-rooms/pending-list' ? loadPendingBooking() : loadBookingData()"
             />
             <assign-room 
               :bookingItem="selected_booking" 
-              :roomData="room_list" 
+              :roomData="total_room" 
               @success="assignSuccess()"
             />
             <div class="card-header">
@@ -34,8 +34,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <template v-if="booking_list.length > 0">
-                    <tr v-for="(booking, index) in booking_list" :key="booking.id">
+                  <template v-if="booking_list.data.length > 0">
+                    <tr v-for="(booking, index) in booking_list.data" :key="booking.id">
                       <td>{{booking.room.name}}</td>
                       <td>{{booking.purpose}}</td>
                       <td>{{booking.participant}} People <i>({{booking.division.name}} Division)</i></td>
@@ -109,6 +109,9 @@
                 </tbody>
               </table>
             </div>
+            <div class="card-footer">
+              <pagination :data="booking_list" @pagination-change-page="bookingPageContent"></pagination>
+            </div>
           </div>
 
           <div class="card" v-else-if="$route.path === '/manage-rooms/settings'">
@@ -128,8 +131,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <template v-if="room_list.length > 0">
-                    <tr v-for="(room, index) in room_list" :key="room.id">
+                  <template v-if="room_list.data.length > 0">
+                    <tr v-for="(room, index) in room_list.data" :key="room.id">
                       <td>{{room.name}}</td>
                       <td>{{room.capacity}}</td>
                       <td class="text-green"><b>Available</b></td>
@@ -150,6 +153,9 @@
                   </template>
                 </tbody>
               </table>
+            </div>
+            <div class="card-footer">
+              <pagination :data="room_list" @pagination-change-page="roomPageContent"></pagination>
             </div>
           </div>
         </div>
@@ -175,8 +181,9 @@
           privilege: ''
         },
 
-        booking_list: [],
-        room_list: [],
+        booking_list: {data: []},
+        room_list: {data: []},
+        total_room: [],
         division_list: [],
         
         selected_booking: {
@@ -214,6 +221,7 @@
       })
       this.$route.path == '/manage-rooms/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
       this.loadRoomData()
+      this.loadRoomList()
       this.loadDivisionData()
     },
     computed:{
@@ -244,28 +252,50 @@
 
       loadPendingBooking(){
         axios.get(window.location.origin+'/api/room/getPendingBooking')
-          .then(({data}) => {
-            data.forEach(item => {
+          .then(response => {
+            response.data.data.forEach(item => {
               item.options = item.options != '' && item.options !== null ? item.options.split(',') : []
             });
-            this.booking_list = data
+            this.booking_list = response.data
           })
       },
       loadBookingData(){
         axios.get(window.location.origin+'/api/room/getBookingData')
-          .then(({data}) => {
-            data.forEach(item => {
+          .then(response => {
+            response.data.data.forEach(item => {
               item.options = item.options != '' && item.options !== null ? item.options.split(',') : []
             });
-            this.booking_list = data
+            this.booking_list = response.data
+          })
+      },
+      bookingPageContent(page = 1) {
+        let content = this.$route.path == '/manage-rooms/pending-list' ? 'getPendingBooking' : 'getBookingData'
+        axios.get(window.location.origin+'/api/room/'+content+'?page=' + page)
+          .then(response => {
+            response.data.data.forEach(item => {
+              item.options = item.options != '' && item.options !== null ? item.options.split(',') : []
+            });
+            this.booking_list = response.data
+          });
+      },
+      loadRoomList(){
+        axios.get(window.location.origin+'/api/room/getRoomList')
+          .then(({data}) => {
+            this.total_room = data
           })
       },
       loadRoomData(){
         axios.get(window.location.origin+'/api/room/getRoomData')
           .then(({data}) => {
-            this.room_list = data;
+            this.room_list = data
           })
           // .catch(err => location.reload())
+      },
+      roomPageContent(page = 1) {
+        axios.get(window.location.origin+'/api/room/getRoomData?page=' + page)
+          .then(response => {
+            this.room_list = response.data
+          });
       },
       loadDivisionData(){
         axios.get(window.location.origin+'/api/division/getDivisionData')

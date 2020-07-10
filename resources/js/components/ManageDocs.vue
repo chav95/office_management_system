@@ -17,7 +17,7 @@
                 <tr>
                   <th>Name</th>
                   <th>Document Number</th>
-                  <th>Document Date</th>
+                  <th>Issue Date</th>
                   <th>Due Date</th>
                   <!-- <th>Description</th> -->
                   <th>Created By</th>

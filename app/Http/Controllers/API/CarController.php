@@ -196,21 +196,21 @@ class CarController extends Controller
         if($id === 'getCarList'){
             $result = Car::with('company', 'division', 'vendor', 'driver')->get();
         }else if($id === 'getCarData'){
-            $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->get();
+            $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->paginate(2);
         }else if($id === 'getBookingData'){
             $result = CarBooking::with('car', 'driver', 'user', 'division')
                 ->where('car_id', '>', 0)
                 ->where('tanggal', '>=', date('Y-m-d'))
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
-                ->get();
+                ->paginate(2);
         }else if($id === 'getPendingBooking'){
             $result = CarBooking::with('user', 'division')
                 ->where('car_id', '=', 0)
                 ->where('tanggal', '>=', date('Y-m-d'))
                 ->orderBy('created_at', 'DESC')
                 ->orderBy('jam_awal', 'ASC')
-                ->get();
+                ->paginate(2);
         }
 
         return $result;

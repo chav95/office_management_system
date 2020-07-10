@@ -23,7 +23,7 @@
                   <label>Tanggal Terbit</label>
                   <datepicker v-model="selected_doc.document_date" placeholder="Issue Date" 
                     :language="id" input-class="input-datepicker" 
-                    :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1)), from: notif_max_date}"
+                    :disabledDates="{from: notif_max_date}"
                   ></datepicker>
 
                   <label>Berlaku Sampai</label>

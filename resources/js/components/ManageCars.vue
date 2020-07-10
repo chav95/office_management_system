@@ -6,12 +6,12 @@
         <div class="card" v-if="$route.path == '/manage-cars' || $route.path == '/manage-cars/booking-list' || $route.path == '/manage-cars/pending-list'">
           <book-car 
             :bookingItem="selected_booking"
-            :carData="car_list" 
+            :carData="total_car" 
             @success="$route.path == '/manage-cars/pending-list' ? loadPendingBooking() : loadBookingData()"
           />
           <assign-car 
             :bookingItem="selected_booking" 
-            :carData="car_list" 
+            :carData="total_car" 
             :driverData="driver_list" 
             @success="assignSuccess()"
           />
@@ -33,8 +33,8 @@
                 </tr>
               </thead>
               <tbody>
-                <template v-if="booking_list.length > 0">
-                  <tr v-for="(booking, index) in booking_list" :key="booking.id">
+                <template v-if="booking_list.data.length > 0">
+                  <tr v-for="(booking, index) in booking_list.data" :key="booking.id">
                     <td v-if="booking.car_id == 0"><i>Not Yet Assigned</i></td>
                     <td v-else>{{booking.car.type}} / {{booking.car.police_number}}</td>
                     
@@ -108,6 +108,9 @@
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            <pagination :data="booking_list" @pagination-change-page="bookingPageContent"></pagination>
+          </div>
         </div>
 
         <div class="card" v-else-if="$route.path === '/manage-cars/settings'">
@@ -140,8 +143,8 @@
                 </tr>
               </thead>
               <tbody>
-                <template v-if="car_list.length > 0">
-                  <tr v-for="(car, index) in car_list" :key="car.id">
+                <template v-if="car_list.data.length > 0">
+                  <tr v-for="(car, index) in car_list.data" :key="car.id">
                     <template v-if="car.police_number !== '-'">
                       <td>{{car.company.name}}</td>
                       <td>{{car.type}}</td>
@@ -170,6 +173,9 @@
               </tbody>
             </table>
           </div>
+          <div class="card-footer">
+            <pagination :data="car_list" @pagination-change-page="carPageContent"></pagination>
+          </div>
         </div>
       </div>
     </div>
@@ -194,7 +200,7 @@
           privilege: ''
         },
 
-        booking_list: [],
+        booking_list: {data: []},
         selected_booking: {
           action: '',
           id: 0,
@@ -208,7 +214,8 @@
             name: '',
           },
         },
-        car_list: [],
+        car_list: {data: []},
+        total_car: [],
 
         company_list: [],
         driver_list: [],
@@ -237,6 +244,7 @@
       })
       this.$route.path == '/manage-cars/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
       this.loadCarData()
+      this.loadCarList()
 
       this.loadCompanyData()
       this.loadDriverData()
@@ -446,12 +454,32 @@
             this.booking_list = data
           })
       },
+      bookingPageContent(page = 1) {
+        let content = this.$route.path == '/manage-cars/pending-list' ? 'getPendingBooking' : 'getBookingData'
+        axios.get(window.location.origin+'/api/car/'+content+'?page=' + page)
+          .then(response => {
+            this.booking_list = response.data
+          });
+      },
+      loadCarList(){
+        axios.get(window.location.origin+'/api/car/getCarList')
+          .then(({data}) => {
+            this.total_car = data
+          })
+          // .catch(err => location.reload())
+      },
       loadCarData(){
         axios.get(window.location.origin+'/api/car/getCarData')
           .then(({data}) => {
-            this.car_list = data;
+            this.car_list = data
           })
           // .catch(err => location.reload())
+      },
+      carPageContent(page = 1) {
+        axios.get(window.location.origin+'/api/car/getCarData?page=' + page)
+          .then(response => {
+            this.car_list = response.data
+          });
       },
       loadCompanyData(){
         axios.get(window.location.origin+'/api/company/getCompanyData')

@@ -174,8 +174,10 @@ class RoomController extends Controller
      */
     public function show($id)
     {
-        if($id === 'getRoomData'){
+        if($id === 'getRoomList'){
             $result = Room::with('today_booking', 'today_booking.user')->get();
+        }else if($id === 'getRoomData'){
+            $result = Room::with('today_booking', 'today_booking.user')->paginate(10);
             // $room_last_booking = $result->booking->last();
 
             // $result->booking = $room_last_booking;
@@ -186,7 +188,7 @@ class RoomController extends Controller
                 ->orWhere('status', '=', -2)
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
-                ->get();
+                ->paginate(10);
         }else if($id === 'getPendingBooking'){
             $result = RoomBooking::with('room', 'user', 'division')
                 ->where('tanggal', '>=', date('Y-m-d'))
@@ -194,7 +196,7 @@ class RoomController extends Controller
                 ->orWhere('status', '=', -1)
                 ->orderBy('created_at', 'DESC')
                 ->orderBy('jam_awal', 'ASC')
-                ->get();
+                ->paginate(10);
         }
 
         return $result;
