@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
+// Route::post('/api/doc/import','API\DocumentController@import');
+
 Route::apiResources([
     'room' => 'API\RoomController',
     'car' => 'API\CarController',

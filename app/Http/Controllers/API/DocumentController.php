@@ -8,9 +8,16 @@ use App\Document;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NewDocNotif;
 use App\Mail\UpcomingDocNotif;
+use App\Imports\DocsImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DocumentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -40,10 +47,13 @@ class DocumentController extends Controller
     public function store(Request $request)
     {
         if($request->action){
-            if($request->action == 'create_doc'){
+            if($request->action == 'import'){
+                return self::import($request);
+            }else if($request->action == 'create_doc'){
                 $doc = new Document;
                 $doc->name = $request->name;
-                $doc->due_date = date('Y-m-d', strtotime($request->due_date));
+                $doc->no_document = $request->no_documenet;
+                $doc->document_date = date('Y-m-d', strtotime($request->document_date));
                 $doc->notif_date = date('Y-m-d', strtotime($request->notif_date));
                 $doc->description = $request->description;
                 $doc->created_by = auth('api')->user()->id;
@@ -64,14 +74,15 @@ class DocumentController extends Controller
 
                 return response()->json(array(
                     'success' => true, 
-                    'mail' => date('Y-m-d') >= $request->notif_date && date('Y-m-d') <= $request->due_date
-                        ? Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif(Document::find($request->id)))
-                        : null,
+                    // 'mail' => date('Y-m-d') >= $request->notif_date && date('Y-m-d') <= $request->due_date
+                    //     ? Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif(Document::find($request->id)))
+                    //     : null,
                     'result' => 
                         Document::where('id', $request->id)->update([
                             'name' => $request->name,
+                            'no_document' => $request->no_document,
+                            'document_date' => date('Y-m-d', strtotime($request->document_date)),
                             'due_date' => date('Y-m-d', strtotime($request->due_date)),
-                            'notif_date' => date('Y-m-d', strtotime($request->notif_date)),
                             'description' => $request->description,
                         ])
                 ), 200);
@@ -140,5 +151,17 @@ class DocumentController extends Controller
             'result' => Document::destroy($id)
             // 'result' => Document::where('id', $id)->delete()
         ), 200);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xls,xlsx'
+        ]);
+
+        $path = $request->file('import_file');
+        $data = Excel::import(new DocsImport, $path);
+
+        return response()->json(array('message' => 'uploaded successfully'), 200);
     }
 }

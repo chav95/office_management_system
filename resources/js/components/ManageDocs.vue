@@ -4,22 +4,22 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card">
-          <create-doc
-            :selected_doc="selected_doc"   
-            @success="loadDocData()"
-          />
+          <create-doc :selected_doc="selected_doc" @success="loadDocData()"/>
+          <import-doc @success="loadDocData()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Document List</strong></h3>
             <button class="btn btn-primary" style="float: right" @click="createItem()">New Document</button>
+            <button class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadDoc">Import From Excel</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th>Name</th>
-                  <!-- <th>Notification Date</th> -->
+                  <th>Document Number</th>
+                  <th>Document Date</th>
                   <th>Due Date</th>
-                  <th>Description</th>
+                  <!-- <th>Description</th> -->
                   <th>Created By</th>
                   <th>Action</th>
                 </tr>
@@ -46,9 +46,10 @@
                 <template v-if="doc_list.data.length > 0">
                   <tr v-for="(item) in doc_list.data" :key="item.id">
                     <td>{{item.name}}</td>
-                    <!-- <td>{{formatDatetime(item.notif_date)}}</td> -->
+                    <td>{{item.no_document}}</td>
+                    <td>{{formatDatetime(item.document_date)}}</td>
                     <td>{{formatDatetime(item.due_date)}}</td>
-                    <td><pre class="doc_description">{{item.description}}</pre></td>
+                    <!-- <td><pre class="doc_description">{{item.description}}</pre></td> -->
                     <td>{{item.user.name | ucwords}}</td>
                     <td>
                       <div class="modify_box" v-if="userLogin.id === item.created_by">
@@ -79,12 +80,13 @@
 </template>
 
 <script>
-  import CreateDoc from './modals/CreateDoc'
   import moment from 'moment'
+  import CreateDoc from './modals/CreateDoc'
+  import ImportDoc from './modals/ImportDoc'
 
   export default {
     components: {
-      CreateDoc
+      CreateDoc, ImportDoc
     },
     data(){
       return{
@@ -100,7 +102,8 @@
           action: '',
           id: 0,
           name: '',
-          notif_date: '',
+          no_document: '',
+          document_date: '',
           due_date: '',
           description: '',
         },
@@ -128,7 +131,8 @@
           action: 'create_doc',
           id: 0,
           name: '',
-          notif_date: '',
+          no_document: '',
+          document_date: '',
           due_date: '',
           description: '',
         }
@@ -137,8 +141,9 @@
       editItem(item){
         this.selected_doc.id = item.id
         this.selected_doc.name = item.name
+        this.selected_doc.no_document = item.no_document
+        this.selected_doc.document_date = item.document_date
         this.selected_doc.due_date = item.due_date
-        // this.selected_doc.notif_date = item.notif_date
         this.selected_doc.description = item.description
         this.selected_doc.action = 'edit_doc'
         $('#CreateDoc').modal('show')

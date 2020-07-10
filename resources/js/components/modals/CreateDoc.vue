@@ -14,23 +14,26 @@
             <div class="modal-body">
               <div class="form-group">
                 <div class="form-group">
-                  <label>Name</label>
+                  <label>Nama</label>
                   <input type="text" v-model="selected_doc.name" class="form-control" placeholder="Document Name">
 
-                  <label>Due Date</label>
+                  <label>Nomor Dokumen</label>
+                  <input type="text" v-model="selected_doc.no_document" class="form-control" placeholder="Document Number">
+
+                  <label>Tanggal Terbit</label>
+                  <datepicker v-model="selected_doc.document_date" placeholder="Issue Date" 
+                    :language="id" input-class="input-datepicker" 
+                    :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1)), from: notif_max_date}"
+                  ></datepicker>
+
+                  <label>Berlaku Sampai</label>
                   <datepicker v-model="selected_doc.due_date" placeholder="Due Date" 
                     :language="id" input-class="input-datepicker" 
                     :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                   ></datepicker>
 
-                  <!-- <label>Notification Date</label>
-                  <datepicker v-model="selected_doc.notif_date" placeholder="Notification Date" 
-                    :language="id" input-class="input-datepicker" 
-                    :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1)), from: notif_max_date}"
-                  ></datepicker> -->
-
-                  <label>Description (Optional)</label>
-                  <textarea v-model="selected_doc.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea>
+                  <!-- <label>Description (Optional)</label>
+                  <textarea v-model="selected_doc.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea> -->
                 </div>
               </div>
             </div>

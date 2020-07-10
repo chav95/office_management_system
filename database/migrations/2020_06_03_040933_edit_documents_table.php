@@ -15,6 +15,8 @@ class EditDocumentsTable extends Migration
     {
         Schema::table('documents', function (Blueprint $table) {
             $table->dropColumn('type');
+            $table->string('no_document')->after('name')->nullable();
+            $table->renameColumn('notif_date', 'document_date')->nullable();
             $table->string('description')->after('due_date')->nullable();
         });
     }

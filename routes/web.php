@@ -25,4 +25,5 @@ Route::post('/login', 'Auth\LoginController@login');
 Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
 Route::get('/logout', 'Auth\LoginController@logout');
 Route::get('/manage-users', 'HomeController@index')->middleware('can:isAdmin');
+
 Route::get('{path}',"HomeController@index")->where('path', '([A-z\d\-\/_.]+)?');
