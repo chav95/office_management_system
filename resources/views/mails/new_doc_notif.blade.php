@@ -14,6 +14,6 @@ Button Text
 
 This mail is auto generated, please do not reply to this mail.
 
-Thanks,<br>
+Thank You,<br>
 {{ config('app.name') }}
 @endcomponent

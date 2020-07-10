@@ -47,8 +47,13 @@
             </div>
 
             <div class="modal-footer">
-              <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="assignCar()" class="btn btn-primary">Assign</button>
+              <button type="reset" :disabled="loading" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+              <button type="button" :disabled="loading" @click="assignCar()" class="btn btn-primary">
+                {{loading 
+                  ? 'Please Wait...' 
+                  : 'Assign'
+                }}
+              </button>
             </div>
           </form>
         </div>
@@ -91,6 +96,8 @@
         car_id: 0,
         driver_id: 0,
         notes: '',
+
+        loading: false,
       }
     },
     watch: {
@@ -181,6 +188,8 @@
       },
       
       assignCar(){
+        this.loading = true
+        
         if(this.completed === true){
           let postToCar = {
             action: 'assign',
@@ -192,6 +201,8 @@
           
           axios.post(window.location.origin+'/api/car', postToCar)
             .then(res => {
+              this.loading = false
+
               if(res.data.success === true){
                 this.$emit('success')
                 this.$alert('Assign Car Success', '', 'success')

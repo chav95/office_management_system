@@ -41,6 +41,7 @@ let routes = [
     {path: '/manage-cars/pending-list', component: require('./components/ManageCars.vue').default},
     {path: '/manage-cars/booking-list', component: require('./components/ManageCars.vue').default},
     {path: '/manage-cars/settings', component: require('./components/ManageCars.vue').default},
+    {path: '/manage-cars/driver-settings', component: require('./components/ManageDrivers.vue').default},
 
     // Document Routes
     {path: '/manage-docs', component: require('./components/ManageDocs.vue').default},

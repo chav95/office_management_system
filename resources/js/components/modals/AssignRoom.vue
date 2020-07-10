@@ -49,8 +49,13 @@
             </div>
 
             <div class="modal-footer">
-              <button type="reset" class="btn btn-danger" data-dismiss="modal">Cancel</button>
-              <button type="button" @click="assignRoom()" class="btn btn-primary">Assign</button>
+              <button type="reset" :disabled="loading" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+              <button type="button" :disabled="loading" @click="assignRoom()" class="btn btn-primary">
+                {{loading 
+                  ? 'Please Wait...' 
+                  : 'Assign'
+                }}
+              </button>
             </div>
           </form>
         </div>
@@ -87,6 +92,8 @@
 
         room_id: 0,
         notes: '',
+
+        loading: false,
       }
     },
     watch: {
@@ -155,6 +162,8 @@
       
       assignRoom(){
         if(this.completed === true){
+          this.loading = true
+
           let postToRoom = {
             action: 'assign',
             booking_id: this.bookingItem.id,
@@ -164,6 +173,8 @@
           
           axios.post(window.location.origin+'/api/room', postToRoom)
             .then(res => {
+              this.loading = false
+
               if(res.data.success === true){
                 this.$emit('success')
                 this.$alert('Assign Room Success', '', 'success')

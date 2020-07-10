@@ -1,19 +1,20 @@
 @component('mail::message')
-# New Room Booking
+# New Car Booking
 
 @component('mail::panel')
-New room booking has been requested for:<br>
+New car booking has been requested for:<br>
 Agenda: {{$booking->purpose}}<br>
 Destination: {{$booking->destination}}<br>
-At date: {{date('l, j F Y', strtotime($booking->tanggal))}} - {{$booking->jam_awal}}.00 s/d {{$booking->jam_akhir}}<br>
+At date: {{date('l, j F Y', strtotime($booking->tanggal))}} - {{$booking->jam_awal}}.00<br>
+Booked By: {{ucwords($booking->user->name)}}<br>
 @endcomponent
 
-{{-- @component('mail::button', ['url' => ''])
-Button Text
-@endcomponent --}}
+@component('mail::button', ['url' => 'http://office.jtd.co.id/manage-cars/pending-list'])
+Go To Site
+@endcomponent
 
 This mail is auto generated, please do not reply to this mail.
 
-Thanks,<br>
+Thank You,<br>
 {{ config('app.name') }}
 @endcomponent

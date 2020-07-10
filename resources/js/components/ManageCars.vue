@@ -45,7 +45,10 @@
                     <td>{{booking.purpose}}</td>
                     <td>{{booktime(booking)}}</td>
                     <!-- <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td> -->
-                    <td>{{booking.user.name}}</td>
+                    <td>
+                      {{booking.user.name}}
+                      <span class="d-block"><i>({{fullDatetime(booking.created_at)}})</i></span>
+                    </td>
                     <td>
                       <template v-if="$route.path == '/manage-cars/pending-list' && booking.status == 0">
                         <div class="modify_box" v-if="booking.user.id == userLogin.id">
@@ -68,9 +71,13 @@
                       <template v-if="$route.path == '/manage-cars/pending-list' && booking.status == -1">
                         <div>
                           <span class="status status-rejected">Rejected</span>
-                          <button class="btn notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
+                          <button class="btn btn-primary notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
                             Notes
                           </button>
+                          <button v-if="userLogin.id == 6"
+                            class="btn btn-danger notes-btn" title="Cancel Booking" 
+                            @click="cancelReject(booking)"
+                          >Cancel Reject</button>
                         </div>
                       </template>
                       <template v-if="$route.path != '/manage-cars/pending-list'">
@@ -262,6 +269,9 @@
         }
         return `${this.formatDatetime(item.tanggal)} - ${item.jam_awal}.00 s/d ${this.formatTime(item.jam_akhir)}`
       },
+      fullDatetime(datetime){
+        return moment(String(datetime)).format('lll');
+      },
       
       createCar(){
         this.action = 'create'
@@ -358,6 +368,23 @@
             this.$alert('Reason For Cancel Booking Cannot Be Empty', '', 'error')
           })
       },
+      cancelReject(item){
+        this.$confirm(`Cancel Reject '${item.purpose}' Booking?`, '', 'warning')
+          .then(()=> {
+            let cancel_data = {
+              action: 'cancel_reject',
+              booking_id: item.id,
+            }
+            axios.post(`${window.location.origin}/api/car`, cancel_data)
+              .then(res => {
+                this.$alert('Rejection Has Been Canceled', '', 'success')
+                this.loadPendingBooking()
+              })
+              .catch(err => {
+                this.$alert(err, '', 'error')
+              })
+          })
+      },
       createBooking(){
         this.selected_booking = {
           action: 'create_booking',
@@ -397,7 +424,7 @@
                 axios.delete(`${window.location.origin}/api/car/${url}-${id}`)
                   .then(res => {
                     this.$alert('Delete Successful', '', 'success');
-                    collection === 'booking_list' ? this.loadBookingData() : this.loadCarData()
+                    collection === 'booking_list' ? this.loadPendingBooking() : this.loadCarData()
                   })
                   .catch(err => {
                     this.$alert(err, '', 'error')

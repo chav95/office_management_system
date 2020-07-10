@@ -196,7 +196,13 @@
               <li class="nav-item">
                 <router-link to="/manage-cars/settings" class="nav-link">
                   <i class="nav-icon fas fa-wrench color-blue"></i>
-                  <p>Settings</p>
+                  <p>Car Settings</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/manage-cars/driver-settings" class="nav-link">
+                  <i class="nav-icon fas fa-wrench color-blue"></i>
+                  <p>Driver Settings</p>
                 </router-link>
               </li>
             </ul>

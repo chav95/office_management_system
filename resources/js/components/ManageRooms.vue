@@ -16,7 +16,7 @@
               @success="assignSuccess()"
             />
             <div class="card-header">
-              <h3 class="card-title"><strong>Booking Room List</strong></h3>
+              <h3 class="card-title"><strong>{{$route.path == '/manage-rooms/pending-list' ? 'Pending' : ''}} Booking Room List</strong></h3>
               <button class="btn btn-primary" style="float: right" @click="createBooking()">Book Room</button>
             </div>
 
@@ -46,7 +46,10 @@
                         </ul>
                         <span v-else>-</span>
                       </td>
-                      <td>{{booking.user.name}}</td>
+                      <td>
+                        {{booking.user.name}}
+                        <span class="d-block"><i>({{fullDatetime(booking.created_at)}})</i></span>
+                      </td>
                       <td>
                         <template v-if="$route.path == '/manage-rooms/pending-list' && booking.status == 0">
                           <div class="modify_box" v-if="booking.user.id == userLogin.id">
@@ -72,6 +75,10 @@
                             <button class="btn btn-primary notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
                               Notes
                             </button>
+                            <button v-if="userLogin.id == 6"
+                              class="btn btn-danger notes-btn" title="Cancel Booking" 
+                              @click="cancelReject(booking)"
+                            >Cancel Reject</button>
                           </div>
                         </template>
                         <template v-if="$route.path != '/manage-rooms/pending-list'">
@@ -177,7 +184,7 @@
           tanggal: '',
           jam_awal: 0,
           jam_akhir: 0,
-          participant: '',
+          participant: 0,
           id: 0,
           purpose: '',
           options: [],
@@ -231,6 +238,10 @@
       formatDatetime(datetime){
         return moment(String(datetime)).format('ll');
       },
+      fullDatetime(datetime){
+        return moment(String(datetime)).format('lll');
+      },
+
       loadPendingBooking(){
         axios.get(window.location.origin+'/api/room/getPendingBooking')
           .then(({data}) => {
@@ -379,6 +390,23 @@
           })
           .catch(err => {
             this.$alert('Reason For Cancel Booking Cannot Be Empty', '', 'error')
+          })
+      },
+      cancelReject(item){
+        this.$confirm(`Cancel Reject '${item.purpose}' Booking?`, '', 'warning')
+          .then(()=> {
+            let cancel_data = {
+              action: 'cancel_reject',
+              booking_id: item.id,
+            }
+            axios.post(`${window.location.origin}/api/room`, cancel_data)
+              .then(res => {
+                this.$alert('Rejection Has Been Canceled', '', 'success')
+                this.loadPendingBooking()
+              })
+              .catch(err => {
+                this.$alert(err, '', 'error')
+              })
           })
       },
       deleteItem(collection, index, id){

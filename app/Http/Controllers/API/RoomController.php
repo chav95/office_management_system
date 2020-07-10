@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Room;
 use App\RoomBooking;
+use App\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookRoomNotif;
+use App\Mail\BookRoomStatus;
 
 class RoomController extends Controller
 {
@@ -93,7 +95,7 @@ class RoomController extends Controller
                 $booking->save();
 
                 // Mail::to('om@jtd.co.id')->send(new BookRoomNotif($booking));
-                Mail::to('chavinpradana@gmail.com')->send(new BookRoomNotif($booking));
+                Mail::to(User::find(6)->email)->send(new BookRoomNotif(RoomBooking::with('user', 'room')->find($booking->id)));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
             }else if($request->action === 'edit_booking'){
@@ -119,7 +121,9 @@ class RoomController extends Controller
                             'room_id' => $request->room_id,
                             'notes' => $request->notes,
                             'status' => 1,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(RoomBooking::find($request->booking_id)->booked_by)->email)
+                        ->send(new BookRoomStatus(RoomBooking::with('user', 'room')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'reject'){
                 return response()->json(array(
@@ -128,7 +132,9 @@ class RoomController extends Controller
                         RoomBooking::where('id', $request->booking_id)->update([
                             'notes' => $request->notes,
                             'status' => -1,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(RoomBooking::find($request->booking_id)->booked_by)->email)
+                        ->send(new BookRoomStatus(RoomBooking::with('user', 'room')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'finish'){
                 return response()->json(array(
@@ -145,6 +151,15 @@ class RoomController extends Controller
                         RoomBooking::where('id', $request->booking_id)->update([
                             'notes' => $request->notes,
                             'status' => -2,
+                        ])
+                ), 200);
+            }else if($request->action == 'cancel_reject'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        RoomBooking::where('id', $request->booking_id)->update([
+                            'notes' => null,
+                            'status' => 0,
                         ])
                 ), 200);
             }
@@ -177,7 +192,7 @@ class RoomController extends Controller
                 ->where('tanggal', '>=', date('Y-m-d'))
                 ->where('status', '=', 0)
                 ->orWhere('status', '=', -1)
-                ->orderBy('tanggal', 'ASC')
+                ->orderBy('created_at', 'DESC')
                 ->orderBy('jam_awal', 'ASC')
                 ->get();
         }

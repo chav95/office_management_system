@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Driver;
+use App\Car;
 
 class DriverController extends Controller
 {
@@ -41,7 +42,45 @@ class DriverController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if($request->action){
+            $result = response();
+            if($request->action == 'create_driver'){
+                $driver = new Driver;
+                $driver->name = $request->name;
+                
+                if($driver->save()){ //add driver successful
+                    $result = response()->json(array(
+                        'success' => true, 
+                        'result' => $request->car > 0
+                                ? Car::where('id', $request->car)->update(['driver_id' => $driver->id,])
+                                : 0
+                    ), 200);
+                }else{
+                    $result = response()->json(array(
+                        'success' => false, 
+                        'message' => 'Failed To Add New Driver'
+                    ), 200);
+                }
+            }else if($request->action == 'edit_driver'){
+                if($request->car > 0){
+                    $driver = Driver::with('car')->where('id', $request->id)->get();
+                    // return $driver[0]->car->id;
+
+                    Car::where('id', $driver[0]->car->id)
+                        ->update(['driver_id' => 0]);
+                }
+
+                $result = response()->json(array(
+                    'success' => true, 
+                    'driver' => Driver::where('id', $request->id)->update(['name' => $request->name]),
+                    'car' => $request->car > 0
+                            ? Car::where('id', $request->car)->update(['driver_id' => $request->id,])
+                            : 0
+                ), 200);
+            }
+
+            return $result;
+        }
     }
 
     /**
@@ -54,6 +93,8 @@ class DriverController extends Controller
     {
         if($id === 'getDriverData'){
             return Driver::with('today_booking')->orderBy('name', 'ASC')->get();
+        }else if($id === 'getDriverList'){
+            return Driver::with('car')->orderBy('name', 'ASC')->paginate(10);
         }
     }
 
@@ -88,6 +129,9 @@ class DriverController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return response()->json(array(
+            'success' => true,
+            'result' => Driver::destroy($id)
+        ), 200);
     }
 }

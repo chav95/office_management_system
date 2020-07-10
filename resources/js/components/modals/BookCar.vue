@@ -15,10 +15,10 @@
               <div class="form-group">
                 <div class="form-group">
                   <datepicker v-model="postToCar.tanggal" placeholder="Choose Booking Date" 
-                    :language="id" :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() + 1))}"
+                    :language="id" :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                     input-class="car-datepicker" wrapper-class="car-datepicker-div"
                   ></datepicker>
-                  <select v-model="postToCar.jam_awal" class="form-control" style="display: inline-block; width: 95px">
+                  <select v-model="postToCar.jam_awal" class="form-control" style="display: inline-block; width: 194px">
                     <option disabled value="0">Hour</option>
                     <option value="9">9.00</option>
                     <option value="10">10.00</option>
@@ -30,7 +30,7 @@
                     <option value="16">16.00</option>
                     <option value="17">17.00</option>
                   </select>
-                  <select v-model="postToCar.jam_akhir" class="form-control" style="display: inline-block; width: 95px">
+                  <!-- <select v-model="postToCar.jam_akhir" class="form-control" style="display: inline-block; width: 95px">
                     <option disabled value="0">Hour</option>
                     <option value="10">10.00</option>
                     <option value="11">11.00</option>
@@ -41,7 +41,7 @@
                     <option value="16">16.00</option>
                     <option value="17">17.00</option>
                     <option value="18">18.00</option>
-                  </select>
+                  </select> -->
                   <input v-model="postToCar.destination" type="text" class="form-control" placeholder="Destination"/>
                   <input v-model="postToCar.purpose" type="text" class="form-control" placeholder="Booking Purpose"/>
                 </div>
@@ -146,7 +146,7 @@
       submitBooking(){
         if(this.postToCar.tanggal === ''){
           this.$alert('Booking Date Cannot Be Empty', '', 'warning')
-        }else if(this.postToCar.jam_awal == 0 || this.postToCar.jam_akhir == 0){
+        }else if(this.postToCar.jam_awal == 0 /*|| this.postToCar.jam_akhir == 0*/){
           this.$alert('Booking Time Cannot Be Empty', '', 'warning')
         }else if(this.postToCar.destination == ''){
           this.$alert('Booking Destination Cannot Be Empty', '', 'warning')

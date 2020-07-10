@@ -6,8 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Car;
 use App\CarBooking;
+use App\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookCarNotif;
+use App\Mail\BookCarStatus;
 
 class CarController extends Controller
 {
@@ -82,7 +84,7 @@ class CarController extends Controller
                 $booking = new CarBooking;
                 $booking->tanggal = date('Y-m-d H:i:s', strtotime($request->tanggal));
                 $booking->jam_awal = $request->jam_awal;
-                $booking->jam_akhir = $request->jam_akhir;
+                // $booking->jam_akhir = $request->jam_akhir;
                 $booking->destination = $request->destination;
                 $booking->purpose = $request->purpose;
                 $booking->division = 0; //$request->division;
@@ -91,7 +93,7 @@ class CarController extends Controller
                 $booking->save();
 
                 // Mail::to('om@jtd.co.id')->send(new BookCarNotif($booking));
-                Mail::to('chavinpradana@gmail.com')->send(new BookCarNotif($booking));
+                Mail::to(User::find(6)->email)->send(new BookCarNotif(CarBooking::with('user', 'car')->find($booking->id)));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
             }else if($request->action === 'edit_booking'){
@@ -137,7 +139,9 @@ class CarController extends Controller
                             'driver_id' => $request->driver_id,
                             'notes' => $request->notes,
                             'status' => 1,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(CarBooking::find($request->booking_id)->booked_by)->email)
+                        ->send(new BookCarStatus(CarBooking::with('user', 'car', 'driver')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'reject'){
                 return response()->json(array(
@@ -146,7 +150,9 @@ class CarController extends Controller
                         CarBooking::where('id', $request->booking_id)->update([
                             'notes' => $request->notes,
                             'status' => -1,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(CarBooking::find($request->booking_id)->booked_by)->email)
+                        ->send(new BookCarStatus(CarBooking::with('user', 'car', 'driver')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'finish'){
                 return response()->json(array(
@@ -166,6 +172,15 @@ class CarController extends Controller
                             'status' => -2,
                         ])
                 ), 200);
+            }else if($request->action == 'cancel_reject'){
+                return response()->json(array(
+                    'success' => true, 
+                    'result' => 
+                        CarBooking::where('id', $request->booking_id)->update([
+                            'notes' => '',
+                            'status' => 0,
+                        ])
+                ), 200);
             }
         }
     }
@@ -178,7 +193,9 @@ class CarController extends Controller
      */
     public function show($id)
     {
-        if($id === 'getCarData'){
+        if($id === 'getCarList'){
+            $result = Car::with('company', 'division', 'vendor', 'driver')->get();
+        }else if($id === 'getCarData'){
             $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->get();
         }else if($id === 'getBookingData'){
             $result = CarBooking::with('car', 'driver', 'user', 'division')
@@ -191,7 +208,7 @@ class CarController extends Controller
             $result = CarBooking::with('user', 'division')
                 ->where('car_id', '=', 0)
                 ->where('tanggal', '>=', date('Y-m-d'))
-                ->orderBy('tanggal', 'ASC')
+                ->orderBy('created_at', 'DESC')
                 ->orderBy('jam_awal', 'ASC')
                 ->get();
         }
