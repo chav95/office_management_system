@@ -8,6 +8,8 @@ use App\Maintenance;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\NewMaintainNotif;
 use App\Mail\UpcomingMaintainNotif;
+use App\Imports\MaintenanceImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class MaintenanceController extends Controller
 {
@@ -45,7 +47,9 @@ class MaintenanceController extends Controller
     public function store(Request $request)
     {
         if($request->action){
-            if($request->action == 'create_maintenance'){
+            if($request->action == 'import'){
+                return self::import($request);
+            }else if($request->action == 'create_maintenance'){
                 $maintenance = new Maintenance;
                 $maintenance->name = $request->name;
                 $maintenance->due_date = date('Y-m-d', strtotime($request->due_date));
@@ -94,7 +98,9 @@ class MaintenanceController extends Controller
     {
         if($id === 'getMaintenanceData'){
             $result = Maintenance::with('user')
+            ->where('created_by', '=', auth('api')->user()->id)
             ->where('due_date', '>=', date('Y-m-d'))
+            ->orderBy('name', 'ASC')
             ->orderBy('due_date', 'ASC')->paginate(10);
         }
 
@@ -136,5 +142,17 @@ class MaintenanceController extends Controller
             'success' => true,
             'result' => Maintenance::where('id', $id)->delete()
         ), 200);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xls,xlsx'
+        ]);
+
+        $path = $request->file('import_file');
+        $data = Excel::import(new MaintenanceImport, $path);
+
+        return response()->json(array('message' => 'uploaded successfully'), 200);
     }
 }

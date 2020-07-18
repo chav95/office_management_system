@@ -25,25 +25,25 @@
                 <tr>
                   <th>Car Model / Police Number</th>
                   <th>Driver</th>
+                  <th>Book Date</th>
                   <th>Destination</th>
                   <th>Purpose</th>
-                  <th>Book Time</th>
-                  <th>Booked By</th>
+                  <th>User</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="booking_list.data.length > 0">
-                  <tr v-for="(booking, index) in booking_list.data" :key="booking.id">
+                  <tr v-for="(booking) in booking_list.data" :key="booking.id">
                     <td v-if="booking.car_id == 0"><i>Not Yet Assigned</i></td>
                     <td v-else>{{booking.car.type}} / {{booking.car.police_number}}</td>
                     
                     <td v-if="booking.driver_id == 0"><i>Not Yet Assigned</i></td>
                     <td v-else>{{booking.driver.name}}</td>
 
+                    <td>{{booktime(booking)}}</td>
                     <td>{{booking.destination}}</td>
                     <td>{{booking.purpose}}</td>
-                    <td>{{booktime(booking)}}</td>
                     <!-- <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td> -->
                     <td>
                       {{booking.user.name}}
@@ -55,7 +55,7 @@
                           <a class="modify-btn" @click="editBooking(booking)" title="Edit Booking">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                           </a>
-                          <a class="modify-btn" @click="deleteItem('booking_list', index, booking.id)" title="Delete Booking">
+                          <a class="modify-btn" @click="deleteItem('booking_list', booking)" title="Delete Booking">
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
                         </div>
@@ -144,7 +144,7 @@
               </thead>
               <tbody>
                 <template v-if="car_list.data.length > 0">
-                  <tr v-for="(car, index) in car_list.data" :key="car.id">
+                  <tr v-for="(car) in car_list.data" :key="car.id">
                     <template v-if="car.police_number !== '-'">
                       <td>{{car.company.name}}</td>
                       <td>{{car.type}}</td>
@@ -159,7 +159,7 @@
                           <a class="modify-btn" @click="editCar(car)" title="Edit Car">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                           </a>
-                          <a class="modify-btn" @click="deleteItem('car_list', index, car.id)" title="Delete Car">
+                          <a class="modify-btn" @click="deleteItem('car_list', car)" title="Delete Car">
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
                         </div>
@@ -278,6 +278,7 @@
         return `${this.formatDatetime(item.tanggal)} - ${item.jam_awal}.00 s/d ${this.formatTime(item.jam_akhir)}`
       },
       fullDatetime(datetime){
+        moment.locale('id');
         return moment(String(datetime)).format('lll');
       },
       
@@ -414,22 +415,22 @@
         this.selected_booking.action = 'edit_booking'
         $('#CreateCarBooking').modal('show');
       },
-      deleteItem(collection, index, id){
+      deleteItem(collection, item){
         let text = ''
         let url = ''
 
         if(collection === 'booking_list'){
-          text = `Booking ${this.booking_list[index].purpose}`
+          text = `Booking ${item.purpose}`
           url = 'booking'
         }else if(collection === 'car_list'){
-          text = `Car ${this.car_list[index].type}`
+          text = `Car ${item.type}`
           url = 'car'
         } console.log(text)
         this.$confirm(`Delete ${text}?`, '', 'question')
           .then( ()=> {
             this.$confirm('This delete action cannot be undone!', '', 'warning')
               .then( ()=> {
-                axios.delete(`${window.location.origin}/api/car/${url}-${id}`)
+                axios.delete(`${window.location.origin}/api/car/${url}-${item.id}`)
                   .then(res => {
                     this.$alert('Delete Successful', '', 'success');
                     collection === 'booking_list' ? this.loadPendingBooking() : this.loadCarData()

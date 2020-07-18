@@ -32,8 +32,8 @@
                     :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                   ></datepicker>
 
-                  <!-- <label>Description (Optional)</label>
-                  <textarea v-model="selected_doc.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea> -->
+                  <label>Notes (Optional)</label>
+                  <textarea v-model="selected_doc.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea>
                 </div>
               </div>
             </div>

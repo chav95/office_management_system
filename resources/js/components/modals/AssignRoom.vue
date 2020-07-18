@@ -134,7 +134,7 @@
       fill_available_room(){
         let arr = []
         this.roomData.forEach(room => {
-          if(room.today_booking.length > 0){
+          /*if(room.today_booking.length > 0){
             let valid = true
             room.today_booking.forEach(booking => {
               if(this.bookingItem.tanggal == booking.tanggal && booking.status == 1){
@@ -153,7 +153,7 @@
             if(valid == true){
               arr.push(room)
             }
-          }else if(room.capacity >= parseInt(this.bookingItem.participant)){
+          }else*/ if(room.capacity >= parseInt(this.bookingItem.participant)){
             arr.push(room)
           }
         });

@@ -19,33 +19,17 @@
                     input-class="room-datepicker" wrapper-class="room-datepicker-div"
                   ></datepicker>
                   <select v-model="postToRoom.jam_awal" class="form-control" style="display: inline-block; width: 95px">
-                    <option disabled value="0">Hour</option>
-                    <option value="9">9.00</option>
-                    <option value="10">10.00</option>
-                    <option value="11">11.00</option>
-                    <option value="12">12.00</option>
-                    <option value="13">13.00</option>
-                    <option value="14">14.00</option>
-                    <option value="15">15.00</option>
-                    <option value="16">16.00</option>
-                    <option value="17">17.00</option>
+                    <option disabled value="-1">Hour</option>
+                    <option v-for="index in 24" :key="index" :value="index-1">{{index-1}}.00</option>
                   </select>
                   <select v-model="postToRoom.jam_akhir" class="form-control" style="display: inline-block; width: 95px">
-                    <option disabled value="0">Hour</option>
-                    <option value="10">10.00</option>
-                    <option value="11">11.00</option>
-                    <option value="12">12.00</option>
-                    <option value="13">13.00</option>
-                    <option value="14">14.00</option>
-                    <option value="15">15.00</option>
-                    <option value="16">16.00</option>
-                    <option value="17">17.00</option>
-                    <option value="18">18.00</option>
+                    <option disabled value="-1">Hour</option>
+                    <option v-for="index in 24" :key="index" :value="index">{{index}}.00</option>
                   </select>
                   <input v-model="postToRoom.participant" type="number" class="form-control" placeholder="Number of Participants"/>
                   <input v-model="postToRoom.purpose" type="text" class="form-control" placeholder="Booking Purpose"/>
                   <select v-model="postToRoom.division" class="form-control">
-                    <option value="0" disabled>{{"Choose Room User's Division"}}</option>
+                    <option value="0" disabled>{{"Choose Division"}}</option>
                     <option v-for="div in divisionList" :key="div.id" :value="div.id">{{div.name}}</option>
                   </select>
                   <select v-show="show_room_select" v-model="postToRoom.room" class="form-control room-select">
@@ -123,8 +107,8 @@
           action: '',
           id: 0,
           tanggal: '',
-          jam_awal: 0,
-          jam_akhir: 0,
+          jam_awal: -1,
+          jam_akhir: -1,
           participant: '',
           purpose: '',
           division: 0,
@@ -184,8 +168,8 @@
       show_room_select(){
         if(
           this.postToRoom.tanggal != '' 
-          && this.postToRoom.jam_awal > 0 
-          && this.postToRoom.jam_akhir > 0 
+          && this.postToRoom.jam_awal > - 1
+          && this.postToRoom.jam_akhir > -1
           && (parseInt(this.postToRoom.participant) > 0 && this.postToRoom.participant != '')
         ){
           return true
@@ -206,7 +190,7 @@
       fill_available_room(){
         let arr = []
         this.roomData.forEach(room => {
-          if(room.today_booking.length > 0){
+          /*if(room.today_booking.length > 0){
             let valid = true
             room.today_booking.forEach(booking => {
               if(this.bookingItem.tanggal == booking.tanggal && booking.status == 1){
@@ -225,7 +209,7 @@
             if(valid == true){
               arr.push(room)
             }
-          }else if(room.capacity >= parseInt(this.postToRoom.participant)){
+          }else*/ if(room.capacity >= parseInt(this.postToRoom.participant)){
             arr.push(room)
           }
         });
@@ -234,7 +218,7 @@
       submitBooking(){
         if(this.postToRoom.tanggal === ''){
           this.$alert('Booking Date Cannot Be Empty', '', 'warning');
-        }else if(this.postToRoom.jam_awal == 0 || this.postToRoom.jam_akhir == 0){
+        }else if(this.postToRoom.jam_awal == -1 || this.postToRoom.jam_akhir == -1){
           this.$alert('Booking Time Cannot Be Empty', '', 'warning');
         }else if(this.postToRoom.participant == 0){
           this.$alert('Number of Participants Cannot Be Empty', '', 'warning');
@@ -264,8 +248,8 @@
                 $('#CreateRoomBooking').modal('hide');
 
                 this.postToRoom.tanggal = ''
-                this.postToRoom.jam_awal = 0
-                this.postToRoom.jam_akhir = 0
+                this.postToRoom.jam_awal = -1
+                this.postToRoom.jam_akhir = -1
                 this.postToRoom.participant = ''
                 this.postToRoom.purpose = ''
                 this.postToRoom.division = 0
@@ -284,7 +268,8 @@
             .catch((error) => {
               this.loading = false
               
-              this.postToRoom.options = this.postToRoom.options.split(',')
+              // this.postToRoom.options = this.postToRoom.options.split(',')
+              this.postToRoom.options = []
               this.$alert(error, '', 'error')
             });          
         }

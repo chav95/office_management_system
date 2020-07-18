@@ -10,6 +10,7 @@ use App\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookRoomNotif;
 use App\Mail\BookRoomStatus;
+use App\Mail\BookRoomDone;
 
 class RoomController extends Controller
 {
@@ -142,7 +143,8 @@ class RoomController extends Controller
                     'result' => 
                         RoomBooking::where('id', $request->booking_id)->update([
                             'status' => 2,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(6)->email)->send(new BookRoomDone(RoomBooking::with('user', 'room')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel'){
                 return response()->json(array(
@@ -151,7 +153,8 @@ class RoomController extends Controller
                         RoomBooking::where('id', $request->booking_id)->update([
                             'notes' => $request->notes,
                             'status' => -2,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(6)->email)->send(new BookRoomDone(RoomBooking::with('user', 'room')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel_reject'){
                 return response()->json(array(
@@ -186,6 +189,7 @@ class RoomController extends Controller
                 ->where('tanggal', '>=', date('Y-m-d'))
                 ->where('status', '>', 0)
                 ->orWhere('status', '=', -2)
+                ->orderByRaw('FIELD(status, 1, 2, -2)')
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
                 ->paginate(10);
@@ -194,6 +198,7 @@ class RoomController extends Controller
                 ->where('tanggal', '>=', date('Y-m-d'))
                 ->where('status', '=', 0)
                 ->orWhere('status', '=', -1)
+                ->orderByRaw('FIELD(status, 1, 2, -2)')
                 ->orderBy('created_at', 'DESC')
                 ->orderBy('jam_awal', 'ASC')
                 ->paginate(10);

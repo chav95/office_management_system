@@ -25,21 +25,25 @@
                 <thead>
                   <tr>
                     <th>Room</th>
+                    <th>Book Time</th>
                     <th>Purpose</th>
                     <th>Participants</th>
-                    <th>Book Time</th>
+                    <th>User</th>
                     <th>Extra(s)</th>
-                    <th>Booked By</th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   <template v-if="booking_list.data.length > 0">
-                    <tr v-for="(booking, index) in booking_list.data" :key="booking.id">
+                    <tr v-for="(booking) in booking_list.data" :key="booking.id">
                       <td>{{booking.room.name}}</td>
+                      <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td>
                       <td>{{booking.purpose}}</td>
                       <td>{{booking.participant}} People <i>({{booking.division.name}} Division)</i></td>
-                      <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td>
+                      <td>
+                        {{booking.user.name}}
+                        <span class="d-block"><i>({{fullDatetime(booking.created_at)}})</i></span>
+                      </td>
                       <td>
                         <ul v-if="booking.options.length > 0">
                           <li v-for="(option, index) in booking.options" :key="index">{{option}}</li>
@@ -47,16 +51,12 @@
                         <span v-else>-</span>
                       </td>
                       <td>
-                        {{booking.user.name}}
-                        <span class="d-block"><i>({{fullDatetime(booking.created_at)}})</i></span>
-                      </td>
-                      <td>
                         <template v-if="$route.path == '/manage-rooms/pending-list' && booking.status == 0">
                           <div class="modify_box" v-if="booking.user.id == userLogin.id">
                             <a class="modify-btn" @click="editBooking(booking)" title="Edit Booking">
                               <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                             </a>
-                            <a class="modify-btn" @click="deleteItem('booking_list', index, booking.id)" title="Delete Room">
+                            <a class="modify-btn" @click="deleteItem('booking_list', booking)" title="Delete Room">
                               <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                             </a>
                           </div>
@@ -132,7 +132,7 @@
                 </thead>
                 <tbody>
                   <template v-if="room_list.data.length > 0">
-                    <tr v-for="(room, index) in room_list.data" :key="room.id">
+                    <tr v-for="(room) in room_list.data" :key="room.id">
                       <td>{{room.name}}</td>
                       <td>{{room.capacity}}</td>
                       <td class="text-green"><b>Available</b></td>
@@ -141,7 +141,7 @@
                           <a class="modify-btn" @click="editRoom(room)" title="Edit Room">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                           </a>
-                          <a class="modify-btn" @click="deleteItem('room_list', index, room.id)" title="Delete Room">
+                          <a class="modify-btn" @click="deleteItem('room_list', room)" title="Delete Room">
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
                         </div>
@@ -189,8 +189,8 @@
         selected_booking: {
           action: '',
           tanggal: '',
-          jam_awal: 0,
-          jam_akhir: 0,
+          jam_awal: -1,
+          jam_akhir: -1,
           participant: 0,
           id: 0,
           purpose: '',
@@ -247,6 +247,7 @@
         return moment(String(datetime)).format('ll');
       },
       fullDatetime(datetime){
+        moment.locale('id');
         return moment(String(datetime)).format('lll');
       },
 
@@ -323,8 +324,8 @@
         this.selected_booking = {
           action: 'create_booking',
           tanggal: '',
-          jam_awal: 0,
-          jam_akhir: 0,
+          jam_awal: -1,
+          jam_akhir: -1,
           participant: '',
           id: 0,
           purpose: '',
@@ -439,22 +440,22 @@
               })
           })
       },
-      deleteItem(collection, index, id){
+      deleteItem(collection, item){
         let text = ''
         let url = ''
 
         if(collection === 'booking_list'){
-          text = `Booking ${this.booking_list[index].purpose}`
+          text = `Booking ${item.purpose}`
           url = 'booking'
         }else if(collection === 'room_list'){
-          text = `Room ${this.room_list[index].name}`
+          text = `Room ${item.name}`
           url = 'room'
         }
         this.$confirm(`Delete ${text}?`, '', 'question')
           .then( ()=> {
             this.$confirm('This delete action cannot be undone!', '', 'warning')
               .then( ()=> {
-                axios.delete(`${window.location.origin}/api/room/${url}-${id}`)
+                axios.delete(`${window.location.origin}/api/room/${url}-${item.id}`)
                   .then(res => {
                     this.$alert('Delete Successful', '', 'success');
                     if(collection == 'booking_list'){

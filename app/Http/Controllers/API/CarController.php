@@ -10,6 +10,7 @@ use App\User;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\BookCarNotif;
 use App\Mail\BookCarStatus;
+use App\Mail\BookCarDone;
 
 class CarController extends Controller
 {
@@ -161,7 +162,8 @@ class CarController extends Controller
                         CarBooking::where('id', $request->booking_id)->update([
                             'jam_akhir' => date('Y-m-d H:i:s'),
                             'status' => 2,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(6)->email)->send(new BookCarDone(CarBooking::with('user', 'car')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel'){
                 return response()->json(array(
@@ -170,7 +172,8 @@ class CarController extends Controller
                         CarBooking::where('id', $request->booking_id)->update([
                             'notes' => $request->notes,
                             'status' => -2,
-                        ])
+                        ]),
+                    'mail' => Mail::to(User::find(6)->email)->send(new BookCarDone(CarBooking::with('user', 'car')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel_reject'){
                 return response()->json(array(
@@ -196,21 +199,23 @@ class CarController extends Controller
         if($id === 'getCarList'){
             $result = Car::with('company', 'division', 'vendor', 'driver')->get();
         }else if($id === 'getCarData'){
-            $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->paginate(2);
+            $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->paginate(10);
         }else if($id === 'getBookingData'){
             $result = CarBooking::with('car', 'driver', 'user', 'division')
                 ->where('car_id', '>', 0)
                 ->where('tanggal', '>=', date('Y-m-d'))
+                ->orderByRaw('FIELD(status, 1, 2, -2)')
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
-                ->paginate(2);
+                ->paginate(10);
         }else if($id === 'getPendingBooking'){
             $result = CarBooking::with('user', 'division')
                 ->where('car_id', '=', 0)
                 ->where('tanggal', '>=', date('Y-m-d'))
+                ->orderByRaw('FIELD(status, 1, 2, -2)')
                 ->orderBy('created_at', 'DESC')
                 ->orderBy('jam_awal', 'ASC')
-                ->paginate(2);
+                ->paginate(10);
         }
 
         return $result;

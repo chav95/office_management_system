@@ -18,8 +18,8 @@
                   <th>Name</th>
                   <th>Document Number</th>
                   <th>Issue Date</th>
-                  <th>Due Date</th>
-                  <!-- <th>Description</th> -->
+                  <th>Expire Date</th>
+                  <th>Notes</th>
                   <th>Created By</th>
                   <th>Action</th>
                 </tr>
@@ -49,7 +49,7 @@
                     <td>{{item.no_document}}</td>
                     <td>{{formatDatetime(item.document_date)}}</td>
                     <td>{{formatDatetime(item.due_date)}}</td>
-                    <!-- <td><pre class="doc_description">{{item.description}}</pre></td> -->
+                    <td><pre class="doc_description">{{item.description}}</pre></td>
                     <td>{{item.user.name | ucwords}}</td>
                     <td>
                       <div class="modify_box" v-if="userLogin.id === item.created_by">
@@ -185,6 +185,7 @@
     margin-bottom: 10px;
   }
   .doc_description{
+    max-width: 350px;
     padding: 0;
     margin-bottom: 0;
     font-family: inherit;

@@ -24,6 +24,7 @@ class Docsimport implements ToModel, WithStartRow
             'no_document' => $row[1],
             'document_date'  => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[2]),
             'due_date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[3]),
+            'description' => $row[5],
             'created_by'  => auth('api')->user()->id,
         ]);
     }

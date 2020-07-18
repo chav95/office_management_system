@@ -53,7 +53,10 @@ let routes = [
     {path: '/hrd/salary-slip', component: require('./components/SalarySlipList.vue').default},
     {path: '/hrd/salary-slip/:id', component: require('./components/SalarySlipDetail.vue').default},
     
+    // User Routes
     {path: '/manage-users', component: require('./components/Users.vue').default},
+    {path: '/manage-users/users', component: require('./components/Users.vue').default},
+    {path: '/manage-users/divisions', component: require('./components/ManageDivision.vue').default},
 ]
 
 const router = new VueRouter({

@@ -53,7 +53,7 @@ class DivisionController extends Controller
     public function show($id)
     {
         if($id === 'getDivisionData'){
-            return Division::orderBy('name', 'ASC')->get();
+            return Division::orderBy('order_no', 'ASC')->orderBy('name', 'ASC')->get();
         }
     }
 

@@ -12,7 +12,7 @@ class Document extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'no_document', 'document_date', 'due_date', 'created_by',
+        'name', 'no_document', 'document_date', 'due_date', 'description', 'created_by',
     ];
     
     public function user(){

@@ -239,8 +239,22 @@
             <li class="nav-item has-treeview">
               <router-link to="/manage-users" class="nav-link">
                 <i class="fas fa-user-cog nav-icon color-yellow"></i>
-                <p>Manage Users</p>
+                <p>Manage Users <i class="right fas fa-angle-left"></i></p>
               </router-link>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <router-link to="/manage-users/users" class="nav-link">
+                    <i class="fas fa-user-cog nav-icon color-yellow"></i>
+                    <p>User Settings</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-users/divisions" class="nav-link">
+                    <i class="fas fa-user-cog nav-icon color-yellow"></i>
+                    <p>Division Settings</p>
+                  </router-link>
+                </li>
+              </ul>
             </li>
           @endif
           {{-- @if(Auth::user()->privilege == 'admin')

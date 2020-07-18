@@ -29,7 +29,7 @@
                     :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1)), from: notif_max_date}"
                   ></datepicker> -->
 
-                  <label>Description (Optional)</label>
+                  <label>Notes (Optional)</label>
                   <textarea v-model="selected_maintenance.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea>
                 </div>
               </div>
