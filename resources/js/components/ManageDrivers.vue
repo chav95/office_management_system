@@ -6,7 +6,7 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title"><strong>User List</strong></h3>
-            <button class="btn btn-primary createBtn" style="float: right" id="createUserBtn" @click="createUser()">Create New User</button>
+            <button class="btn btn-primary createBtn" style="float: right" id="createUserBtn" @click="createUser()">Create New Driver</button>
           </div>
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0" style="height: 100%;">

@@ -26,7 +26,7 @@
                   <tr  v-for="user in allUser.data" :key="user.id" hover:bg-blue px-4 py2>
                     <td>{{user.name | ucwords}}</td>
                     <td>{{user.email}}</td>
-                    <td>{{user.division.name}}</td>
+                    <td>{{user.division == null ? '-' : user.division.name}}</td>
                     <td>{{user.privilege.replace('_', ' ') | ucwords}}</td>
                     <td>{{formatDatetime(user.created_at)}}</td>
                     <td>

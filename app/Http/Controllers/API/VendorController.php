@@ -41,7 +41,24 @@ class VendorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if($request->act){
+            if($request->act == 'create'){
+                $vendor = new Vendor;
+                $vendor->name = $request->name;
+                $vendor->save();
+
+                return response()->json(array(
+                    'success' => true, 'last_insert_id' => $vendor->id
+                ), 200);
+            }else if($request->act == 'edit'){
+                return response()->json(array(
+                    'result' => 
+                        Vendor::where('id', $request->id)->update([
+                            'name' => $request->name,
+                        ])
+                ), 200);
+            }
+        }
     }
 
     /**
@@ -54,6 +71,8 @@ class VendorController extends Controller
     {
         if($id === 'getVendorData'){
             return Vendor::orderBy('name', 'ASC')->get();
+        }else if($id === 'getVendorList'){
+            return Vendor::orderBy('name', 'ASC')->paginate(10);
         }
     }
 
@@ -88,6 +107,9 @@ class VendorController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return response()->json(array(
+            'success' => true,
+            'result' => Vendor::destroy($id)
+        ), 200);
     }
 }

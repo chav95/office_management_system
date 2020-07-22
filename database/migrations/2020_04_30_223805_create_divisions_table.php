@@ -16,7 +16,7 @@ class CreateDivisionsTable extends Migration
         Schema::create('divisions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
-            $table->integer('order_no');
+            $table->integer('order_no')->nullable();
             $table->timestamps();
         });
     }

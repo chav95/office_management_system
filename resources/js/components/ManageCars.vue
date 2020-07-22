@@ -152,8 +152,8 @@
                       <td>{{car.police_number}}</td>
                       <!-- <td>{{car.driver.name}}</td> -->
                       <td>{{formatDatetime(car.lease_start)}} s/d {{car.lease_due === null ? '-' : formatDatetime(car.lease_due)}}</td>
-                      <td>{{car.vendor.name}}</td>
-                      <td>{{car.division.name}}</td>
+                      <td>{{car.vendor == null ? '-' : car.vendor.name}}</td>
+                      <td>{{car.division == null ? '-' : car.division.name}}</td>
                       <td>
                         <div class="modify_box">
                           <a class="modify-btn" @click="editCar(car)" title="Edit Car">

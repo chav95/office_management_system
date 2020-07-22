@@ -5,22 +5,22 @@
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title"><strong>Division List</strong></h3>
-            <button v-if="can_modify" class="btn btn-primary createBtn" style="float: right" id="createItemBtn" @click="createItem()">Create New Division</button>
+            <h3 class="card-title"><strong>Vendor List</strong></h3>
+            <button v-if="can_modify" class="btn btn-primary createBtn" style="float: right" id="createItemBtn" @click="createItem()">Create New Vendor</button>
           </div>
           <!-- /.card-header -->
           <div class="card-body table-responsive p-0" style="height: 100%;">
             <table class="table table-head-fixed">
               <thead>
                 <tr>
-                  <th>Division</th>
+                  <th>Vendor</th>
                   <th>Registered At</th>
                   <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                <template v-if="division_list.data.length > 0">
-                  <tr  v-for="item in division_list.data" :key="item.id" hover:bg-blue px-4 py2>
+                <template v-if="vendor_list.data.length > 0">
+                  <tr  v-for="item in vendor_list.data" :key="item.id" hover:bg-blue px-4 py2>
                     <td>{{item.name | ucwords}}</td>
                     <td>{{formatDatetime(item.created_at)}}</td>
                     <td>
@@ -42,7 +42,7 @@
             </table>
           </div>
           <div class="card-footer">
-            <pagination :data="division_list" @pagination-change-page="getResults"></pagination>
+            <pagination :data="vendor_list" @pagination-change-page="getResults"></pagination>
           </div>
           <!-- /.card-body -->
         </div>
@@ -62,8 +62,8 @@
 
               <div class="modal-body">
                 <div class="form-group">
-                  <label>Division Name</label>
-                  <input v-model="form.name" type="text" name="name" placeholder="Division Name"
+                  <label>Vendor Name</label>
+                  <input v-model="form.name" type="text" name="name" placeholder="Vendor Name"
                     class="form-control" :class="{ 'is-invalid': form.errors.has('name') }">
                   <has-error :form="form" field="name"></has-error>
                 </div>
@@ -98,14 +98,14 @@
           id: Number,
           name: String,
         }),
-        division_list: {data: {}},
+        vendor_list: {data: {}},
         modalTitle: '',
         modalBtnText: '',
       }
     },
     mounted(){
       this.loadUserlogin()
-      this.loadDivisionList()
+      this.loadVendorList()
     },
     computed:{
       can_modify(){
@@ -121,31 +121,31 @@
           this.userLogin = data;
         })
       },
-      loadDivisionList(){
-        axios.get(window.location.origin+'/api/division/getDivisionList')
+      loadVendorList(){
+        axios.get(window.location.origin+'/api/vendor/getVendorList')
           .then(({data}) => {
-            this.division_list = data
+            this.vendor_list = data
           })
       },
       formatDatetime(datetime){
         return moment(String(datetime)).format('llll');
       },
       getResults(page = 1) {
-        axios.get(window.location.origin+'/api/division/getDivisionList?page=' + page)
+        axios.get(window.location.origin+'/api/vendor/getVendorList?page=' + page)
           .then(response => {
-              this.division_list = response.data;
+              this.vendor_list = response.data;
           });
       },
       createItem(){
-        this.modalTitle = 'Create New Division'
+        this.modalTitle = 'Create New Vendor'
         this.modalBtnText = 'Create New'
         this.form.id = 0
         this.form.act = 'create'
         this.form.name = ''
         $('#modifyModal').modal('show');
       },
-      editItem(id, name, email, division, privilege){
-        this.modalTitle = 'Edit Division'
+      editItem(id, name){
+        this.modalTitle = 'Edit Vendor'
         this.modalBtnText = 'Submit Edit'
         this.form.id = id
         this.form.act = 'edit'
@@ -153,23 +153,23 @@
         $('#modifyModal').modal('show');
       },
       submitUser(){
-        this.form.post(window.location.origin+'/api/division')
+        this.form.post(window.location.origin+'/api/vendor')
           .then(({response}) => {
             $('#modifyModal').modal('hide');
             this.$alert(`${this.modalTitle} Successful`, '', 'success')
-            this.loadDivisionList()
+            this.loadVendorList()
           })
           .catch(err => this.$alert('Invalid Data', '', 'error'));
       },
-      deleteItem(user_id, user_name){
-        this.$confirm('Permanently delete division '+user_name+'?', '', 'question')
+      deleteItem(item_id, item_name){
+        this.$confirm('Permanently delete vendor '+item_name+'?', '', 'question')
           .then( () => {
             this.$confirm('This delete action cannot be undone!', '', 'warning')
               .then( () => {
-                axios.delete(window.location.origin+'/api/division/'+user_id)
+                axios.delete(window.location.origin+'/api/vendor/'+item_id)
                   .then(({response}) => {
                     this.$alert('Delete Successful', '', 'success');
-                    this.loadDivisionList();
+                    this.loadVendorList();
                   })
                   .catch(({error}) => this.$alert(error.message, '', 'error'));
               });

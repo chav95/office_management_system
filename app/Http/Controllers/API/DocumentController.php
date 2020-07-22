@@ -99,9 +99,18 @@ class DocumentController extends Controller
     public function show($id)
     {
         if($id === 'getDocData'){
-            $result = Document::with('user')
-                ->where('due_date', '>=', date('Y-m-d'))
-                ->orderBy('due_date', 'ASC')->paginate(10);
+            if(auth('api')->user()->id == 6){
+                $result = Document::with('user')
+                    ->where('due_date', '>=', date('Y-m-d'))
+                    ->orderBy('name', 'ASC')
+                    ->orderBy('due_date', 'ASC')->paginate(10);
+            }else{
+                $result = Document::with('user')
+                    ->where('due_date', '>=', date('Y-m-d'))
+                    ->where('created_by', '=', auth('api')->user()->id)
+                    ->orderBy('name', 'ASC')
+                    ->orderBy('due_date', 'ASC')->paginate(10);
+            }            
 
             // $four_weeks = date('Y-m-d', strtotime("+ 28 days"));
             // $result = Document::with('user')

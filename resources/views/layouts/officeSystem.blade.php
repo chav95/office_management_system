@@ -205,6 +205,12 @@
                   <p>Driver Settings</p>
                 </router-link>
               </li>
+              <li class="nav-item">
+                <router-link to="/manage-cars/vendor-settings" class="nav-link">
+                  <i class="nav-icon fas fa-wrench color-blue"></i>
+                  <p>Vendor Settings</p>
+                </router-link>
+              </li>
             </ul>
           </li>
           <li class="nav-item has-treeview">

@@ -41,7 +41,24 @@ class DivisionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if($request->act){
+            if($request->act == 'create'){
+                $division = new Division;
+                $division->name = $request->name;
+                $division->save();
+
+                return response()->json(array(
+                    'success' => true, 'last_insert_id' => $division->id
+                ), 200);
+            }else if($request->act == 'edit'){
+                return response()->json(array(
+                    'result' => 
+                        Division::where('id', $request->id)->update([
+                            'name' => $request->name,
+                        ])
+                ), 200);
+            }
+        }
     }
 
     /**
@@ -54,6 +71,8 @@ class DivisionController extends Controller
     {
         if($id === 'getDivisionData'){
             return Division::orderBy('order_no', 'ASC')->orderBy('name', 'ASC')->get();
+        }else if($id === 'getDivisionList'){
+            return Division::orderBy('order_no', 'ASC')->orderBy('name', 'ASC')->paginate(10);
         }
     }
 
@@ -88,6 +107,9 @@ class DivisionController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return response()->json(array(
+            'success' => true,
+            'result' => Division::destroy($id)
+        ), 200);
     }
 }

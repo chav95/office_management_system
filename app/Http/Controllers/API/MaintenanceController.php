@@ -53,7 +53,7 @@ class MaintenanceController extends Controller
                 $maintenance = new Maintenance;
                 $maintenance->name = $request->name;
                 $maintenance->due_date = date('Y-m-d', strtotime($request->due_date));
-                $maintenance->notif_date = date('Y-m-d', strtotime($request->notif_date));
+                // $maintenance->document_date = date('Y-m-d', strtotime($request->document_date));
                 $maintenance->description = $request->description;
                 $maintenance->created_by = auth('api')->user()->id;
                 $maintenance->save();
