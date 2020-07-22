@@ -220,6 +220,8 @@
           this.$alert('Booking Date Cannot Be Empty', '', 'warning');
         }else if(this.postToRoom.jam_awal == -1 || this.postToRoom.jam_akhir == -1){
           this.$alert('Booking Time Cannot Be Empty', '', 'warning');
+        }else if(this.postToRoom.jam_akhir <= this.postToRoom.jam_awal){
+          this.$alert('Booking Time is Invalid', '', 'warning')
         }else if(this.postToRoom.participant == 0){
           this.$alert('Number of Participants Cannot Be Empty', '', 'warning');
         }else if(this.postToRoom.purpose === ''){

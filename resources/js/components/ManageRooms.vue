@@ -30,7 +30,7 @@
                     <th>Participants</th>
                     <th>User</th>
                     <th>Extra(s)</th>
-                    <th>Action</th>
+                    <th class="no-print">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -50,7 +50,7 @@
                         </ul>
                         <span v-else>-</span>
                       </td>
-                      <td>
+                      <td class="no-print">
                         <template v-if="$route.path == '/manage-rooms/pending-list' && booking.status == 0">
                           <div class="modify_box" v-if="booking.user.id == userLogin.id">
                             <a class="modify-btn" @click="editBooking(booking)" title="Edit Booking">
@@ -127,7 +127,7 @@
                     <th>Room</th>
                     <th>Capacity</th>
                     <th>Status</th>
-                    <th>Action</th>
+                    <th class="no-print">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -136,7 +136,7 @@
                       <td>{{room.name}}</td>
                       <td>{{room.capacity}}</td>
                       <td class="text-green"><b>Available</b></td>
-                      <td>
+                      <td class="no-print">
                         <div>
                           <a class="modify-btn" @click="editRoom(room)" title="Edit Room">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>

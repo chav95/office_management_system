@@ -32,6 +32,14 @@
                     :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                   ></datepicker>
 
+                  <template v-if="userLogin.id == 5">
+                    <label>User</label>
+                    <select v-model="selected_doc.user" class="form-control" placeholder="Document Owner">
+                      <option value="0" disabled>Select User</option>
+                      <option v-for="item in user_data" :key="item.id" :value="item.id">{{item.name}}</option>
+                    </select>
+                  </template>
+
                   <label>Notes (Optional)</label>
                   <textarea v-model="selected_doc.description" rows="4" class="form-control" placeholder="Description (Optional)"></textarea>
                 </div>
@@ -57,7 +65,7 @@
 </template>
 
 <script>
-  import Datepicker from 'vuejs-datepicker';
+  import Datepicker from 'vuejs-datepicker'
   import {id, en} from 'vuejs-datepicker/dist/locale'
   import moment from 'moment'
   
@@ -66,6 +74,7 @@
       Datepicker
     },
     props: {
+      userLogin: Object,
       selected_doc: Object,
     },
     data(){
@@ -73,12 +82,14 @@
         id,
         en,
 
+        user_data: {},
+
         loading: false,
       }
     },
     computed: {
       completed(){
-        if(this.selected_doc.descripton !== '' && this.selected_doc.name !== '' /*&& this.selected_doc.notif_date != ''*/ && this.selected_doc.due_date != ''){
+        if(this.selected_doc.name !== '' /*&& this.selected_doc.notif_date != '' && this.selected_doc.due_date != ''*/){
           return true
         }
         return false
@@ -91,6 +102,13 @@
       },
     },
     methods: {
+      loadUserData(){
+        axios.get(window.location.origin+'/api/user/getUserData')
+          .then(res => {
+            this.user_data = res.data
+          })
+      },
+
       submitDoc(){
         if(this.completed === true){
           this.loading = true
@@ -120,6 +138,10 @@
           this.$alert('All Data Must Be Filled', '', 'error');
         }
       }
+    },
+
+    mounted(){
+      this.loadUserData()
     }
   }
 </script>

@@ -29,7 +29,7 @@
                   <th>Destination</th>
                   <th>Purpose</th>
                   <th>User</th>
-                  <th>Action</th>
+                  <th class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -49,7 +49,7 @@
                       {{booking.user.name}}
                       <span class="d-block"><i>({{fullDatetime(booking.created_at)}})</i></span>
                     </td>
-                    <td>
+                    <td class="no-print">
                       <template v-if="$route.path == '/manage-cars/pending-list' && booking.status == 0">
                         <div class="modify_box" v-if="booking.user.id == userLogin.id">
                           <a class="modify-btn" @click="editBooking(booking)" title="Edit Booking">
@@ -136,10 +136,10 @@
                   <th>Engine</th>
                   <th>Police Number</th>
                   <!-- <th>Driver</th> -->
-                  <th>Lease Duration</th>
+                  <th>STNK / Lease Timeline</th>
                   <th>Vendor</th>
                   <th>User</th>
-                  <th>Action</th>
+                  <th class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -151,10 +151,16 @@
                       <td>{{car.engine_cc}}</td>
                       <td>{{car.police_number}}</td>
                       <!-- <td>{{car.driver.name}}</td> -->
-                      <td>{{formatDatetime(car.lease_start)}} s/d {{car.lease_due === null ? '-' : formatDatetime(car.lease_due)}}</td>
+
+                      <td>
+                        {{car.lease_start == '1970-01-01' ? '-' : formatDatetime(car.lease_start)}} 
+                        s/d 
+                        {{car.lease_due == '1970-01-01' ? '-' : formatDatetime(car.lease_due)}}
+                      </td>
+                      
                       <td>{{car.vendor == null ? '-' : car.vendor.name}}</td>
                       <td>{{car.division == null ? '-' : car.division.name}}</td>
-                      <td>
+                      <td class="no-print">
                         <div class="modify_box">
                           <a class="modify-btn" @click="editCar(car)" title="Edit Car">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>

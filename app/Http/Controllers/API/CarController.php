@@ -93,7 +93,7 @@ class CarController extends Controller
                 $booking->booked_by = auth('api')->user()->id;
                 $booking->save();
 
-                // Mail::to('om@jtd.co.id')->send(new BookCarNotif($booking));
+                // Mail::to('om@jtd.co.id')->queue(new BookCarNotif($booking));
                 Mail::to(User::find(6)->email)->send(new BookCarNotif(CarBooking::with('user', 'car')->find($booking->id)));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);

@@ -4,7 +4,7 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card">
-          <create-doc :selected_doc="selected_doc" @success="loadDocData()"/>
+          <create-doc :selected_doc="selected_doc" :userLogin="userLogin" @success="loadDocData()"/>
           <import-doc @success="loadDocData()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Document List</strong></h3>
@@ -21,7 +21,7 @@
                   <th>Expire Date</th>
                   <th>Notes</th>
                   <th>Created By</th>
-                  <th>Action</th>
+                  <th class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -50,9 +50,10 @@
                     <td>{{formatDatetime(item.document_date)}}</td>
                     <td>{{formatDatetime(item.due_date)}}</td>
                     <td><pre class="doc_description">{{item.description}}</pre></td>
-                    <td>{{item.user.name | ucwords}}</td>
-                    <td>
-                      <div class="modify_box" v-if="userLogin.id === item.created_by">
+                    <!-- <td>{{item.user.name | ucwords}}</td> -->
+                    <td>{{item.user.name}}</td>
+                    <td class="no-print">
+                      <div class="modify_box" v-if="userLogin.id === item.created_by || userLogin.id == 5">
                         <a class="modify-btn" @click="editItem(item)" title="Edit Document">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
@@ -97,6 +98,7 @@
         doc_list: {
           data: []
         },
+        user_data: {},
 
         selected_doc: {
           action: '',
@@ -106,6 +108,7 @@
           document_date: '',
           due_date: '',
           description: '',
+          user: 0,
         },
       }
     },
@@ -119,6 +122,7 @@
             this.doc_list = data
           })
       },
+
       getPageContent(page = 1) {
         axios.get(window.location.origin+'/api/doc/getDocData?page=' + page)
           .then(response => {
@@ -135,6 +139,7 @@
           document_date: '',
           due_date: '',
           description: '',
+          user: 0,
         }
         $('#CreateDoc').modal('show')
       },
@@ -145,6 +150,7 @@
         this.selected_doc.document_date = item.document_date
         this.selected_doc.due_date = item.due_date
         this.selected_doc.description = item.description
+        this.selected_doc.user = item.user.id
         this.selected_doc.action = 'edit_doc'
         $('#CreateDoc').modal('show')
       },

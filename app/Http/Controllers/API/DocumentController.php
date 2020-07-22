@@ -52,11 +52,11 @@ class DocumentController extends Controller
             }else if($request->action == 'create_doc'){
                 $doc = new Document;
                 $doc->name = $request->name;
-                $doc->no_document = $request->no_documenet;
+                $doc->no_document = $request->no_document;
                 $doc->document_date = date('Y-m-d', strtotime($request->document_date));
-                $doc->notif_date = date('Y-m-d', strtotime($request->notif_date));
+                $doc->due_date = date('Y-m-d', strtotime($request->due_date));
                 $doc->description = $request->description;
-                $doc->created_by = auth('api')->user()->id;
+                $doc->created_by = $request->user == 0 ? auth('api')->user()->id : $request->user;
                 $doc->save();
                 
                 // Mail::to('om@jtd.co.id')->send(new BookCarNotif($booking));
@@ -84,6 +84,7 @@ class DocumentController extends Controller
                             'document_date' => date('Y-m-d', strtotime($request->document_date)),
                             'due_date' => date('Y-m-d', strtotime($request->due_date)),
                             'description' => $request->description,
+                            'created_by' => $request->user,
                         ])
                 ), 200);
             }
@@ -99,18 +100,18 @@ class DocumentController extends Controller
     public function show($id)
     {
         if($id === 'getDocData'){
-            if(auth('api')->user()->id == 6){
+            // if(auth('api')->user()->id == 6){
                 $result = Document::with('user')
                     ->where('due_date', '>=', date('Y-m-d'))
                     ->orderBy('name', 'ASC')
                     ->orderBy('due_date', 'ASC')->paginate(10);
-            }else{
-                $result = Document::with('user')
-                    ->where('due_date', '>=', date('Y-m-d'))
-                    ->where('created_by', '=', auth('api')->user()->id)
-                    ->orderBy('name', 'ASC')
-                    ->orderBy('due_date', 'ASC')->paginate(10);
-            }            
+            // }else{
+            //     $result = Document::with('user')
+            //         ->where('due_date', '>=', date('Y-m-d'))
+            //         ->where('created_by', '=', auth('api')->user()->id)
+            //         ->orderBy('name', 'ASC')
+            //         ->orderBy('due_date', 'ASC')->paginate(10);
+            // }            
 
             // $four_weeks = date('Y-m-d', strtotime("+ 28 days"));
             // $result = Document::with('user')

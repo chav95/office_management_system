@@ -29,10 +29,10 @@
                       <option v-for="item in driver_data" :key="item.id" :value="item.id">{{item.name}}</option>
                     </template>
                   </select> -->
-                  <datepicker v-model="lease_start" placeholder="Lease Start Date" 
+                  <datepicker v-model="lease_start" placeholder="STNK Issue Date" 
                     :language="id" input-class="input-datepicker" wrapper-class="width-50"
                   ></datepicker>
-                  <datepicker v-model="lease_due" placeholder="Lease End Date" 
+                  <datepicker v-model="lease_due" placeholder="STNK Expire Date" 
                     :language="id" input-class="input-datepicker" wrapper-class="width-50"
                   ></datepicker>
                   <input type="number" v-model="lease_price" class="form-control" placeholder="Leasing Price">
@@ -107,8 +107,8 @@
         engine: '',
         police_number: '',
         driver: 0,
-        lease_start: '',
-        lease_due: '',
+        lease_start: null,
+        lease_due: null,
         lease_price: '',
         vendor: 0,
         division: 0,
@@ -136,7 +136,7 @@
       completed(){
         if(
           this.company > 0 && this.type !== '' && parseInt(this.engine) > 0 && this.police_number !== '' && //this.driver > 0 &&
-          this.lease_start !== '' && this.lease_due !== '' && parseInt(this.lease_price) > 0 && this.vendor > 0 && this.division > 0
+          /*this.lease_start !== '' && this.lease_due !== '' && parseInt(this.lease_price) > 0 &&*/ this.vendor > 0 && this.division > 0
         ){
           return true
         }
@@ -173,8 +173,8 @@
                 this.engine = ''
                 this.police_number = ''
                 this.driver = 0
-                this.lease_start = ''
-                this.lease_due = ''
+                this.lease_start = null,
+                this.lease_due = null,
                 this.lease_price = ''
                 this.vendor = 0
                 this.division = 0

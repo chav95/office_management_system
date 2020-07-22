@@ -20,7 +20,6 @@
                   <label>Due Date</label>
                   <datepicker v-model="selected_maintenance.due_date" placeholder="Due Date" 
                     :language="id" input-class="input-datepicker" 
-                    :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                   ></datepicker>
 
                   <!-- <label>Notification Date</label>

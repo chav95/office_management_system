@@ -3,7 +3,7 @@
 
 @component('mail::panel')
 New room booking has been requested for:<br>
-Room: {{$booking->room->name}}
+Room: {{$booking->room->name}}<br>
 Agenda: {{$booking->purpose}}<br>
 Time: {{date('l, j F Y', strtotime($booking->tanggal))}} - {{$booking->jam_awal}}.00 s/d {{$booking->jam_akhir}}.00<br>
 Booked By: {{ucwords($booking->user->name)}}<br>

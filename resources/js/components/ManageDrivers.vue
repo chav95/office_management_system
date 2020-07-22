@@ -5,7 +5,7 @@
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title"><strong>User List</strong></h3>
+            <h3 class="card-title"><strong>Driver List</strong></h3>
             <button class="btn btn-primary createBtn" style="float: right" id="createUserBtn" @click="createUser()">Create New Driver</button>
           </div>
           <!-- /.card-header -->
@@ -16,13 +16,14 @@
                   <th>Name</th>
                   <th>Assigned Car</th>
                   <th>Registered At</th>
-                  <th>Action</th>
+                  <th class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="driver.data.length > 0">
                   <tr  v-for="user in driver.data" :key="user.id" hover:bg-blue px-4 py2>
-                    <td>{{user.name | ucwords}}</td>
+                    <!-- <td>{{user.name | ucwords}}</td> -->
+                    <td>{{user.name}}</td>
                     <td>  
                       {{user.car == null 
                         ? '-'
@@ -30,9 +31,9 @@
                       }}
                     </td>
                     <td>{{formatDatetime(user.created_at)}}</td>
-                    <td>
+                    <td class="no-print">
                       <div class="modify_box">
-                        <a class="modify-btn" title="Edit" v-on:click="editDriver(user.id, user.name, user.car.id)">
+                        <a class="modify-btn" title="Edit" v-on:click="editDriver(user.id, user.name, user.car === null ? 0 : user.car.id)">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
                         <a class="modify-btn" title="Delete" v-on:click="deleteDriver(user.id, user.name)">
@@ -69,8 +70,8 @@
 
               <div class="modal-body">
                 <div class="form-group">
-                  <label>User Name</label>
-                  <input v-model="form.name" type="text" name="name" placeholder="User Name"
+                  <label>Driver Name</label>
+                  <input v-model="form.name" type="text" name="name" placeholder="Driver Name"
                     class="form-control" :class="{ 'is-invalid': form.errors.has('name') }">
                   <has-error :form="form" field="name"></has-error>
                 </div>

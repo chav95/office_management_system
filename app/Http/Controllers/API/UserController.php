@@ -135,9 +135,13 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        if($id == 'getUserList'){
+        if($id == 'getUserData'){
             return User::with('division')
-                ->with('division')
+                ->where('status', '=', '1')
+                ->orderBy('name', 'asc')
+                ->get();
+        }else if($id == 'getUserList'){
+            return User::with('division')
                 ->where('status', '=', '1')
                 ->orderBy('name', 'asc')
                 ->paginate(10);

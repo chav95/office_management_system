@@ -15,15 +15,16 @@
                 <tr>
                   <th>Division</th>
                   <th>Registered At</th>
-                  <th>Action</th>
+                  <th class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="division_list.data.length > 0">
                   <tr  v-for="item in division_list.data" :key="item.id" hover:bg-blue px-4 py2>
-                    <td>{{item.name | ucwords}}</td>
+                    <!-- <td>{{item.name | ucwords}}</td> -->
+                    <td>{{item.name}}</td>
                     <td>{{formatDatetime(item.created_at)}}</td>
-                    <td>
+                    <td class="no-print">
                       <div v-if="can_modify" class="modify-btn-container">
                         <a class="modify-btn" title="Edit" v-on:click="editItem(item.id, item.name)">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>

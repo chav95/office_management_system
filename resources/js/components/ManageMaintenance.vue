@@ -23,7 +23,7 @@
                   <th>Expire Date</th>
                   <th>Notes</th>
                   <th>Created By</th>
-                  <th>Action</th>
+                  <th class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -33,8 +33,9 @@
                     <!-- <td>{{formatDatetime(item.notif_date)}}</td> -->
                     <td>{{formatDatetime(item.due_date)}}</td>
                     <td><pre class="maintenance_description">{{item.description}}</pre></td>
-                    <td>{{item.user.name | ucwords}}</td>
-                    <td>
+                    <!-- <td>{{item.user.name | ucwords}}</td> -->
+                    <td>{{item.user.name}}</td>
+                    <td class="no-print">
                       <div class="modify_box" v-if="userLogin.id === item.created_by">
                         <a class="modify-btn" @click="editItem(item)" title="Edit Maintenance">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>

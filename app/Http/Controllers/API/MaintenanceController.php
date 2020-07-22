@@ -97,11 +97,18 @@ class MaintenanceController extends Controller
     public function show($id)
     {
         if($id === 'getMaintenanceData'){
-            $result = Maintenance::with('user')
-            ->where('created_by', '=', auth('api')->user()->id)
-            ->where('due_date', '>=', date('Y-m-d'))
-            ->orderBy('name', 'ASC')
-            ->orderBy('due_date', 'ASC')->paginate(10);
+            if(auth('api')->user()->id == 6){
+                $result = Maintenance::with('user')
+                    ->where('due_date', '>=', date('Y-m-d'))
+                    ->orderBy('due_date', 'ASC')->paginate(10)
+                    ->orderBy('name', 'ASC');
+            }else{
+                $result = Maintenance::with('user')
+                    ->where('created_by', '=', auth('api')->user()->id)
+                    ->where('due_date', '>=', date('Y-m-d'))
+                    ->orderBy('due_date', 'ASC')->paginate(10)
+                    ->orderBy('name', 'ASC');
+            }  
         }
 
         return $result;

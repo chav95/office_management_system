@@ -66,8 +66,10 @@ class DriverController extends Controller
                     $driver = Driver::with('car')->where('id', $request->id)->get();
                     // return $driver[0]->car->id;
 
-                    Car::where('id', $driver[0]->car->id)
-                        ->update(['driver_id' => 0]);
+                    if($driver[0]->car !== null){
+                        Car::where('id', $driver[0]->car->id)
+                            ->update(['driver_id' => 0]);
+                    }
                 }
 
                 $result = response()->json(array(
