@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <div class="row justify-content-center mt-4 mb-4 h-100">
         <div class="col-12">
-          <div class="card" v-if="$route.path == '/manage-rooms' || $route.path == '/manage-rooms/booking-list' || $route.path == '/manage-rooms/pending-list'">
+          <div class="card" v-if="$route.path == '/manage-rooms' || $route.path == '/manage-rooms/booking-list' || $route.path == '/manage-rooms/pending-list' || $route.path == '/manage-rooms/history'">
             <book-room 
               :bookingItem="selected_booking" 
               :roomData="total_room" 
@@ -16,8 +16,15 @@
               @success="assignSuccess()"
             />
             <div class="card-header">
-              <h3 class="card-title"><strong>{{$route.path == '/manage-rooms/pending-list' ? 'Pending' : ''}} Booking Room List</strong></h3>
-              <button class="btn btn-primary" style="float: right" @click="createBooking()">Book Room</button>
+              <h3 class="card-title">
+                <strong>{{$route.path == '/manage-rooms/pending-list' 
+                  ? 'Pending' 
+                  : $route.path == '/manage-rooms/history'
+                    ? 'History'
+                    : ''
+                }} Booking Room List</strong>
+              </h3>
+              <button v-if="$route.path !== '/manage-rooms/history'" class="btn btn-primary" style="float: right" @click="createBooking()">Book Room</button>
             </div>
 
             <div class="card-body">
@@ -90,7 +97,7 @@
                               Notes
                             </button>
 
-                            <template v-if="userLogin.id == booking.booked_by && booking.status == 1">
+                            <template v-if="userLogin.id == booking.booked_by && booking.status == 1 && $route.path != '/manage-rooms/history'">
                               <!-- <button class="btn btn-success notes-btn" title="Finish Booking" @click="finish(booking)">
                                 Finish
                               </button> -->
@@ -219,7 +226,15 @@
       axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
         this.userLogin = data;
       })
-      this.$route.path == '/manage-rooms/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
+      // this.$route.path == '/manage-rooms/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
+      if(this.$route.path == '/manage-rooms/pending-list'){
+        this.loadPendingBooking()
+      }else if(this.$route.path == '/manage-rooms/history'){
+        this.loadBookingHistory()
+      }else{
+        this.loadBookingData()
+      }
+
       this.loadRoomData()
       this.loadRoomList()
       this.loadDivisionData()
@@ -239,7 +254,13 @@
     },
     watch:{
       '$route.path'(newVal, oldVal){
-        this.$route.path == '/manage-rooms/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
+        if(this.$route.path == '/manage-rooms/pending-list'){
+          this.loadPendingBooking()
+        }else if(this.$route.path == '/manage-rooms/history'){
+          this.loadBookingHistory()
+        }else{
+          this.loadBookingData()
+        }
       },
     },
     methods:{
@@ -269,8 +290,25 @@
             this.booking_list = response.data
           })
       },
+      loadBookingHistory(){
+        axios.get(window.location.origin+'/api/room/getBookingHistory')
+          .then(response => {
+            response.data.data.forEach(item => {
+              item.options = item.options != '' && item.options !== null ? item.options.split(',') : []
+            });
+            this.booking_list = response.data
+          })
+      },
       bookingPageContent(page = 1) {
-        let content = this.$route.path == '/manage-rooms/pending-list' ? 'getPendingBooking' : 'getBookingData'
+        let content = ''
+        if(this.$route.path == '/manage-rooms/pending-list'){
+          content = 'getPendingBooking'
+        }else if(this.$route.path == '/manage-rooms/history'){
+          content = 'getBookingHistory'
+        }else{
+          content = 'getBookingData'
+        }
+
         axios.get(window.location.origin+'/api/room/'+content+'?page=' + page)
           .then(response => {
             response.data.data.forEach(item => {

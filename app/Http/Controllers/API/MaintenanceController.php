@@ -100,14 +100,31 @@ class MaintenanceController extends Controller
             if(auth('api')->user()->id == 6){
                 $result = Maintenance::with('user')
                     ->where('due_date', '>=', date('Y-m-d'))
-                    ->orderBy('due_date', 'ASC')->paginate(10)
-                    ->orderBy('name', 'ASC');
+                    ->orderBy('due_date', 'ASC')
+                    ->orderBy('name', 'ASC')
+                    ->paginate(10);
             }else{
                 $result = Maintenance::with('user')
                     ->where('created_by', '=', auth('api')->user()->id)
                     ->where('due_date', '>=', date('Y-m-d'))
-                    ->orderBy('due_date', 'ASC')->paginate(10)
-                    ->orderBy('name', 'ASC');
+                    ->orderBy('due_date', 'ASC')
+                    ->orderBy('name', 'ASC')
+                    ->paginate(10);
+            }  
+        }else if($id === 'getMaintenanceHistory'){
+            if(auth('api')->user()->id == 6){
+                $result = Maintenance::with('user')
+                    ->where('due_date', '<', date('Y-m-d'))
+                    ->orderBy('due_date', 'ASC')
+                    ->orderBy('name', 'ASC')
+                    ->paginate(10);
+            }else{
+                $result = Maintenance::with('user')
+                    ->where('created_by', '=', auth('api')->user()->id)
+                    ->where('due_date', '<', date('Y-m-d'))
+                    ->orderBy('due_date', 'ASC')
+                    ->orderBy('name', 'ASC')
+                    ->paginate(10);
             }  
         }
 

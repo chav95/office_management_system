@@ -193,6 +193,15 @@ class RoomController extends Controller
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
                 ->paginate(10);
+        }else if($id === 'getBookingHistory'){
+            $result = RoomBooking::with('room', 'user', 'division')
+                ->where('tanggal', '<', date('Y-m-d'))
+                // ->where('status', '>', 0)
+                // ->orWhere('status', '=', -2)
+                // ->orderByRaw('FIELD(status, 1, 2, -2)')
+                ->orderBy('tanggal', 'DESC')
+                ->orderBy('jam_awal', 'ASC')
+                ->paginate(10);
         }else if($id === 'getPendingBooking'){
             $result = RoomBooking::with('room', 'user', 'division')
                 ->where('tanggal', '>=', date('Y-m-d'))

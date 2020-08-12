@@ -208,6 +208,14 @@ class CarController extends Controller
                 ->orderBy('tanggal', 'ASC')
                 ->orderBy('jam_awal', 'ASC')
                 ->paginate(10);
+        }else if($id === 'getBookingHistory'){
+            $result = CarBooking::with('car', 'driver', 'user', 'division')
+                // ->where('car_id', '>', 0)
+                ->where('tanggal', '<', date('Y-m-d'))
+                // ->orderByRaw('FIELD(status, 1, 2, -2)')
+                ->orderBy('tanggal', 'DESC')
+                ->orderBy('jam_awal', 'ASC')
+                ->paginate(10);
         }else if($id === 'getPendingBooking'){
             $result = CarBooking::with('user', 'division')
                 ->where('car_id', '=', 0)

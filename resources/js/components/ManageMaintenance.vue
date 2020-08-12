@@ -11,8 +11,8 @@
           <import-maintenance @success="loadMaintenanceData()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Maintenance List</strong></h3>
-            <button class="btn btn-primary" style="float: right" @click="createItem()">New Maintenance</button>
-            <button class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadMaintain">Import From Excel</button>
+            <button v-if="$route.path != '/maintenance/history'" class="btn btn-primary" style="float: right" @click="createItem()">New Maintenance</button>
+            <button v-if="$route.path != '/maintenance/history'" class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadMaintain">Import From Excel</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -36,7 +36,7 @@
                     <!-- <td>{{item.user.name | ucwords}}</td> -->
                     <td>{{item.user.name}}</td>
                     <td class="no-print">
-                      <div class="modify_box" v-if="userLogin.id === item.created_by">
+                      <div class="modify_box" v-if="userLogin.id === item.created_by && $route.path != '/maintenance/history'">
                         <a class="modify-btn" @click="editItem(item)" title="Edit Maintenance">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
@@ -102,8 +102,16 @@
             this.maintenance_list = data
           })
       },
+      loadMaintenanceHistory(){
+        axios.get(window.location.origin+'/api/maintenance/getMaintenanceHistory')
+          .then(({data}) => {
+            this.maintenance_list = data
+          })
+      },
+
       getPageContent(page = 1) {
-        axios.get(window.location.origin+'/api/maintenance/getMaintenanceData?page=' + page)
+        let content = this.$route.path ==  '/maintenance/history' ? 'getMaintenanceHistory' : 'getMaintenanceData'
+        axios.get(window.location.origin+`/api/maintenance/${content}?page=` + page)
           .then(response => {
             this.maintenance_list = response.data;
           });
@@ -149,10 +157,19 @@
     },
     mounted() {
       axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
-        this.userLogin = data;
-      });
-      this.loadMaintenanceData();
-    }
+        this.userLogin = data
+      })
+      this.$route.path ==  '/maintenance/history' ? this.loadMaintenanceHistory() : this.loadMaintenanceData()
+    },
+    watch:{
+      '$route.path'(newVal, oldVal){
+        if(this.$route.path == '/maintenance/history'){
+          this.loadMaintenanceHistory()
+        }else{
+          this.loadMaintenanceData()
+        }
+      },
+    },
   }
 </script>
 

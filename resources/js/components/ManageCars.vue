@@ -3,7 +3,7 @@
   <div class="container-fluid">
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
-        <div class="card" v-if="$route.path == '/manage-cars' || $route.path == '/manage-cars/booking-list' || $route.path == '/manage-cars/pending-list'">
+        <div class="card" v-if="$route.path == '/manage-cars' || $route.path == '/manage-cars/booking-list' || $route.path == '/manage-cars/pending-list' || $route.path == '/manage-cars/history'">
           <book-car 
             :bookingItem="selected_booking"
             :carData="total_car" 
@@ -16,8 +16,14 @@
             @success="assignSuccess()"
           />
           <div class="card-header">
-            <h3 class="card-title"><strong>{{$route.path == '/manage-cars/pending-list' ? 'Pending' : ''}} Booking Car List</strong></h3>
-            <button class="btn btn-primary" style="float: right" @click="createBooking()">Book Car</button>
+            <h3 class="card-title">
+              <strong>{{$route.path == '/manage-cars/pending-list' 
+                ? 'Pending' 
+                : $route.path == '/manage-cars/history'
+                  ? 'History'
+                  : ''
+              }} Booking Car List</strong></h3>
+            <button v-if="$route.path !== '/manage-cars/history'" class="btn btn-primary" style="float: right" @click="createBooking()">Book Car</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -89,7 +95,7 @@
                             Notes
                           </button>
 
-                          <template v-if="userLogin.id == booking.booked_by && booking.status == 1">
+                          <template v-if="userLogin.id == booking.booked_by && booking.status == 1 && $route.path != '/manage-rooms/history'">
                             <button class="btn btn-success notes-btn" title="Finish Booking" @click="finish(booking)">
                               Finish
                             </button>
@@ -248,7 +254,15 @@
       axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
         this.userLogin = data;
       })
-      this.$route.path == '/manage-cars/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
+      
+      if(this.$route.path == '/manage-cars/pending-list'){
+        this.loadPendingBooking()
+      }else if(this.$route.path == '/manage-cars/history'){
+        this.loadBookingHistory()
+      }else{
+        this.loadBookingData()
+      }
+
       this.loadCarData()
       this.loadCarList()
 
@@ -266,7 +280,13 @@
     },
     watch:{
       '$route.path'(newVal, oldVal){
-        this.$route.path == '/manage-cars/pending-list' ? this.loadPendingBooking() : this.loadBookingData()
+        if(this.$route.path == '/manage-cars/pending-list'){
+          this.loadPendingBooking()
+        }else if(this.$route.path == '/manage-cars/history'){
+          this.loadBookingHistory()
+        }else{
+          this.loadBookingData()
+        }
       },
     },
     methods:{
@@ -461,8 +481,22 @@
             this.booking_list = data
           })
       },
+      loadBookingHistory(){
+         axios.get(window.location.origin+'/api/car/getBookingHistory')
+          .then(({data}) => {
+            this.booking_list = data
+          })
+      },
       bookingPageContent(page = 1) {
-        let content = this.$route.path == '/manage-cars/pending-list' ? 'getPendingBooking' : 'getBookingData'
+        let content = ''
+        if(this.$route.path == '/manage-cars/pending-list'){
+          content = 'getPendingBooking'
+        }else if(this.$route.path == '/manage-cars/history'){
+          content = 'getBookingHistory'
+        }else{
+          content = 'getBookingData'
+        }
+        
         axios.get(window.location.origin+'/api/car/'+content+'?page=' + page)
           .then(response => {
             this.booking_list = response.data

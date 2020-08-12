@@ -120,6 +120,11 @@ class DocumentController extends Controller
             //     ->whereRaw("MOD(DATEDIFF(due_date, '$four_weeks'), 7) = 0")
             //     ->paginate(10);
             //     // ->toSql();
+        }else if($id === 'getDocHistory'){
+            $result = Document::with('user')
+                ->where('due_date', '<', date('Y-m-d'))
+                ->orderBy('name', 'ASC')
+                ->orderBy('due_date', 'ASC')->paginate(10);
         }
 
         return $result;

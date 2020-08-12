@@ -7,9 +7,9 @@
           <create-doc :selected_doc="selected_doc" :userLogin="userLogin" @success="loadDocData()"/>
           <import-doc @success="loadDocData()"/>
           <div class="card-header">
-            <h3 class="card-title"><strong>Document List</strong></h3>
-            <button class="btn btn-primary" style="float: right" @click="createItem()">New Document</button>
-            <button class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadDoc">Import From Excel</button>
+            <h3 class="card-title"><strong>{{$route.path == '/manage-docs/history' ? 'History ' : ''}}Document List</strong></h3>
+            <button v-if="$route.path != '/manage-docs/history'" class="btn btn-primary" style="float: right" @click="createItem()">New Document</button>
+            <button v-if="$route.path != '/manage-docs/history'" class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadDoc">Import From Excel</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -25,24 +25,6 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- <tr>
-                  <td>
-                    <router-link to="/manage-docs/1">STNK Toyota Avanza (B 5213 BMD)</router-link>
-                  </td>
-                  <td>Document</td>
-                  <td>1 May 2022</td>
-                  <td>21 December 2022</td>
-                  <td>
-                    <div>
-                      <a class="modify-btn" title="Edit Document">
-                        <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                      </a>
-                      <a class="modify-btn" @click="deleteItem('STNK Toyota Avanza (B 5213 BMD)')" title="Delete Document">
-                        <i class="fa fa-trash color-red fa-fw fa-lg"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr> -->
                 <template v-if="doc_list.data.length > 0">
                   <tr v-for="(item) in doc_list.data" :key="item.id">
                     <td>{{item.name}}</td>
@@ -53,7 +35,7 @@
                     <!-- <td>{{item.user.name | ucwords}}</td> -->
                     <td>{{item.user.name}}</td>
                     <td class="no-print">
-                      <div class="modify_box" v-if="userLogin.id === item.created_by || userLogin.id == 5">
+                      <div class="modify_box" v-if="(userLogin.id === item.created_by || userLogin.id == 5) && $route.path != '/manage-docs/history'">
                         <a class="modify-btn" @click="editItem(item)" title="Edit Document">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
@@ -122,9 +104,16 @@
             this.doc_list = data
           })
       },
+      loadDocHistory(){
+        axios.get(window.location.origin+'/api/doc/getDocHistory')
+          .then(({data}) => {
+            this.doc_list = data
+          })
+      },
 
       getPageContent(page = 1) {
-        axios.get(window.location.origin+'/api/doc/getDocData?page=' + page)
+        let content = this.$route.path == '/manage-docs/history' ? 'getDocHistory' : 'getDocData'
+        axios.get(window.location.origin+`/api/doc/${content}?page=` + page)
           .then(response => {
             this.doc_list = response.data;
           });
@@ -176,8 +165,17 @@
       axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
         this.userLogin = data;
       });
-      this.loadDocData();
-    }
+      this.$route.path == '/manage-docs/history' ? this.loadDocHistory() : this.loadDocData()
+    },
+    watch:{
+      '$route.path'(newVal, oldVal){
+        if(this.$route.path == '/manage-docs/history'){
+          this.loadDocHistory()
+        }else{
+          this.loadDocData()
+        }
+      },
+    },
   }
 </script>
 

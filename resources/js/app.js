@@ -35,6 +35,7 @@ let routes = [
     {path: '/manage-rooms/pending-list', component: require('./components/ManageRooms.vue').default},
     {path: '/manage-rooms/booking-list', component: require('./components/ManageRooms.vue').default},
     {path: '/manage-rooms/settings', component: require('./components/ManageRooms.vue').default},
+    {path: '/manage-rooms/history', component: require('./components/ManageRooms.vue').default},
 
     // Car Routes
     {path: '/manage-cars', component: require('./components/ManageCars.vue').default},
@@ -43,10 +44,13 @@ let routes = [
     {path: '/manage-cars/settings', component: require('./components/ManageCars.vue').default},
     {path: '/manage-cars/driver-settings', component: require('./components/ManageDrivers.vue').default},
     {path: '/manage-cars/vendor-settings', component: require('./components/ManageVendor.vue').default},
+    {path: '/manage-cars/history', component: require('./components/ManageCars.vue').default},
 
     // Document Routes
     {path: '/manage-docs', component: require('./components/ManageDocs.vue').default},
+    {path: '/manage-docs/history', component: require('./components/ManageDocs.vue').default},
     {path: '/maintenance', component: require('./components/ManageMaintenance.vue').default},
+    {path: '/maintenance/history', component: require('./components/ManageMaintenance.vue').default},
     {path: '/manage-docs/:id', component: require('./components/DetailDocs.vue').default},
 
     // HRD Routes
@@ -93,41 +97,10 @@ Vue.component('apexchart', VueApexCharts);
  * or customize the JavaScript scaffolding to fit your unique needs.
  */ 
 
-let store = new Vuex.Store({
-    state: {
-        selectedPlaylist: [],
-        playlistParentID: Number
-    },
-    mutations: {
-        SET_SELECTED_PLAYLIST(state, item){
-            let alreadyInArray = state.selectedPlaylist.indexOf(item);
-            if(alreadyInArray == -1){
-                state.selectedPlaylist.push(item);
-            }else{
-                state.selectedPlaylist.splice(alreadyInArray, 1);
-            }
-        },
-        RESET_SELECTED_PLAYLIST(state){
-            state.selectedPlaylist = [];
-        },
-        SET_PLAYLIST_PARENT_ID(state, id){
-            state.playlistParentID = id;
-        }
-    },
-    actions: {
-
-    },
-    getters: {
-        getSelectedPlaylist(state){
-            return state.selectedPlaylist
-        }
-    }
-});
-
 const app = new Vue({
     el: '#app',
     router,
-    store,
+    // store,
     /*components: {
         'navbar': require('./components/Upload.vue'),
     }*/

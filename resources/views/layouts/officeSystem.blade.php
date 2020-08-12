@@ -173,6 +173,12 @@
                   <p>Settings</p>  
                 </router-link>
               </li>
+              <li class="nav-item">
+                <router-link to="/manage-rooms/history" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-purple"></i>
+                  <p>History</p>
+                </router-link>
+              </li>
             </ul>
           </li>
           <li class="nav-item has-treeview">
@@ -211,21 +217,55 @@
                   <p>Vendor Settings</p>
                 </router-link>
               </li>
+              <li class="nav-item">
+                <router-link to="/manage-cars/history" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-blue"></i>
+                  <p>History</p>
+                </router-link>
+              </li>
             </ul>
           </li>
           <li class="nav-item has-treeview">
             <!--<a href="#" class="nav-link active">-->
             <router-link to="/manage-docs" class="nav-link">
               <i class="nav-icon fas fa-clipboard-list color-orange"></i>
-              <p>Manage Documents</p>
+              <p>Manage Documents <i class="right fas fa-angle-left"></i></p>
             </router-link>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <router-link to="/manage-docs" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-orange"></i>
+                  <p>Upcoming List</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/manage-docs/history" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-orange"></i>
+                  <p>History</p>
+                </router-link>
+              </li>
+            </ul>
             {{-- <playlist-sidebar :playlist="{{$playlist}}"></playlist-sidebar>--}}
           </li>
           <li class="nav-item has-treeview">
             <router-link to="/maintenance" class="nav-link">
               <i class="nav-icon fas fa-recycle color-green"></i>
-              <p>Maintenance</p>
+              <p>Maintenance <i class="right fas fa-angle-left"></i></p>
             </router-link>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <router-link to="/maintenance" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-green"></i>
+                  <p>Upcoming List</p>
+                </router-link>
+              </li>
+              <li class="nav-item">
+                <router-link to="/maintenance/history" class="nav-link">
+                  <i class="nav-icon fas fa-list-alt color-green"></i>
+                  <p>History</p>
+                </router-link>
+              </li>
+            </ul>
           </li>
           <li class="nav-item has-treeview">
             <router-link to="/hrd" class="nav-link">
