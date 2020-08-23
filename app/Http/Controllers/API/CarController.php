@@ -110,27 +110,48 @@ class CarController extends Controller
                         ])
                 ), 200);
             }else if($request->action === 'assign'){
-                // $selected_car = Car::find($request->car);
-                // // return response()->json(array('success' => true, 'item' => $selected_car), 200);
+                $booking = CarBooking::find($request->booking_id);
+
+                $selected_car = Car::find($request->car_id);
+                // return response()->json(array('success' => true, 'item' => $selected_car), 200);
                 
-                // if($selected_car->police_number !== '-'){
-                //     $check_existing_booking = CarBooking::with('car', 'user')
-                //         ->where('tanggal', '=', date('Y-m-d', strtotime($request->tanggal)))
-                //         ->where('car_id', '=', $request->car)
-                //         ->get();
+                if($selected_car->police_number !== '-'){ //return CarBooking::find($request->booking_id)->tanggal;
+                    $check_existing_booking = CarBooking::with('car', 'user')
+                        ->where('tanggal', '=', date('Y-m-d', strtotime($booking->tanggal)))
+                        ->where('car_id', '=', $request->car_id)
+                        ->get(); //return $check_existing_booking;
             
-                //     foreach($check_existing_booking as $item){
-                //         for($i = $request->jam_awal; $i <= $request->jam_akhir; $i++){
-                //             if(($item->jam_awal <= $i) && ($i <= $item->jam_akhir)){
-                //                 $book_time = date('M n, Y', strtotime($item->tanggal)).' - '.$item->jam_awal.'.00 s/d '.$item->jam_akhir.'.00';
-                //                 return response()->json(array(
-                //                     'success' => false, 
-                //                     'msg' => 'Choosen Car Already Booked At: '.$item->jam_awal.'.00 s/d '.$item->jam_akhir.'.00'
-                //                 ), 200);
-                //             }
-                //         }
-                //     }
-                // }
+                    foreach($check_existing_booking as $item){
+                        // for($i = $booking->jam_awal; $i <= $request->jam_akhir; $i++){
+                            // if(($item->jam_awal <= $i) && ($i <= $item->jam_akhir)){
+                            if($item->jam_awal == $booking->jam_awal){
+                                $book_time = date('M n, Y', strtotime($item->tanggal)).' - '.$item->jam_awal.'.00';
+                                return response()->json(array(
+                                    'success' => false, 
+                                    'msg' => 'Choosen Car Already Booked At: '.$item->jam_awal.'.00'
+                                ), 200);
+                            }
+                        // }
+                    }
+
+                    $check_driver_schedule = CarBooking::with('car', 'user', 'driver')
+                        ->where('tanggal', '=', date('Y-m-d', strtotime($booking->tanggal)))
+                        ->where('driver_id', '=', $request->driver_id)
+                        ->get();
+            
+                    foreach($check_driver_schedule as $item){
+                        // for($i = $request->jam_awal; $i <= $request->jam_akhir; $i++){
+                            // if(($item->jam_awal <= $i) && ($i <= $item->jam_akhir)){
+                            if($item->jam_awal = $booking->jam_awal){
+                                $book_time = date('M n, Y', strtotime($item->tanggal)).' - '.$item->jam_awal.'.00';
+                                return response()->json(array(
+                                    'success' => false, 
+                                    'msg' => 'Choosen Driver Already Booked At: '.$item->jam_awal.'.00'
+                                ), 200);
+                            }
+                        // }
+                    }
+                }
 
                 return response()->json(array(
                     'success' => true, 

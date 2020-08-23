@@ -267,20 +267,22 @@
               </li>
             </ul>
           </li>
-          <li class="nav-item has-treeview">
-            <router-link to="/hrd" class="nav-link">
-              <i class="nav-icon fas fa-users color-light-red"></i>
-              <p>Human Resource <i class="right fas fa-angle-left"></i></p>
-            </router-link>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <router-link to="/hrd/salary-slip" class="nav-link">
-                  <i class="nav-icon fas fa-file-invoice-dollar color-light-red"></i>
-                  <p>Salary Slip</p>
-                </router-link>
-              </li>
-            </ul>
-          </li>
+          @if(Auth::user()->privilege == 'admin' || Auth::user()->privilege == 'super_admin')
+            <li class="nav-item has-treeview">
+              <router-link to="/hrd" class="nav-link">
+                <i class="nav-icon fas fa-users color-light-red"></i>
+                <p>Human Resource <i class="right fas fa-angle-left"></i></p>
+              </router-link>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <router-link to="/hrd/salary-slip" class="nav-link">
+                    <i class="nav-icon fas fa-file-invoice-dollar color-light-red"></i>
+                    <p>Salary Slip</p>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+          @endif
           @if(Auth::user()->privilege == 'admin' || Auth::user()->privilege == 'super_admin')
             <li class="nav-item has-treeview">
               <router-link to="/manage-users" class="nav-link">

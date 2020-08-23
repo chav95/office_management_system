@@ -21,7 +21,7 @@
                 </div>
 
                 <div class="col-sm-9">
-                  {{formatDatetime(bookingItem.tanggal)}} - {{bookingItem.jam_awal}}.00 s/d {{bookingItem.jam_akhir}}.00 <br>
+                  {{formatDatetime(bookingItem.tanggal)}} - {{bookingItem.jam_awal}}.00 <br>
                   {{bookingItem.destination}} <br>
                   {{bookingItem.purpose}} <br>
                   {{bookingItem.user.name}} <br>

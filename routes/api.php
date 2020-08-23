@@ -27,6 +27,7 @@ Route::apiResources([
     'driver' => 'API\DriverController',
     'vendor' => 'API\VendorController',
     'division' => 'API\DivisionController',
+    'employee' => 'API\EmployeeController',
 ]);
 
 Route::middleware('auth:api')->get('/user', function (Request $request){

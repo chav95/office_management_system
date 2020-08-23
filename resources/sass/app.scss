@@ -69,11 +69,19 @@ $fa-font-path:        "../webfonts";
 
 .form-control, .vdp-datepicker{
   margin-bottom: 10px;
+  border-color: grey;
+}
+.input-group-text{
+  border-color: grey;
 }
 
 .room-datepicker-div, .car-datepicker-div{
   display: inline-block;
   width: 268px;
+}
+.datepicer-div{
+  display: inline-block;
+  width: 100%;
 }
 .room-datepicker, .car-datepicker, .input-datepicker{
   padding-left: 10px;

@@ -4,54 +4,34 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card">
-          <!-- <create-modal model_title="New Document"></create-modal> -->
+          <create-employee :selected_employee="selected_employee" @success="loadEmployeeList()"></create-employee>
           <div class="card-header">
             <h3 class="card-title"><strong>Salary Slip List</strong></h3>
-            <!-- <button class="btn btn-primary" style="float: right" data-toggle="modal" data-target="#CreateModel">New Document</button> -->
+            <button class="btn btn-primary" style="float: right" @click="createEmployee()">Add New Employee</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
               <thead>
                 <tr>
                   <th>Employee Name</th>
-                  <th>Position</th>
-                  <th>Masa Kerja Efektif</th>
-                  <th>Employee Status</th>
-                  <th></th>
+                  <th>NIK</th>
+                  <th>NPWP</th>
+                  <th>Start Working From</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                <tr v-for="item in employee_list.data" :key="item.id">
+                  <td><router-link :to="`/hrd/salary-slip/${item.id}`" title="See Salary Slip">{{item.name}}</router-link></td>
+                  <td>{{item.nik}}</td>
+                  <td>{{item.npwp}}</td>
+                  <td>{{formatDate(item.entry_date)}}</td>
                   <td>
-                    <router-link to="/hrd/salary-slip/1">Budi Suharjo</router-link>
-                  </td>
-                  <td>Assisten Manager Marketing</td>
-                  <td>4 Tahun 2 Bulan</td>
-                  <td>Karyawan Perbantuan</td>
-                  <td>
-                    <div>
-                      <a class="modify-btn" title="Edit Slip">
+                    <div class="modify_box">
+                      <a class="modify-btn" @click="editEmployee(item)" title="Edit Slip">
                         <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                       </a>
-                      <a class="modify-btn" @click="deleteItem('Budi Suharjo')" title="Delete Slip">
-                        <i class="fa fa-trash color-red fa-fw fa-lg"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <router-link to="/hrd/salary-slip/2">Stefani</router-link>
-                  </td>
-                  <td>Product Manager</td>
-                  <td>5 Tahun 11 Bulan</td>
-                  <td>Karyawan Perbantuan</td>
-                  <td>
-                    <div>
-                      <a class="modify-btn" title="Edit Slip">
-                        <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                      </a>
-                      <a class="modify-btn" @click="deleteItem('Stefani')" title="Delete Slip">
+                      <a class="modify-btn" @click="deleteItem(item)" title="Delete Slip">
                         <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                       </a>
                     </div>
@@ -59,6 +39,9 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="card-footer">
+            <pagination :data="employee_list" @pagination-change-page="employeePageContent"></pagination>
           </div>
         </div>
       </div>
@@ -68,43 +51,116 @@
 </template>
 
 <script>
-  import CreateModal from './reusables/CreateNewModal.vue';
+  import moment from 'moment'
+  import CreateEmployee from './modals/CreateEmployee.vue'
 
   export default {
     components: {
-      CreateModal,
+      CreateEmployee,
     },
     data(){
       return{
-        
+        employee_list: {data: []},
+        selected_employee: {
+          action: '',
+          id: 0,
+          nik: '',
+          name: '',
+          npwp: '',
+          entry_date: '',
+          gaji_tunjangan: 0,
+          terima_pph: 0,
+          total_terima_lain: 0,
+          total_potongan_lain: 0,
+          total_potongan_pph: 0,
+          jumlah_penerimaan: 0,
+          jumlah_potongan: 0,
+          penerimaan_bersih: 0,
+          pengurang: 0,
+          penerimaan: 0,
+        },
       }
     },
     methods:{
-      deleteItem(name){
-        this.$confirm(`Delete Salary Slip ${name}?`, '', 'question')
+      formatDate(datetime){
+        return moment(String(datetime)).format('ll')
+      },
+
+      createEmployee(){
+        this.selected_employee = {
+          action: 'create',
+          id: 0,
+          nik: '',
+          name: '',
+          npwp: '',
+          entry_date: '',
+          gaji_tunjangan: 0,
+          terima_pph: 0,
+          total_terima_lain: 0,
+          total_potongan_lain: 0,
+          total_potongan_pph: 0,
+          jumlah_penerimaan: 0,
+          jumlah_potongan: 0,
+          penerimaan_bersih: 0,
+          pengurang: 0,
+          penerimaan: 0,
+        }
+        $('#CreateEmployee').modal('show');
+      },
+      editEmployee(item){
+        this.selected_employee = item
+        this.selected_employee.action = 'edit'
+        $('#CreateEmployee').modal('show');
+      },
+      deleteItem(item){
+        this.$confirm(`Delete Employee ${item.name}?`, '', 'question')
           .then( ()=> {
             this.$confirm('This delete action cannot be undone!', '', 'warning')
               .then( ()=> {
-                this.$alert('Delete Successful', '', 'success');
-                this.loadMusics();
+                axios.delete(`${window.location.origin}/api/employee/${item.id}`)
+                  .then(res => {
+                    this.$alert('Delete Successful', '', 'success');
+                    this.loadEmployeeList()
+                  })
+                  .catch(err => {
+                    this.$alert(err, '', 'error')
+                  })
               });
-            })
+          })
           .catch(error => console.error(error));
-      }
+      },
+      
+      loadEmployeeList(){
+        axios.get(window.location.origin+'/api/employee/getEmployeeList')
+          .then(({data}) => {
+            this.employee_list = data
+          })
+      },
+      employeePageContent(page = 1) {
+        axios.get(window.location.origin+'/api/employee/getEmployeeList?page=' + page)
+          .then(response => {
+            this.employee_list = response.data
+          })
+      },
     },
     watch: {
       // '$route.params.playlist_id': function(playlist_id){
-      //   this.loadWishlist();
+      //   this.loadWishlist()
       // }
     },
     mounted() {
-      
+      this.loadEmployeeList()
     }
   }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
   .card-tools{
     text-align: right;
+  }
+
+  .modify_box{
+    width: 52px;
+    margin-bottom: 10px;
   }
 </style>
