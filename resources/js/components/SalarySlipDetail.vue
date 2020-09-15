@@ -5,8 +5,8 @@
         <div class="row mb-2">
           <div class="col-sm-6">
             <h1>
-                Salary Slip Details
-                <button class="btn btn-default" @click="printDoc()"><i class="fas fa-print"></i> Print</button>
+              Salary Slip Details
+              <button class="btn btn-default" @click="printDoc()"><i class="fas fa-print"></i> Print</button>
             </h1>
           </div>
         </div>

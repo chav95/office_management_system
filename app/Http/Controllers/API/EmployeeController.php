@@ -5,6 +5,9 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Employee;
+use App\Imports\SalaryImport;
+use Maatwebsite\Excel\Facades\Excel;
+use DateTime;
 
 class EmployeeController extends Controller
 {
@@ -37,7 +40,10 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         if($request->action){
-            if($request->action == 'create'){
+            if($request->action == 'import'){
+                // return DateTime::createFromFormat('n/j/Y', '2/27/2012')->format('Y-m-d');
+                return self::import($request);
+            }else if($request->action == 'create'){
                 self::validateEmployee($request);
 
                 $employee = new Employee;
@@ -101,6 +107,14 @@ class EmployeeController extends Controller
             return Employee::orderBy('name', 'ASC')->get();
         }else if($id == 'getEmployeeList'){
             return Employee::orderBy('name', 'ASC')->paginate(10);
+        }else if($id == 'getYearSelect'){
+            return Employee::distinct()->pluck('year');
+        }else if(strpos($id, 'period') !== false){
+            $params = explode('-', $id);
+            $month = $params[1];
+            $year = $params[2];
+
+            return Employee::where('month', $month)->where('year', $year)->paginate(10);
         }else{ //$id is employee id
             return Employee::find($id);
         }
@@ -160,5 +174,17 @@ class EmployeeController extends Controller
             'pengurang' => 'integer|digits_between:1,17',
             'penerimaan' => 'integer|digits_between:1,17',
         ]);
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'import_file' => 'required|file|mimes:xls,xlsx'
+        ]);
+
+        $path = $request->file('import_file');
+        $data = Excel::import(new SalaryImport, $path);
+
+        return response()->json(array('message' => 'uploaded successfully'), 200);
     }
 }

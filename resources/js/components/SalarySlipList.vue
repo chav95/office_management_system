@@ -4,12 +4,28 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card">
-          <create-employee :selected_employee="selected_employee" @success="loadEmployeeList()"></create-employee>
+          <!-- <create-employee :selected_employee="selected_employee" @success="loadEmployeeList()"></create-employee> -->
+          <import-salary @success="loadEmployeeList()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Salary Slip List</strong></h3>
-            <button class="btn btn-primary" style="float: right" @click="createEmployee()">Add New Employee</button>
+            <!-- <button class="btn btn-primary" style="float: right" @click="createEmployee()">Add New Employee</button> -->
+            <button class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadSalary">Import Salary</button>
           </div>
           <div class="card-body">
+            <div class="form-group text-center mb-0">
+              <h4 class="mb-0">Period:</h4>
+              <select v-model="month_select" class="form-control month-select mr-2">
+                <option value="0" disabled>-Month-</option>
+                <option v-for="index in 12" :key="index" :value="index">{{month_arr[index]}}</option>
+              </select>
+              <select v-model="year_select" class="form-control year-select mr-2">
+                <option value="0" disabled>-Year-</option>
+                <option v-for="year in year_arr" :key="year" :value="year">{{year}}</option>
+              </select>
+              <button class="form-control btn btn-success period-search mr-2" @click="loadPeriodSlip()">Search</button>
+            </div>
+            <hr class="header-line-bot mt-0 mb-4">
+
             <table id="example1" class="table table-bordered table-striped">
               <thead>
                 <tr>
@@ -21,22 +37,27 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in employee_list.data" :key="item.id">
-                  <td><router-link :to="`/hrd/salary-slip/${item.id}`" title="See Salary Slip">{{item.name}}</router-link></td>
-                  <td>{{item.nik}}</td>
-                  <td>{{item.npwp}}</td>
-                  <td>{{formatDate(item.entry_date)}}</td>
-                  <td>
-                    <div class="modify_box">
-                      <a class="modify-btn" @click="editEmployee(item)" title="Edit Slip">
-                        <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
-                      </a>
-                      <a class="modify-btn" @click="deleteItem(item)" title="Delete Slip">
-                        <i class="fa fa-trash color-red fa-fw fa-lg"></i>
-                      </a>
-                    </div>
-                  </td>
-                </tr>
+                <template v-if="employee_list.data.length > 0">
+                  <tr v-for="item in employee_list.data" :key="item.id">
+                    <td><router-link :to="`/hrd/salary-slip/${item.id}`" title="See Salary Slip">{{item.name}}</router-link></td>
+                    <td>{{item.nik}}</td>
+                    <td>{{item.npwp}}</td>
+                    <td>{{formatDate(item.entry_date)}}</td>
+                    <td>
+                      <div class="modify_box">
+                        <a class="modify-btn" @click="editEmployee(item)" title="Edit Slip">
+                          <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
+                        </a>
+                        <a class="modify-btn" @click="deleteItem(item)" title="Delete Slip">
+                          <i class="fa fa-trash color-red fa-fw fa-lg"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+                <template v-else>
+                  <tr><td colspan="100%"><h5 class="text-center">{{first_load == true ? 'Search Period First' : 'Selected Period Is Empty'}}</h5></td></tr>
+                </template>
               </tbody>
             </table>
           </div>
@@ -53,13 +74,19 @@
 <script>
   import moment from 'moment'
   import CreateEmployee from './modals/CreateEmployee.vue'
+  import ImportSalary from './modals/ImportSalary'
 
   export default {
     components: {
-      CreateEmployee,
+      CreateEmployee, ImportSalary
     },
     data(){
       return{
+        first_load: true,
+        month_select: 0,
+        year_select: 0,
+        loading: false,
+
         employee_list: {data: []},
         selected_employee: {
           action: '',
@@ -79,11 +106,53 @@
           pengurang: 0,
           penerimaan: 0,
         },
+        month_arr: [
+          '-Month-',
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        ],
+        year_arr: [],
       }
     },
     methods:{
       formatDate(datetime){
         return moment(String(datetime)).format('ll')
+      },
+
+      loadYearSelect(){
+        // let default_val = ['-Year-']
+        axios.get(`${window.location.origin}/api/employee/getYearSelect`)
+          .then(({data}) => {
+            // this.year_arr = [...default_val, ...data]
+            this.year_arr = data
+          })
+      },
+      loadPeriodSlip(){
+        this.first_load = false
+
+        if(this.month_select == 0){
+          this.$alert('Select Month First', '', 'error');
+        }else if(this.year_select == 0){
+          this.$alert('Select Year First', '', 'error');
+        }else{
+          this.loading = true
+
+          axios.get(`${window.location.origin}/api/employee/period-${this.month_select}-${this.year_select}`)
+            .then(({data}) => {
+              this.loading = false
+              this.employee_list = data
+            }) 
+        }
       },
 
       createEmployee(){
@@ -144,12 +213,17 @@
       },
     },
     watch: {
-      // '$route.params.playlist_id': function(playlist_id){
-      //   this.loadWishlist()
-      // }
+      // bookingItem: {
+      //   handler: function(newVal, oldVal) { //console.log('triggered')
+      //     this.fill_available_room()
+      //     this.room_id = this.bookingItem.room.id
+      //   },
+      //   immediate: true,
+      //   deep: true,
     },
     mounted() {
-      this.loadEmployeeList()
+      // this.loadEmployeeList()
+      this.loadYearSelect()
     }
   }
 </script>
@@ -162,5 +236,22 @@
   .modify_box{
     width: 52px;
     margin-bottom: 10px;
+  }
+
+  .month-select{
+    display: inline-block;
+    width: 120px;
+  }
+  .year-select{
+    display: inline-block;
+    width: 85px;
+  }
+  .period-search{
+    width: 80px;
+    vertical-align: baseline;
+  }
+
+  .header-line-bot{
+    border-bottom: 2px solid #212529;
   }
 </style>
