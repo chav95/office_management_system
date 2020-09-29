@@ -105,6 +105,9 @@
         handler: function(newVal, oldVal) { //console.log('triggered')
           this.fill_available_car()
           this.fill_available_driver()
+          this.car_id = newVal.car_id
+          this.driver_id = newVal.driver_id
+          this.notes = newVal.notes
         },
         immediate: true,
         deep: true,

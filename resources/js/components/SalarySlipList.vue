@@ -5,7 +5,7 @@
       <div class="col-12">
         <div class="card">
           <!-- <create-employee :selected_employee="selected_employee" @success="loadEmployeeList()"></create-employee> -->
-          <import-salary @success="loadEmployeeList()"/>
+          <import-salary @success="loadYearSelect()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Salary Slip List</strong></h3>
             <!-- <button class="btn btn-primary" style="float: right" @click="createEmployee()">Add New Employee</button> -->

@@ -100,7 +100,8 @@
       bookingItem: {
         handler: function(newVal, oldVal) { console.log('triggered')
           this.fill_available_room()
-          this.room_id = this.bookingItem.room.id
+          this.room_id = newVal.room.id
+          this.notes = newVal.notes
         },
         immediate: true,
         deep: true,

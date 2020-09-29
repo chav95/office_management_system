@@ -95,12 +95,17 @@
                             Notes
                           </button>
 
-                          <template v-if="userLogin.id == booking.booked_by && booking.status == 1 && $route.path != '/manage-rooms/history'">
-                            <button class="btn btn-success notes-btn" title="Finish Booking" @click="finish(booking)">
-                              Finish
-                            </button>
-                            <button class="btn btn-danger notes-btn" title="Cancel Booking" @click="cancel(booking)">
-                              Cancel
+                          <template v-if="booking.status == 1 && $route.path != '/manage-cars/history'">
+                            <template v-if="userLogin.id == booking.booked_by">  
+                              <button class="btn btn-success notes-btn" title="Finish Booking" @click="finish(booking)">
+                                Finish
+                              </button>
+                              <button class="btn btn-danger notes-btn" title="Cancel Booking" @click="cancel(booking)">
+                                Cancel
+                              </button>
+                            </template>
+                            <button class="btn btn-info notes-btn" title="Change Driver / Car" @click="assign(booking)" v-if="userLogin.id == 6">
+                              Edit Assign
                             </button>
                           </template>
                         </div>
@@ -420,6 +425,7 @@
               })
           })
       },
+
       createBooking(){
         this.selected_booking = {
           action: 'create_booking',
