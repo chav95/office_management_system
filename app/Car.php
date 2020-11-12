@@ -13,7 +13,7 @@ class Car extends Model
     public function today_booking(){
         $today = date('Y-m-d');
         // return $this->hasMany('App\CarBooking')->where('tanggal', $today);
-        return $this->hasMany('App\CarBooking')->whereDate('tanggal', '>=', $today);
+        return $this->hasMany('App\CarBooking')->whereDate('tanggal', '>=', $today)->where('status', '=', 1);
     }
 
     public function user(){

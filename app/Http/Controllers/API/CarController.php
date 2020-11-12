@@ -120,6 +120,7 @@ class CarController extends Controller
                         ->where('tanggal', '=', date('Y-m-d', strtotime($booking->tanggal)))
                         ->where('car_id', '=', $request->car_id)
                         ->where('status', '!=', 2)
+                        ->where('status', '!=', -2)
                         ->get(); //return $check_existing_booking;
             
                     foreach($check_existing_booking as $item){
@@ -139,6 +140,7 @@ class CarController extends Controller
                         ->where('tanggal', '=', date('Y-m-d', strtotime($booking->tanggal)))
                         ->where('driver_id', '=', $request->driver_id)
                         ->where('status', '!=', 2)
+                        ->where('status', '!=', -2)
                         ->get();
             
                     foreach($check_driver_schedule as $item){

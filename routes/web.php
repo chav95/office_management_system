@@ -20,10 +20,13 @@
     // return new BookRoomNotif();
 // });
 
-Route::get('/login', 'Auth\LoginController@showLoginForm')->name('login');
-Route::post('/login', 'Auth\LoginController@login');
-Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
-Route::get('/logout', 'Auth\LoginController@logout');
+// Route::get('/login', 'Auth\LoginController@showLoginForm')->name('login');
+// Route::post('/login', 'Auth\LoginController@login');
+// Route::post('/register', 'Auth\LoginController@register');
+// Route::post('/logout', 'Auth\LoginController@logout')->name('logout');
+// Route::get('/logout', 'Auth\LoginController@logout');
+Auth::routes();
+
 Route::get('/manage-users', 'HomeController@index')->middleware('can:isAdmin');
 
 Route::get('{path}',"HomeController@index")->where('path', '([A-z\d\-\/_.]+)?');

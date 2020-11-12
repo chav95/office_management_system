@@ -42,17 +42,17 @@
                 <template v-if="booking_list.data.length > 0">
                   <tr v-for="(booking) in booking_list.data" :key="booking.id">
                     <td v-if="booking.car_id == 0"><i>Not Yet Assigned</i></td>
-                    <td v-else>{{booking.car.type}} / {{booking.car.police_number}}</td>
+                    <td v-else>{{booking.car == null ? 'Car Deleted' : booking.car.type}} / {{booking.car == null ? '' : booking.car.police_number}}</td>
                     
                     <td v-if="booking.driver_id == 0"><i>Not Yet Assigned</i></td>
-                    <td v-else>{{booking.driver.name}}</td>
+                    <td v-else>{{booking.driver == null ? 'Driver Deleted' : booking.driver.name}}</td>
 
                     <td>{{booktime(booking)}}</td>
                     <td>{{booking.destination}}</td>
                     <td>{{booking.purpose}}</td>
                     <!-- <td>{{formatDatetime(booking.tanggal)}} - {{booking.jam_awal}}.00 s/d {{booking.jam_akhir}}.00</td> -->
                     <td>
-                      {{booking.user.name}}
+                      {{booking.user == null ? 'User Deleted' : booking.user.name}}
                       <span class="d-block"><i>({{fullDatetime(booking.created_at)}})</i></span>
                     </td>
                     <td class="no-print">

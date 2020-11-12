@@ -11,6 +11,11 @@ use DateTime;
 
 class EmployeeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:api');
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -115,8 +120,11 @@ class EmployeeController extends Controller
             $year = $params[2];
 
             return Employee::where('month', $month)->where('year', $year)->paginate(10);
-        }else{ //$id is employee id
-            return Employee::find($id);
+        }else if($id == 'getUserSalary'){
+            $nik = auth('api')->user()->username; //return $nik;
+            return Employee::where('nik', (string)$nik)->latest('year', 'month')->first();
+        }else{ //$id is employee nik
+            return Employee::where('nik', (string)$id)->latest('year', 'month')->first();
         }
     }
 
@@ -179,7 +187,8 @@ class EmployeeController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'import_file' => 'required|file|mimes:xls,xlsx'
+            // 'import_file' => 'required|file|mimes:xls,xlsx'
+            'import_file' => 'required|file'
         ]);
 
         $path = $request->file('import_file');

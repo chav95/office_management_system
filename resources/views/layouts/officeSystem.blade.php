@@ -143,176 +143,185 @@
       <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
+          @if(Auth::user()->privilege == 'salary')
           <li class="nav-item">
-            <router-link to="/dashboard" class="nav-link">
-              <i class="nav-icon fas fa-chart-bar color-teal"></i>
-              <p>Dashboard</p>
+            <router-link to="/salary-slip" class="nav-link">
+              <i class="nav-icon fas fa-file-invoice-dollar color-green"></i>
+              <p>Salary Slip</p>
             </router-link>
           </li>
-          <li class="nav-item">
-            <router-link to="/manage-rooms" class="nav-link">
-              <i class="nav-icon fas fa-building color-purple"></i>
-              <p>Manage Rooms <i class="right fas fa-angle-left"></i></p>
-            </router-link>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <router-link to="/manage-rooms/pending-list" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-purple"></i>
-                  <p>Pending Booking</p>  
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-rooms/booking-list" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-purple"></i>
-                  <p>Booking List</p>  
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-rooms/settings" class="nav-link">
-                  <i class="nav-icon fas fa-wrench color-purple"></i>
-                  <p>Settings</p>  
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-rooms/history" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-purple"></i>
-                  <p>History</p>
-                </router-link>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item has-treeview">
-            <router-link to="/manage-cars" class="nav-link">
-              <i class="fas fa-car nav-icon color-blue"></i>
-              <p>Manage Cars <i class="right fas fa-angle-left"></i></p>
-            </router-link>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <router-link to="/manage-cars/pending-list" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-blue"></i>
-                  <p>Pending Booking</p>
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-cars/booking-list" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-blue"></i>
-                  <p>Booking List</p>
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-cars/settings" class="nav-link">
-                  <i class="nav-icon fas fa-wrench color-blue"></i>
-                  <p>Car Settings</p>
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-cars/driver-settings" class="nav-link">
-                  <i class="nav-icon fas fa-wrench color-blue"></i>
-                  <p>Driver Settings</p>
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-cars/vendor-settings" class="nav-link">
-                  <i class="nav-icon fas fa-wrench color-blue"></i>
-                  <p>Vendor Settings</p>
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-cars/history" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-blue"></i>
-                  <p>History</p>
-                </router-link>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item has-treeview">
-            <!--<a href="#" class="nav-link active">-->
-            <router-link to="/manage-docs" class="nav-link">
-              <i class="nav-icon fas fa-clipboard-list color-orange"></i>
-              <p>Manage Documents <i class="right fas fa-angle-left"></i></p>
-            </router-link>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <router-link to="/manage-docs" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-orange"></i>
-                  <p>Upcoming List</p>
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/manage-docs/history" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-orange"></i>
-                  <p>History</p>
-                </router-link>
-              </li>
-            </ul>
-            {{-- <playlist-sidebar :playlist="{{$playlist}}"></playlist-sidebar>--}}
-          </li>
-          <li class="nav-item has-treeview">
-            <router-link to="/maintenance" class="nav-link">
-              <i class="nav-icon fas fa-recycle color-green"></i>
-              <p>Maintenance <i class="right fas fa-angle-left"></i></p>
-            </router-link>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <router-link to="/maintenance" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-green"></i>
-                  <p>Upcoming List</p>
-                </router-link>
-              </li>
-              <li class="nav-item">
-                <router-link to="/maintenance/history" class="nav-link">
-                  <i class="nav-icon fas fa-list-alt color-green"></i>
-                  <p>History</p>
-                </router-link>
-              </li>
-            </ul>
-          </li>
-          @if(Auth::user()->privilege == 'admin' || Auth::user()->privilege == 'super_admin')
-            <li class="nav-item has-treeview">
-              <router-link to="/hrd" class="nav-link">
-                <i class="nav-icon fas fa-users color-light-red"></i>
-                <p>Human Resource <i class="right fas fa-angle-left"></i></p>
-              </router-link>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <router-link to="/hrd/salary-slip" class="nav-link">
-                    <i class="nav-icon fas fa-file-invoice-dollar color-light-red"></i>
-                    <p>Salary Slip</p>
-                  </router-link>
-                </li>
-              </ul>
-            </li>
-          @endif
-          @if(Auth::user()->privilege == 'admin' || Auth::user()->privilege == 'super_admin')
-            <li class="nav-item has-treeview">
-              <router-link to="/manage-users" class="nav-link">
-                <i class="fas fa-user-cog nav-icon color-yellow"></i>
-                <p>Manage Users <i class="right fas fa-angle-left"></i></p>
-              </router-link>
-              <ul class="nav nav-treeview">
-                <li class="nav-item">
-                  <router-link to="/manage-users/users" class="nav-link">
-                    <i class="fas fa-user-cog nav-icon color-yellow"></i>
-                    <p>User Settings</p>
-                  </router-link>
-                </li>
-                <li class="nav-item">
-                  <router-link to="/manage-users/divisions" class="nav-link">
-                    <i class="fas fa-user-cog nav-icon color-yellow"></i>
-                    <p>Division Settings</p>
-                  </router-link>
-                </li>
-              </ul>
-            </li>
-          @endif
-          {{-- @if(Auth::user()->privilege == 'admin')
+          @else
             <li class="nav-item">
-              <router-link to="/app-settings" class="nav-link">
-                <i class="nav-icon fas fa-cog color-green"></i>
-                <p>Settings</p>
+              <router-link to="/dashboard" class="nav-link">
+                <i class="nav-icon fas fa-chart-bar color-teal"></i>
+                <p>Dashboard</p>
               </router-link>
             </li>
-          @endif --}}
+            <li class="nav-item">
+              <router-link to="/manage-rooms" class="nav-link">
+                <i class="nav-icon fas fa-building color-purple"></i>
+                <p>Manage Rooms <i class="right fas fa-angle-left"></i></p>
+              </router-link>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <router-link to="/manage-rooms/pending-list" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-purple"></i>
+                    <p>Pending Booking</p>  
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-rooms/booking-list" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-purple"></i>
+                    <p>Booking List</p>  
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-rooms/settings" class="nav-link">
+                    <i class="nav-icon fas fa-wrench color-purple"></i>
+                    <p>Settings</p>  
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-rooms/history" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-purple"></i>
+                    <p>History</p>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item has-treeview">
+              <router-link to="/manage-cars" class="nav-link">
+                <i class="fas fa-car nav-icon color-blue"></i>
+                <p>Manage Cars <i class="right fas fa-angle-left"></i></p>
+              </router-link>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <router-link to="/manage-cars/pending-list" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-blue"></i>
+                    <p>Pending Booking</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-cars/booking-list" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-blue"></i>
+                    <p>Booking List</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-cars/settings" class="nav-link">
+                    <i class="nav-icon fas fa-wrench color-blue"></i>
+                    <p>Car Settings</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-cars/driver-settings" class="nav-link">
+                    <i class="nav-icon fas fa-wrench color-blue"></i>
+                    <p>Driver Settings</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-cars/vendor-settings" class="nav-link">
+                    <i class="nav-icon fas fa-wrench color-blue"></i>
+                    <p>Vendor Settings</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-cars/history" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-blue"></i>
+                    <p>History</p>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+            <li class="nav-item has-treeview">
+              <!--<a href="#" class="nav-link active">-->
+              <router-link to="/manage-docs" class="nav-link">
+                <i class="nav-icon fas fa-clipboard-list color-orange"></i>
+                <p>Manage Documents <i class="right fas fa-angle-left"></i></p>
+              </router-link>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <router-link to="/manage-docs" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-orange"></i>
+                    <p>Upcoming List</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/manage-docs/history" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-orange"></i>
+                    <p>History</p>
+                  </router-link>
+                </li>
+              </ul>
+              {{-- <playlist-sidebar :playlist="{{$playlist}}"></playlist-sidebar>--}}
+            </li>
+            <li class="nav-item has-treeview">
+              <router-link to="/maintenance" class="nav-link">
+                <i class="nav-icon fas fa-recycle color-green"></i>
+                <p>Maintenance <i class="right fas fa-angle-left"></i></p>
+              </router-link>
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <router-link to="/maintenance" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-green"></i>
+                    <p>Upcoming List</p>
+                  </router-link>
+                </li>
+                <li class="nav-item">
+                  <router-link to="/maintenance/history" class="nav-link">
+                    <i class="nav-icon fas fa-list-alt color-green"></i>
+                    <p>History</p>
+                  </router-link>
+                </li>
+              </ul>
+            </li>
+            @if(Auth::user()->privilege == 'admin' || Auth::user()->privilege == 'super_admin')
+              <li class="nav-item has-treeview">
+                <router-link to="/hrd" class="nav-link">
+                  <i class="nav-icon fas fa-users color-light-red"></i>
+                  <p>Human Resource <i class="right fas fa-angle-left"></i></p>
+                </router-link>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <router-link to="/hrd/salary-slip" class="nav-link">
+                      <i class="nav-icon fas fa-file-invoice-dollar color-light-red"></i>
+                      <p>Salary Slip</p>
+                    </router-link>
+                  </li>
+                </ul>
+              </li>
+            @endif
+            @if(Auth::user()->privilege == 'admin' || Auth::user()->privilege == 'super_admin')
+              <li class="nav-item has-treeview">
+                <router-link to="/manage-users" class="nav-link">
+                  <i class="fas fa-user-cog nav-icon color-yellow"></i>
+                  <p>Manage Users <i class="right fas fa-angle-left"></i></p>
+                </router-link>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <router-link to="/manage-users/users" class="nav-link">
+                      <i class="fas fa-user-cog nav-icon color-yellow"></i>
+                      <p>User Settings</p>
+                    </router-link>
+                  </li>
+                  <li class="nav-item">
+                    <router-link to="/manage-users/divisions" class="nav-link">
+                      <i class="fas fa-user-cog nav-icon color-yellow"></i>
+                      <p>Division Settings</p>
+                    </router-link>
+                  </li>
+                </ul>
+              </li>
+            @endif
+            {{-- @if(Auth::user()->privilege == 'admin')
+              <li class="nav-item">
+                <router-link to="/app-settings" class="nav-link">
+                  <i class="nav-icon fas fa-cog color-green"></i>
+                  <p>Settings</p>
+                </router-link>
+              </li>
+            @endif --}}
+          @endif
           <li class="nav-item">
             <a class="nav-link" href="{{ route('logout') }}"
               onclick="event.preventDefault();

@@ -24,7 +24,7 @@
               <div class="row">
                 <div class="col-12" style="font-size: 1.15em">
                   <h4><strong>Rincian Penghasilan Karyawan</strong></h4>
-                  <h4 class="periode"><small>Bulan: <strong>{{periode()}}</strong></small></h4>
+                  <h4 class="periode"><small>Bulan: <strong>{{periode(employee_detail.month, employee_detail.year)}}</strong></small></h4>
                 </div>
                 <!-- /.col -->
               </div>
@@ -151,7 +151,10 @@
   export default{
     data(){
       return{
+        userLogin: {},
         employee_detail: {
+          month: 0,
+          year: 0,
           gaji_tunjangan: 0,
           terima_pph: 0,
           total_terima_lain: 0,
@@ -172,18 +175,30 @@
       formatDate(datetime){
         return moment(String(datetime)).format('LL')
       },
-      periode(){
-        return moment().format("MMMM YYYY")
+      periode(month, year){
+        let m = month.toString().length == 1 ? `0${month}` : month;
+        return moment(new Date(`${m}-01-${year}`)).format("MMMM YYYY")
       },
       numberInThousand(number){
         return number.toLocaleString()
       },
       
       loadEmployeeDetail(){
-        axios.get(window.location.origin+'/api/employee/'+this.$route.params.id)
-          .then(({data}) => {
-            this.employee_detail = data
-          })
+          // axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
+          //   this.userLogin = data;
+          // })
+
+        if(!this.$route.params.id){
+          axios.get(window.location.origin+'/api/employee/getUserSalary')
+            .then(({data}) => {
+              this.employee_detail = data
+            })
+        }else{
+          axios.get(window.location.origin+'/api/employee/'+this.$route.params.id)
+            .then(({data}) => {
+              this.employee_detail = data
+            })
+        }
       },
     },
     watch: {

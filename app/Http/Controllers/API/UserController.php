@@ -52,6 +52,7 @@ class UserController extends Controller
                 // return $request['privilege'];
                 return User::create([
                     'name' => $request['name'],
+                    'username' => $request['email'],
                     'email' => $request['email'],
                     'division_id' => $request['division'],
                     'password' => Hash::make('password123'),
@@ -72,6 +73,7 @@ class UserController extends Controller
                 return User::where('id', $request->id)
                     ->update([
                         'name' => $request->name,
+                        'username' => $request->email,
                         'email' => $request->email,
                         'division_id' => $request->division,
                         'privilege' => $request->privilege,
@@ -138,11 +140,13 @@ class UserController extends Controller
         if($id == 'getUserData'){
             return User::with('division')
                 ->where('status', '=', '1')
+                ->where('privilege', '!=', 'salary')
                 ->orderBy('name', 'asc')
                 ->get();
         }else if($id == 'getUserList'){
             return User::with('division')
                 ->where('status', '=', '1')
+                ->where('privilege', '!=', 'salary')
                 ->orderBy('name', 'asc')
                 ->paginate(10);
         }else if($id == 'getUserLogin'){

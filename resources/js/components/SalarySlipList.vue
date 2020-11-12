@@ -9,22 +9,24 @@
           <div class="card-header">
             <h3 class="card-title"><strong>Salary Slip List</strong></h3>
             <!-- <button class="btn btn-primary" style="float: right" @click="createEmployee()">Add New Employee</button> -->
-            <button class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadSalary">Import Salary</button>
+            <button v-if="userLogin.privilege != 'salary'" class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadSalary">Import Salary</button>
           </div>
           <div class="card-body">
-            <div class="form-group text-center mb-0">
-              <h4 class="mb-0">Period:</h4>
-              <select v-model="month_select" class="form-control month-select mr-2">
-                <option value="0" disabled>-Month-</option>
-                <option v-for="index in 12" :key="index" :value="index">{{month_arr[index]}}</option>
-              </select>
-              <select v-model="year_select" class="form-control year-select mr-2">
-                <option value="0" disabled>-Year-</option>
-                <option v-for="year in year_arr" :key="year" :value="year">{{year}}</option>
-              </select>
-              <button class="form-control btn btn-success period-search mr-2" @click="loadPeriodSlip()">Search</button>
-            </div>
-            <hr class="header-line-bot mt-0 mb-4">
+            <template v-if="userLogin.privilege != 'salary'">
+              <div class="form-group text-center mb-0">
+                <h4 class="mb-0">Period:</h4>
+                <select v-model="month_select" class="form-control month-select mr-2">
+                  <option value="0" disabled>-Month-</option>
+                  <option v-for="index in 12" :key="index" :value="index">{{month_arr[index]}}</option>
+                </select>
+                <select v-model="year_select" class="form-control year-select mr-2">
+                  <option value="0" disabled>-Year-</option>
+                  <option v-for="year in year_arr" :key="year" :value="year">{{year}}</option>
+                </select>
+                <button class="form-control btn btn-success period-search mr-2" @click="loadPeriodSlip()">Search</button>
+              </div>
+              <hr class="header-line-bot mt-0 mb-4">
+            </template>
 
             <table id="example1" class="table table-bordered table-striped">
               <thead>
@@ -32,18 +34,25 @@
                   <th>Employee Name</th>
                   <th>NIK</th>
                   <th>NPWP</th>
+                  <th>Period</th>
                   <th>Start Working From</th>
-                  <th>Action</th>
+                  <!-- <th>Action</th> -->
                 </tr>
               </thead>
               <tbody>
                 <template v-if="employee_list.data.length > 0">
                   <tr v-for="item in employee_list.data" :key="item.id">
-                    <td><router-link :to="`/hrd/salary-slip/${item.id}`" title="See Salary Slip">{{item.name}}</router-link></td>
+                    <td>
+                      <router-link v-if="userLogin.privilege == '!salary'" :to="`/hrd/salary-slip/${item.id}`" title="See Salary Slip">{{item.name}}</router-link>
+                      <p>{{item.name}}</p>
+                    </td>
                     <td>{{item.nik}}</td>
                     <td>{{item.npwp}}</td>
-                    <td>{{formatDate(item.entry_date)}}</td>
                     <td>
+                      <router-link :to="`/hrd/salary-slip/${item.nik}`" target="_blank" title="See Salary Slip">{{periode(item.month, item.year)}}</router-link>
+                    </td>
+                    <td>{{formatDate(item.entry_date)}}</td>
+                    <!-- <td>
                       <div class="modify_box">
                         <a class="modify-btn" @click="editEmployee(item)" title="Edit Slip">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
@@ -52,7 +61,7 @@
                           <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                         </a>
                       </div>
-                    </td>
+                    </td> -->
                   </tr>
                 </template>
                 <template v-else>
@@ -82,6 +91,11 @@
     },
     data(){
       return{
+        userLogin: {
+          id: 0,
+          privilege: ''
+        },
+
         first_load: true,
         month_select: 0,
         year_select: 0,
@@ -128,6 +142,10 @@
       formatDate(datetime){
         return moment(String(datetime)).format('ll')
       },
+      periode(month, year){
+        let m = month.toString().length == 1 ? `0${month}` : month;
+        return moment(new Date(`${m}-01-${year}`)).format("MMMM YYYY")
+      },
 
       loadYearSelect(){
         // let default_val = ['-Year-']
@@ -153,6 +171,16 @@
               this.employee_list = data
             }) 
         }
+      },
+      loadPersonalList(){
+        this.first_load = false
+        this.loading = true
+
+        axios.get(`${window.location.origin}/api/employee/${this.userLogin.username}`)
+          .then(({data}) => {
+            this.loading = false
+            this.employee_list = data
+          }) 
       },
 
       createEmployee(){
@@ -206,9 +234,10 @@
           })
       },
       employeePageContent(page = 1) {
-        axios.get(window.location.origin+'/api/employee/getEmployeeList?page=' + page)
-          .then(response => {
-            this.employee_list = response.data
+        axios.get(`${window.location.origin}/api/employee/period-${this.month_select}-${this.year_select}?page=${page}`)
+          .then(({data}) => {
+            this.loading = false
+            this.employee_list = data
           })
       },
     },
@@ -222,6 +251,14 @@
       //   deep: true,
     },
     mounted() {
+      axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
+        this.userLogin = data;
+
+        if(data.privilege == 'salary'){
+          this.loadPersonalList()
+        }
+      })
+
       // this.loadEmployeeList()
       this.loadYearSelect()
     }
