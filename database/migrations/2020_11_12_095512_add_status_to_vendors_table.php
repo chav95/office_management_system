@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddStatusToCar extends Migration
+class AddStatusToVendorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddStatusToCar extends Migration
      */
     public function up()
     {
-        Schema::table('cars', function (Blueprint $table) {
-            $table->integer('status')->default(1)->after('division_id');
+        Schema::table('vendors', function (Blueprint $table) {
+            $table->integer('status')->after('name')->default(1);
         });
     }
 
@@ -25,7 +25,7 @@ class AddStatusToCar extends Migration
      */
     public function down()
     {
-        Schema::table('cars', function (Blueprint $table) {
+        Schema::table('vendors', function (Blueprint $table) {
             $table->dropColumn('status');
         });
     }

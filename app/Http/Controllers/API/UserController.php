@@ -181,7 +181,7 @@ class UserController extends Controller
     {
         return response()->json(array(
             'success' => true, 
-            'result' => User::where('id', $id)->delete()
+            'result' => User::where('id', $id)->update(['status' => 0]) //User::where('id', $id)->delete()
         ), 200);
     }
 }

@@ -33,7 +33,7 @@
                 <tr>
                   <th>Employee Name</th>
                   <th>NIK</th>
-                  <th>NPWP</th>
+                  <!-- <th>NPWP</th> -->
                   <th>Period</th>
                   <th>Start Working From</th>
                   <!-- <th>Action</th> -->
@@ -43,13 +43,18 @@
                 <template v-if="employee_list.data.length > 0">
                   <tr v-for="item in employee_list.data" :key="item.id">
                     <td>
-                      <router-link v-if="userLogin.privilege == '!salary'" :to="`/hrd/salary-slip/${item.id}`" title="See Salary Slip">{{item.name}}</router-link>
+                      <!-- <router-link v-if="userLogin.privilege == '!salary'" :to="`/hrd/salary-slip/${item.id}`" title="See Salary Slip">{{item.name}}</router-link> -->
                       <p>{{item.name}}</p>
                     </td>
                     <td>{{item.nik}}</td>
-                    <td>{{item.npwp}}</td>
+                    <!-- <td>{{item.npwp}}</td> -->
                     <td>
-                      <router-link :to="`/hrd/salary-slip/${item.nik}`" target="_blank" title="See Salary Slip">{{periode(item.month, item.year)}}</router-link>
+                      <router-link 
+                        v-if="userLogin.id == 6 || userLogin.privilege == 'salary'"
+                        :to="`/hrd/salary-slip/${item.nik}/${item.year}/${item.month}`" 
+                        target="_blank" title="See Salary Slip"
+                      >{{periode(item.month, item.year)}}</router-link>
+                      <span v-else>{{periode(item.month, item.year)}}</span>
                     </td>
                     <td>{{formatDate(item.entry_date)}}</td>
                     <!-- <td>
@@ -65,7 +70,7 @@
                   </tr>
                 </template>
                 <template v-else>
-                  <tr><td colspan="100%"><h5 class="text-center">{{first_load == true ? 'Search Period First' : 'Selected Period Is Empty'}}</h5></td></tr>
+                  <tr><td colspan="100%"><h5 class="text-center">{{first_load == true ? 'Search Period First' : 'Selected List Is Empty'}}</h5></td></tr>
                 </template>
               </tbody>
             </table>
@@ -142,9 +147,9 @@
       formatDate(datetime){
         return moment(String(datetime)).format('ll')
       },
-      periode(month, year){
-        let m = month.toString().length == 1 ? `0${month}` : month;
-        return moment(new Date(`${m}-01-${year}`)).format("MMMM YYYY")
+      periode(month = 0, year = 0){
+        // let m = month.toString().length == 1 ? `0${month}` : month;
+        return moment(new Date(`${month}-01-${year}`)).format("MMMM YYYY")
       },
 
       loadYearSelect(){

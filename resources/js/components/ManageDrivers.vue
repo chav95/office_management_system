@@ -16,7 +16,7 @@
                   <th>Name</th>
                   <th>Assigned Car</th>
                   <th>Registered At</th>
-                  <th class="no-print">Action</th>
+                  <th v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -31,7 +31,7 @@
                       }}
                     </td>
                     <td>{{formatDatetime(user.created_at)}}</td>
-                    <td class="no-print">
+                    <td v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">
                       <div class="modify_box">
                         <a class="modify-btn" title="Edit" v-on:click="editDriver(user.id, user.name, user.car === null ? 0 : user.car.id)">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>

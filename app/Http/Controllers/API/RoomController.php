@@ -178,9 +178,9 @@ class RoomController extends Controller
     public function show($id)
     {
         if($id === 'getRoomList'){
-            $result = Room::with('today_booking', 'today_booking.user')->get();
+            $result = Room::with('today_booking', 'today_booking.user')->where('status', 1)->get();
         }else if($id === 'getRoomData'){
-            $result = Room::with('today_booking', 'today_booking.user')->paginate(10);
+            $result = Room::with('today_booking', 'today_booking.user')->where('status', 1)->paginate(10);
             // $room_last_booking = $result->booking->last();
 
             // $result->booking = $room_last_booking;
@@ -254,7 +254,7 @@ class RoomController extends Controller
             'success' => true, 
             'result' => $item_class === 'booking'
                 ? RoomBooking::where('id', $item_id)->delete()
-                : Room::where('id', $item_id)->delete()
+                : Room::where('id', $item_id)->update(['status' => 0])
         ), 200);
     }
 }

@@ -70,9 +70,9 @@ class VendorController extends Controller
     public function show($id)
     {
         if($id === 'getVendorData'){
-            return Vendor::orderBy('name', 'ASC')->get();
+            return Vendor::orderBy('name', 'ASC')->where('status', 1)->get();
         }else if($id === 'getVendorList'){
-            return Vendor::orderBy('name', 'ASC')->paginate(10);
+            return Vendor::orderBy('name', 'ASC')->where('status', 1)->paginate(10);
         }
     }
 
@@ -109,7 +109,7 @@ class VendorController extends Controller
     {
         return response()->json(array(
             'success' => true,
-            'result' => Vendor::destroy($id)
+            'result' => Vendor::where('id', $id)->update(['status' => 0])
         ), 200);
     }
 }

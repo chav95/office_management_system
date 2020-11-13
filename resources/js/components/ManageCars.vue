@@ -65,7 +65,7 @@
                             <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                           </a>
                         </div>
-                        <div class="modify_box" v-if="userLogin.id == 6">
+                        <div class="modify_box" v-if="userLogin.id == 6 || userLogin.id == 20">
                           <a class="modify-btn" title="Assign Car & Driver" @click="assign(booking)">
                             <i class="fa fa-thumbtack color-blue fa-fw fa-lg"></i>
                           </a>
@@ -80,7 +80,7 @@
                           <button class="btn btn-primary notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
                             Notes
                           </button>
-                          <button v-if="userLogin.id == 6"
+                          <button v-if="userLogin.id == 6 || userLogin.id == 20"
                             class="btn btn-danger notes-btn" title="Cancel Booking" 
                             @click="cancelReject(booking)"
                           >Cancel Reject</button>
@@ -104,7 +104,7 @@
                                 Cancel
                               </button>
                             </template>
-                            <button class="btn btn-info notes-btn" title="Change Driver / Car" @click="assign(booking)" v-if="userLogin.id == 6">
+                            <button class="btn btn-info notes-btn" title="Change Driver / Car" @click="assign(booking)" v-if="userLogin.id == 6 || userLogin.id == 20">
                               Edit Assign
                             </button>
                           </template>
@@ -150,7 +150,7 @@
                   <th>STNK / Lease Timeline</th>
                   <th>Vendor</th>
                   <th>User</th>
-                  <th class="no-print">Action</th>
+                  <th v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -171,7 +171,7 @@
                       
                       <td>{{car.vendor == null ? '-' : car.vendor.name}}</td>
                       <td>{{car.division == null ? '-' : car.division.name}}</td>
-                      <td class="no-print">
+                      <td v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">
                         <div class="modify_box">
                           <a class="modify-btn" @click="editCar(car)" title="Edit Car">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>

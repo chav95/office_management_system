@@ -20,7 +20,7 @@ import VueRouter from 'vue-router'
 import VueApexCharts from 'vue-apexcharts'
 
 Vue.use(VueSimpleAlert)
-Vue.use(moment)
+Vue.use(require('moment/locale/id'))
 Vue.use(Vuex)
 Vue.use(VueRouter)
 Vue.use(VueApexCharts)
@@ -56,9 +56,9 @@ let routes = [
     // HRD Routes
     {path: '/hrd', component: require('./components/SalarySlipList.vue').default},
     {path: '/hrd/salary-slip', component: require('./components/SalarySlipList.vue').default},
-    {path: '/hrd/salary-slip/:id', component: require('./components/SalarySlipDetail.vue').default},
+    {path: '/hrd/salary-slip/:id/:year/:month', component: require('./components/SalarySlipDetail.vue').default},
     {path: '/salary-slip', component: require('./components/SalarySlipList.vue').default},
-    {path: '/salary-slip/:id', component: require('./components/SalarySlipDetail.vue').default},
+    {path: '/salary-slip/:id/:year/:month', component: require('./components/SalarySlipDetail.vue').default},
     
     // User Routes
     {path: '/manage-users', component: require('./components/Users.vue').default},

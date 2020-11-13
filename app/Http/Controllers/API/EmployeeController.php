@@ -120,11 +120,18 @@ class EmployeeController extends Controller
             $year = $params[2];
 
             return Employee::where('month', $month)->where('year', $year)->paginate(10);
+        }else if(strpos($id, 'detail') !== false){
+            $params = explode('-', $id);
+            $nik = $params[1];
+            $year = $params[2];
+            $month = $params[3];
+
+            return Employee::where('month', $month)->where('year', $year)->where('nik', $nik)->first();
         }else if($id == 'getUserSalary'){
             $nik = auth('api')->user()->username; //return $nik;
             return Employee::where('nik', (string)$nik)->latest('year', 'month')->first();
         }else{ //$id is employee nik
-            return Employee::where('nik', (string)$id)->latest('year', 'month')->first();
+            return Employee::where('nik', (string)$id)->latest('year', 'month')->paginate(10);
         }
     }
 

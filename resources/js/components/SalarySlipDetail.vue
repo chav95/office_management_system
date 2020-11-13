@@ -1,5 +1,6 @@
 <template>
 <div class="container">
+  <template v-if="userLogin.id == 6 || userLogin.username == $route.params.id">
     <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
@@ -142,6 +143,26 @@
         </div>
       </div>
     </section>
+  </template>
+
+  <template v-else>
+    <section class="content mt-5">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-12">
+            <div class="callout callout-info">
+              <h5>
+                <i :class="`fas color-red mr-2 ${loading == false ? 'fa-exclamation-triangle' : ''}`"></i>
+                <strong>
+                  {{loading == true ? 'Please Wait...' : 'ACCESS DENIED'}}
+                </strong>
+              </h5>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </template>
 </div>
 </template>
 
@@ -151,7 +172,10 @@
   export default{
     data(){
       return{
-        userLogin: {},
+        loading: true,
+        userLogin: {
+          id: 0,
+        },
         employee_detail: {
           month: 0,
           year: 0,
@@ -175,12 +199,12 @@
       formatDate(datetime){
         return moment(String(datetime)).format('LL')
       },
-      periode(month, year){
-        let m = month.toString().length == 1 ? `0${month}` : month;
-        return moment(new Date(`${m}-01-${year}`)).format("MMMM YYYY")
+      periode(month = 0, year = 0){
+        // let m = month.toString().length == 1 ? `0${month}` : month;
+        return moment(new Date(`${month}-01-${year}`)).format("MMMM YYYY")
       },
       numberInThousand(number){
-        return number.toLocaleString()
+        return number.toLocaleString().replace(/\,/g, '.')
       },
       
       loadEmployeeDetail(){
@@ -188,17 +212,17 @@
           //   this.userLogin = data;
           // })
 
-        if(!this.$route.params.id){
-          axios.get(window.location.origin+'/api/employee/getUserSalary')
+        // if(!this.$route.params.id){
+        //   axios.get(window.location.origin+'/api/employee/getUserSalary')
+        //     .then(({data}) => {
+        //       this.employee_detail = data
+        //     })
+        // }else{
+          axios.get(`${window.location.origin}/api/employee/detail-${this.$route.params.id}-${this.$route.params.year}-${this.$route.params.month}`)
             .then(({data}) => {
               this.employee_detail = data
             })
-        }else{
-          axios.get(window.location.origin+'/api/employee/'+this.$route.params.id)
-            .then(({data}) => {
-              this.employee_detail = data
-            })
-        }
+        // }
       },
     },
     watch: {
@@ -207,7 +231,15 @@
       // }
     },
     mounted() {
-      this.loadEmployeeDetail()
+      moment.locale();
+      axios.get(window.location.origin+'/api/user/getUserLogin').then(({data}) => {
+        this.userLogin = data;
+
+        if(data.id == 6 || data.username == this.$route.params.id){
+          this.loadEmployeeDetail()
+        }
+        this.loading = false
+      })
     }
   }
 </script>

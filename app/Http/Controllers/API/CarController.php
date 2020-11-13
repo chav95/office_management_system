@@ -222,9 +222,10 @@ class CarController extends Controller
     public function show($id)
     {
         if($id === 'getCarList'){
-            $result = Car::with('company', 'division', 'vendor', 'driver')->get();
+            $result = Car::with('company', 'division', 'vendor', 'driver')->where('status', 1)->get();
         }else if($id === 'getCarData'){
-            $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')->paginate(10);
+            $result = Car::with('today_booking', 'today_booking.user', 'company', 'division', 'vendor', 'driver')
+                ->where('status', 1)->paginate(10);
         }else if($id === 'getBookingData'){
             $result = CarBooking::with('car', 'driver', 'user', 'division')
                 ->where('car_id', '>', 0)
@@ -292,7 +293,7 @@ class CarController extends Controller
             'success' => true, 
             'result' => $item_class == 'booking' 
                 ? CarBooking::where('id', $item_id)->delete()
-                : Car::where('id', $item_id)->delete()
+                : Car::where('id', $item_id)->update(['status' => 0])
         ), 200);
     }
 }

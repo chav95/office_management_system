@@ -16,7 +16,7 @@
         <div class="row">
           <div class="col-12">
             <div class="callout callout-info">
-              <h5><i class="fab fa-ello color-indigo"></i> Welcome, <strong>{{userLogin.name}}</strong></h5>
+              <h5><i class="fab fa-ello color-indigo mr-2"></i> Welcome, <strong>{{userLogin.name}}</strong></h5>
             </div>
           </div>
         </div>

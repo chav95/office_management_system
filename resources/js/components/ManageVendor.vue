@@ -15,7 +15,7 @@
                 <tr>
                   <th>Vendor</th>
                   <th>Registered At</th>
-                  <th class="no-print">Action</th>
+                  <th v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -24,7 +24,7 @@
                     <!-- <td>{{item.name | ucwords}}</td> -->
                     <td>{{item.name}}</td>
                     <td>{{formatDatetime(item.created_at)}}</td>
-                    <td class="no-print">
+                    <td v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">
                       <div v-if="can_modify" class="modify-btn-container">
                         <a class="modify-btn" title="Edit" v-on:click="editItem(item.id, item.name)">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
@@ -37,7 +37,7 @@
                   </tr>
                 </template>
                 <template v-else>
-                  <tr><td colspan="100%"><h3 class="text-center">User Table Is Empty</h3></td></tr>
+                  <tr><td colspan="100%"><h3 class="text-center">Vendor Is Empty</h3></td></tr>
                 </template>
               </tbody>
             </table>

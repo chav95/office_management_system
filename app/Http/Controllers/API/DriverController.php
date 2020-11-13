@@ -94,9 +94,9 @@ class DriverController extends Controller
     public function show($id)
     {
         if($id === 'getDriverData'){
-            return Driver::with('today_booking')->orderBy('name', 'ASC')->get();
+            return Driver::with('today_booking')->orderBy('name', 'ASC')->where('status', 1)->get();
         }else if($id === 'getDriverList'){
-            return Driver::with('car')->orderBy('name', 'ASC')->paginate(10);
+            return Driver::with('car')->orderBy('name', 'ASC')->where('status', 1)->paginate(10);
         }
     }
 
@@ -133,7 +133,7 @@ class DriverController extends Controller
     {
         return response()->json(array(
             'success' => true,
-            'result' => Driver::destroy($id)
+            'result' => Driver::where('id', $id)->update(['status' => 0])
         ), 200);
     }
 }

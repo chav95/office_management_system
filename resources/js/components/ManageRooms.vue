@@ -67,7 +67,7 @@
                               <i class="fa fa-trash color-red fa-fw fa-lg"></i>
                             </a>
                           </div>
-                          <div class="modify_box" v-if="userLogin.id == 6">
+                          <div class="modify_box" v-if="userLogin.id == 6 || userLogin.id == 20">
                             <a class="modify-btn" title="Assign Room" @click="assign(booking)">
                               <i class="fa fa-thumbtack color-blue fa-fw fa-lg"></i>
                             </a>
@@ -82,7 +82,7 @@
                             <button class="btn btn-primary notes-btn" title="Reason For Rejection" @click="$alert(booking.notes)">
                               Notes
                             </button>
-                            <button v-if="userLogin.id == 6"
+                            <button v-if="userLogin.id == 6 || userLogin.id == 20"
                               class="btn btn-danger notes-btn" title="Cancel Booking" 
                               @click="cancelReject(booking)"
                             >Cancel Reject</button>
@@ -139,7 +139,7 @@
                     <th>Room</th>
                     <th>Capacity</th>
                     <th>Status</th>
-                    <th class="no-print">Action</th>
+                    <th v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -148,7 +148,7 @@
                       <td>{{room.name}}</td>
                       <td>{{room.capacity}}</td>
                       <td class="text-green"><b>Available</b></td>
-                      <td class="no-print">
+                      <td v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'" class="no-print">
                         <div>
                           <a class="modify-btn" @click="editRoom(room)" title="Edit Room">
                             <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
@@ -250,7 +250,8 @@
           || this.userLogin.id == 3 
           || this.userLogin.id == 4 
           || this.userLogin.id == 5 
-          || this.userLogin.id == 6)
+          || this.userLogin.id == 6 
+          || this.userLogin.id == 20)
         {
           return true
         }
@@ -505,6 +506,7 @@
                       this.loadPendingBooking()
                     }else{
                       this.loadRoomData()
+                      this.loadRoomList()
                     }
                   })
                   .catch(err => {
