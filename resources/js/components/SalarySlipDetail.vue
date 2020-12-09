@@ -54,14 +54,14 @@
                     <h5><strong>Penerimaan</strong></h5>
 
                     <!-- <h6><strong>Penerimaan</strong></h6> -->
-                    <div class="col-5 section-left">
+                    <div class="col-6 section-left">
                       Gaji <span style="float: right">:</span><br>
                       PPh 21 <span style="float: right">:</span><br>
                       Pendapatan Lainnya <span style="float: right">:</span><br>
                       <hr class="section-line">
                       <span style="float: right"><strong>Jumlah Penerimaan :</strong></span><br>
                     </div>
-                    <div class="col-5 section-right">
+                    <div class="col-4 section-right">
                       <span style="float: right">{{numberInThousand(employee_detail.gaji_tunjangan)}}</span><br>
                       <span style="float: right">{{numberInThousand(employee_detail.terima_pph)}}</span><br>
                       <span style="float: right">{{numberInThousand(employee_detail.total_terima_lain)}}</span><br>
@@ -74,13 +74,13 @@
                     <h5><strong>Potongan</strong></h5>
 
                     <!-- <h6><strong>Umum</strong></h6> -->
-                    <div class="col-5 section-left">
+                    <div class="col-6 section-left">
                       PPh 21 <span style="float: right">:</span><br>
                       Potongan Lainnya <span style="float: right">:</span><br>
                       <hr class="section-line">
                       <span style="float: right"><strong>Jumlah Potongan :</strong></span><br>
                     </div>
-                    <div class="col-5 section-right">
+                    <div class="col-4 section-right">
                       <span style="float: right">{{numberInThousand(employee_detail.total_potongan_pph)}}</span><br>
                       <span style="float: right">{{numberInThousand(employee_detail.total_potongan_lain)}}</span><br>
                       <hr class="section-line">
@@ -94,12 +94,12 @@
                 <div class="col-12 total-container">
                   <div class="section-container total">
                     <div class="col-6 section">
-                      <div class="col-5 section-left">
+                      <div class="col-6 section-left">
                         <strong>Penerimaan</strong> <span style="float: right">:</span> <br>
                         <strong>Pengurangan</strong> <span style="float: right">:</span> <br>
                       </div>
                       
-                      <div class="col-5 section-right">
+                      <div class="col-4 section-right">
                         <strong><span style="float: right">{{numberInThousand(employee_detail.penerimaan)}}</span></strong> <br>
                         <strong><span style="float: right">{{numberInThousand(employee_detail.pengurang)}}</span></strong> <br>
                       </div>
@@ -107,6 +107,44 @@
                   </div>
 
                   <div class="section-container total mt-4">
+                    <hr class="header-line-top thin-margin mb-2">
+                    <div class="col-6 section">
+                      <h5><strong>Penerimaan Lain</strong></h5>
+                      <div v-if="extra_penerimaan.length > 0">
+                        <div v-for="item in extra_penerimaan" :key="item.id">
+                          <div class="col-6 section-left align-bottom">
+                            {{item.keterangan}} <span style="float: right">:</span><br>
+                          </div>
+
+                          <div class="col-4 section-left align-bottom">
+                            <strong><span style="float: right">{{numberInThousand(item.nominal)}}</span></strong><br>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else class="text-center">n/a</div>
+                    </div>
+
+                    <div class="col-6 section">
+                      <h5><strong>Potongan Lain</strong></h5>
+                      <div v-if="extra_potongan.length > 0">
+                        <div v-for="item in extra_potongan" :key="item.id">
+                          <div class="col-6 section-left align-bottom">
+                            {{item.keterangan}} <span style="float: right">:</span><br>
+                          </div>
+
+                          <div class="col-4 section-left align-bottom">
+                            <strong><span style="float: right">{{numberInThousand(item.nominal)}}</span></strong><br>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else class="text-center">n/a</div>
+                    </div>
+                    <hr class="header-line-bot thin-margin mt-2">
+                  </div>
+
+                  <!-- <div class="section-container total mt-4">
                     <hr class="header-line-top thin-margin mb-2">
                     <div class="col-6 section">
                       <div class="col-5 section-left">
@@ -118,7 +156,7 @@
                       </div>
                     </div>
                     <hr class="header-line-bot thin-margin mt-2">
-                  </div>
+                  </div> -->
                 </div>
                 <!-- /.col -->
               </div>
@@ -190,6 +228,8 @@
           pengurang: 0,
           penerimaan_bersih: 0,
         },
+        extra_penerimaan: [],
+        extra_potongan: [],
       }
     },
     methods:{
@@ -221,6 +261,21 @@
           axios.get(`${window.location.origin}/api/employee/detail-${this.$route.params.id}-${this.$route.params.year}-${this.$route.params.month}`)
             .then(({data}) => {
               this.employee_detail = data
+            })
+
+          axios.get(`${window.location.origin}/api/employee/extra-${this.$route.params.id}-${this.$route.params.year}-${this.$route.params.month}`)
+            .then(({data}) => { //console.log(JSON.stringify({data}))
+              for(let i=0; i<data.length; i++){
+                console.log(data[i].jenis)
+                switch(data[i].jenis.toLowerCase()){
+                  case('penerimaan'):
+                    this.extra_penerimaan.push(data[i])
+                  break;
+                  case('potongan'):
+                    this.extra_potongan.push(data[i])
+                  break;
+                }
+              }
             })
         // }
       },

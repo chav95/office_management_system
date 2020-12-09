@@ -45,6 +45,7 @@ return array(
     'App\\Http\\Middleware\\VerifyCsrfToken' => $baseDir . '/app/Http/Middleware/VerifyCsrfToken.php',
     'App\\Imports\\Docsimport' => $baseDir . '/app/Imports/DocsImport.php',
     'App\\Imports\\MaintenanceImport' => $baseDir . '/app/Imports/MaintenanceImport.php',
+    'App\\Imports\\SalaryExtraImport' => $baseDir . '/app/Imports/SalaryExtraImport.php.php',
     'App\\Imports\\SalaryImport' => $baseDir . '/app/Imports/SalaryImport.php',
     'App\\Imports\\UsersImport' => $baseDir . '/app/Imports/UsersImport.php',
     'App\\Log' => $baseDir . '/app/Log.php',

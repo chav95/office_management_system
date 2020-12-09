@@ -600,6 +600,7 @@ class ComposerStaticInitae15b551b157e0cdd0c024dfd09c73a7
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
         'App\\Imports\\Docsimport' => __DIR__ . '/../..' . '/app/Imports/DocsImport.php',
         'App\\Imports\\MaintenanceImport' => __DIR__ . '/../..' . '/app/Imports/MaintenanceImport.php',
+        'App\\Imports\\SalaryExtraImport' => __DIR__ . '/../..' . '/app/Imports/SalaryExtraImport.php.php',
         'App\\Imports\\SalaryImport' => __DIR__ . '/../..' . '/app/Imports/SalaryImport.php',
         'App\\Imports\\UsersImport' => __DIR__ . '/../..' . '/app/Imports/UsersImport.php',
         'App\\Log' => __DIR__ . '/../..' . '/app/Log.php',

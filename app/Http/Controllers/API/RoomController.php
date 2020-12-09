@@ -96,7 +96,9 @@ class RoomController extends Controller
                 $booking->save();
 
                 // Mail::to('om@jtd.co.id')->send(new BookRoomNotif($booking));
-                Mail::to(User::find(6)->email)->send(new BookRoomNotif(RoomBooking::with('user', 'room')->find($booking->id)));
+                Mail::to(User::find(6)->email)
+                    ->cc(User::find(20)->email)
+                    ->send(new BookRoomNotif(RoomBooking::with('user', 'room')->find($booking->id)));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
             }else if($request->action === 'edit_booking'){
@@ -144,7 +146,9 @@ class RoomController extends Controller
                         RoomBooking::where('id', $request->booking_id)->update([
                             'status' => 2,
                         ]),
-                    'mail' => Mail::to(User::find(6)->email)->send(new BookRoomDone(RoomBooking::with('user', 'room')->find($request->booking_id)))
+                    'mail' => Mail::to(User::find(6)->email)
+                        ->cc(User::find(20)->email)
+                        ->send(new BookRoomDone(RoomBooking::with('user', 'room')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel'){
                 return response()->json(array(
@@ -154,7 +158,9 @@ class RoomController extends Controller
                             'notes' => $request->notes,
                             'status' => -2,
                         ]),
-                    'mail' => Mail::to(User::find(6)->email)->send(new BookRoomDone(RoomBooking::with('user', 'room')->find($request->booking_id)))
+                    'mail' => Mail::to(User::find(6)->email)
+                        ->cc(User::find(20)->email)
+                        ->send(new BookRoomDone(RoomBooking::with('user', 'room')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel_reject'){
                 return response()->json(array(

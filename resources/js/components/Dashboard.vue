@@ -43,6 +43,9 @@
 		},
 		data(){
 			return{
+				book_car_data: {},
+				book_room_data: {},
+				
 				roomBookingBar: {
 					options: {
 						chart: {

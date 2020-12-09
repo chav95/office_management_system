@@ -5,7 +5,9 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Employee;
+use App\EmployeeExtra;
 use App\Imports\SalaryImport;
+use App\Imports\SalaryExtraImport;
 use Maatwebsite\Excel\Facades\Excel;
 use DateTime;
 
@@ -127,6 +129,13 @@ class EmployeeController extends Controller
             $month = $params[3];
 
             return Employee::where('month', $month)->where('year', $year)->where('nik', $nik)->first();
+        }else if(strpos($id, 'extra') !== false){
+            $params = explode('-', $id);
+            $nik = $params[1];
+            $year = $params[2];
+            $month = $params[3];
+
+            return EmployeeExtra::where('month', $month)->where('year', $year)->where('nik', $nik)->get();
         }else if($id == 'getUserSalary'){
             $nik = auth('api')->user()->username; //return $nik;
             return Employee::where('nik', (string)$nik)->latest('year', 'month')->first();
@@ -166,10 +175,21 @@ class EmployeeController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json(array(
-            'success' => true,
-            'result' => Employee::destroy($id)
-        ), 200);
+        if(strpos($id, 'period') !== false){
+            $params = explode('-', $id);
+            $month = $params[1];
+            $year = $params[2];
+
+            return response()->json(array(
+                'success' => true,
+                'result' => Employee::where('month', $month)->where('year', $year)->delete()
+            ), 200);
+        }else{
+            return response()->json(array(
+                'success' => true,
+                'result' => Employee::destroy($id)
+            ), 200);
+        }
     }
 
     public function validateEmployee($request){
@@ -195,12 +215,27 @@ class EmployeeController extends Controller
     {
         $request->validate([
             // 'import_file' => 'required|file|mimes:xls,xlsx'
-            'import_file' => 'required|file'
+            'import_file' => 'required|file',
+            'import_file2' => 'required|file'
         ]);
 
-        $path = $request->file('import_file');
-        $data = Excel::import(new SalaryImport, $path);
+        $import_file = $request->file('import_file');
+        $import_file2 = $request->file('import_file2');
+        
+        // switch($request->upload_type){
+            // case 'base':
+                $export_gaji = Excel::import(new SalaryImport, $import_file);
+            // break;
+            // case 'extra':
+                $export_gaji_lain = Excel::import(new SalaryExtraImport, $import_file2);
+            // break;
+        // }
+        // $data = Excel::import(new $model, $path);
 
-        return response()->json(array('message' => 'uploaded successfully'), 200);
+        return response()->json(array(
+            'message' => 'uploaded successfully',
+            'export_gaji' => $export_gaji,
+            'export_gaji_lain' => $export_gaji_lain,
+        ), 200);
     }
 }

@@ -94,7 +94,9 @@ class CarController extends Controller
                 $booking->save();
 
                 // Mail::to('om@jtd.co.id')->queue(new BookCarNotif($booking));
-                Mail::to(User::find(6)->email)->send(new BookCarNotif(CarBooking::with('user', 'car')->find($booking->id)));
+                Mail::to(User::find(6)->email)
+                    ->cc(User::find(20)->email)
+                    ->send(new BookCarNotif(CarBooking::with('user', 'car')->find($booking->id)));
 
                 return response()->json(array('success' => true, 'last_insert_id' => $booking->id), 200);
             }else if($request->action === 'edit_booking'){
@@ -188,7 +190,9 @@ class CarController extends Controller
                             'jam_akhir' => date('Y-m-d H:i:s'),
                             'status' => 2,
                         ]),
-                    'mail' => Mail::to(User::find(6)->email)->send(new BookCarDone(CarBooking::with('user', 'car')->find($request->booking_id)))
+                    'mail' => Mail::to(User::find(6)->email)
+                        ->cc(User::find(20)->email)
+                        ->send(new BookCarDone(CarBooking::with('user', 'car')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel'){
                 return response()->json(array(
@@ -198,7 +202,9 @@ class CarController extends Controller
                             'notes' => $request->notes,
                             'status' => -2,
                         ]),
-                    'mail' => Mail::to(User::find(6)->email)->send(new BookCarDone(CarBooking::with('user', 'car')->find($request->booking_id)))
+                    'mail' => Mail::to(User::find(6)->email)
+                        ->cc(User::find(20)->email)
+                        ->send(new BookCarDone(CarBooking::with('user', 'car')->find($request->booking_id)))
                 ), 200);
             }else if($request->action == 'cancel_reject'){
                 return response()->json(array(
@@ -250,6 +256,16 @@ class CarController extends Controller
                 ->orderBy('created_at', 'DESC')
                 ->orderBy('jam_awal', 'ASC')
                 ->paginate(10);
+        }else if($id == 'getDashboard'){
+            $all_data = [];
+            // for(range(1, 6) as $index){
+            //     $month = date()
+            //     $data = CarBooking::
+
+            //     array_push($data, (object)[
+
+            //     ]);
+            // }
         }
 
         return $result;

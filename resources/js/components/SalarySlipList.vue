@@ -5,11 +5,13 @@
       <div class="col-12">
         <div class="card">
           <!-- <create-employee :selected_employee="selected_employee" @success="loadEmployeeList()"></create-employee> -->
-          <import-salary @success="loadYearSelect()"/>
+          <import-salary :upload_type="import_action" @success="loadYearSelect()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Salary Slip List</strong></h3>
             <!-- <button class="btn btn-primary" style="float: right" @click="createEmployee()">Add New Employee</button> -->
-            <button v-if="userLogin.privilege != 'salary'" class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadSalary">Import Salary</button>
+            <!-- <button v-if="userLogin.privilege != 'salary'" class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadSalary">Import Salary Base Info</button> -->
+            <button v-if="userLogin.privilege != 'salary'" class="btn btn-primary" style="float: right; margin-right: 5px" @click="importModal('extra')">Import Salary</button>
+            <!-- <button v-if="userLogin.privilege != 'salary'" class="btn btn-primary" style="float: right; margin-right: 5px" @click="importModal('base')">Import Salary BASE Info</button> -->
           </div>
           <div class="card-body">
             <template v-if="userLogin.privilege != 'salary'">
@@ -24,6 +26,10 @@
                   <option v-for="year in year_arr" :key="year" :value="year">{{year}}</option>
                 </select>
                 <button class="form-control btn btn-success period-search mr-2" @click="loadPeriodSlip()">Search</button>
+                <button 
+                  :class="`form-control btn btn-danger period-search mr-2 ${delete_button == false ? 'd-none' : ''}`" 
+                  @click="deletePeriodSlip()"
+                >Delete</button>
               </div>
               <hr class="header-line-bot mt-0 mb-4">
             </template>
@@ -141,17 +147,27 @@
           'December',
         ],
         year_arr: [],
+
+        delete_button: false,
+        current_month: 0,
+        current_year: 0,
+
+        import_action: '',
       }
     },
     methods:{
       formatDate(datetime){
-        return moment(String(datetime)).format('ll')
+        return moment(String(datetime)).format('LL')
       },
       periode(month = 0, year = 0){
         // let m = month.toString().length == 1 ? `0${month}` : month;
         return moment(new Date(`${month}-01-${year}`)).format("MMMM YYYY")
       },
 
+      importModal(type){
+        this.import_action = type
+        $('#UploadSalary').modal('show')
+      },
       loadYearSelect(){
         // let default_val = ['-Year-']
         axios.get(`${window.location.origin}/api/employee/getYearSelect`)
@@ -162,6 +178,10 @@
       },
       loadPeriodSlip(){
         this.first_load = false
+        this.delete_button = false
+
+        this.current_month = this.month_select
+        this.current_year = this.year_select
 
         if(this.month_select == 0){
           this.$alert('Select Month First', '', 'error');
@@ -174,8 +194,21 @@
             .then(({data}) => {
               this.loading = false
               this.employee_list = data
+
+              if(data.data.length > 0){
+                this.delete_button = true
+              }
             }) 
         }
+      },
+      employeePageContent(page = 1) {
+        axios.get(`${window.location.origin}/api/employee/period-${this.month_select}-${this.year_select}?page=${page}`)
+          .then(({data}) => {
+            this.loading = false
+            this.employee_list = data
+
+            console.log({data})
+          })
       },
       loadPersonalList(){
         this.first_load = false
@@ -186,6 +219,21 @@
             this.loading = false
             this.employee_list = data
           }) 
+      },
+      deletePeriodSlip(){
+        this.$confirm(`Confirm Delete ${this.periode(this.current_month, this.current_year)} Payroll?`, '', 'warning')
+          .then(()=> {
+            axios.delete(`${window.location.origin}/api/employee/period-${this.month_select}-${this.year_select}`)
+              .then(res => {
+                this.$alert('Delete Successful', '', 'success');
+                this.month_select = this.current_month
+                this.year_select = this.current_year
+                this.loadPeriodSlip()
+              })
+              .catch(err => {
+                this.$alert(err, '', 'error')
+              })
+          })
       },
 
       createEmployee(){
@@ -235,13 +283,6 @@
       loadEmployeeList(){
         axios.get(window.location.origin+'/api/employee/getEmployeeList')
           .then(({data}) => {
-            this.employee_list = data
-          })
-      },
-      employeePageContent(page = 1) {
-        axios.get(`${window.location.origin}/api/employee/period-${this.month_select}-${this.year_select}?page=${page}`)
-          .then(({data}) => {
-            this.loading = false
             this.employee_list = data
           })
       },

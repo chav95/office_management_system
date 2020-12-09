@@ -12,10 +12,19 @@
             </div>
 
             <div class="modal-body">
+              <div class="form-group mb-0">
+                <div class="form-group mb-0">
+                  <label class="form-control-label"  for="input-file-import">Upload <strong>Export Gaji</strong></label>
+                  <input type="file" class="form-control mb-0" :class="{ ' is-invalid' : error.message }" id="input-file-import" name="file_import" ref="import_file"  @change="fileChange">
+                  <div v-if="error.message" class="invalid-feedback"></div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-body">
               <div class="form-group">
                 <div class="form-group">
-                  <label class="form-control-label"  for="input-file-import">Upload Excel File</label>
-                  <input type="file" class="form-control" :class="{ ' is-invalid' : error.message }" id="input-file-import" name="file_import" ref="import_file"  @change="onFileChange">
+                  <label class="form-control-label"  for="input-file-import2">Upload <strong>Export Gaji Lain</strong></label>
+                  <input type="file" class="form-control" :class="{ ' is-invalid' : error.message }" id="input-file-import2" name="file_import2" ref="import_file2"  @change="fileChange2">
                   <div v-if="error.message" class="invalid-feedback"></div>
                 </div>
               </div>
@@ -39,20 +48,30 @@
 
 <script>
   export default {
+    props: {
+      upload_type: {
+        type: String
+      },
+    },
     data() {
       return {
         error: {},
         import_file: '',
+        import_file2: '',
         
         loading: false,
       }
     },
     methods: {
-      onFileChange(e) {
+      fileChange(e){
         this.import_file = e.target.files[0];
+      },
+      fileChange2(e){
+        this.import_file2 = e.target.files[0];
       },
       resetFile(){
         this.$refs.import_file.value = '';
+        this.$refs.import_file2.value = '';
       },
 
       proceedAction() {
@@ -60,7 +79,9 @@
 
         let formData = new FormData()
         formData.append('action', 'import')
+        formData.append('upload_type', this.upload_type)
         formData.append('import_file', this.import_file)
+        formData.append('import_file2', this.import_file2)
 
         axios.post(window.location.origin+'/api/employee', formData, {
           headers: { 'content-type': 'multipart/form-data' }

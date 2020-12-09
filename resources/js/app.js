@@ -72,10 +72,10 @@ const router = new VueRouter({
     routes // short for `routes: routes`
 })
 
-Vue.filter('upText', function(text){
+Vue.filter('upText', function(text = ''){
     return text.charAt(0).toUpperCase() + value.slice(1) ;
 });
-Vue.filter('ucwords', function(text){
+Vue.filter('ucwords', function(text = ''){
     return text
         .split(' ')
         .map(w => w[0].toUpperCase() + w.substr(1).toLowerCase())
