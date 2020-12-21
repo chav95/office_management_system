@@ -15,23 +15,28 @@
             <table id="example1" class="table table-bordered table-striped">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Document Number</th>
-                  <th>Issue Date</th>
-                  <th>Expire Date</th>
-                  <th>Notes</th>
-                  <th>Created By</th>
+                  <th>Bagian (Unit)</th>
+                  <th>Nama</th>
+                  <th>Nomor Dokumen</th>
+                  <th>Masa Berlaku</th>
+                  <th>Waktu Pengurusan</th>
+                  <th>Diurus Oleh</th>
                   <th class="no-print">Action</th>
                 </tr>
               </thead>
               <tbody>
                 <template v-if="doc_list.data.length > 0">
                   <tr v-for="(item) in doc_list.data" :key="item.id">
+                    <td>{{item.bagian}} ({{item.unit}})</td>
                     <td>{{item.name}}</td>
                     <td>{{item.no_document}}</td>
-                    <td>{{formatDatetime(item.document_date)}}</td>
-                    <td>{{formatDatetime(item.due_date)}}</td>
-                    <td><pre class="doc_description">{{item.description}}</pre></td>
+                    <td class="masa_berlaku">
+                      {{formatDatetime(item.document_date)}}
+                      <br>s/d<br>
+                      {{formatDatetime(item.due_date)}}
+                    </td>
+                    <td>{{item.waktu_urus}}</td>
+                    <!-- <td><pre class="doc_description">{{item.description}}</pre></td> -->
                     <!-- <td>{{item.user.name | ucwords}}</td> -->
                     <td>{{item.user.name}}</td>
                     <td class="no-print">
@@ -96,7 +101,12 @@
     },
     methods:{
       formatDatetime(datetime){
-        return moment(String(datetime)).format('ll')
+        let result = moment(datetime)
+        if(result == null || !result.isValid()){
+          return datetime
+        }else{
+          return moment(String(datetime)).format('ll')
+        }        
       },
       loadDocData(){
         axios.get(window.location.origin+'/api/doc/getDocData')
@@ -194,5 +204,8 @@
     margin-bottom: 0;
     font-family: inherit;
     font-size: inherit;
+  }
+  .masa_berlaku{
+    min-width: 110px;
   }
 </style>

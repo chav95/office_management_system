@@ -1,8 +1,8 @@
-function test(n){
-    var a = [0,1]
-    if (n <= 2) return 1
-    for (var i = 2; i <=n; i++){
-        a[i] = a[i-1]+a[i-2];
-    }
-    return a[n]
+let result = 0
+
+for(let i=0; i<5; i++){
+    if(i==3) result += 10
+    else result += i
 }
+
+console.log(result)

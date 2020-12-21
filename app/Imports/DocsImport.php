@@ -22,9 +22,14 @@ class Docsimport implements ToModel, WithStartRow
         return new Document([
             'name'  => $row[0],
             'no_document' => $row[1],
-            'document_date'  => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[2]),
-            'due_date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[3]),
-            'description' => $row[5],
+            // 'document_date'  => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[2]),
+            // 'due_date' => \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[3]),
+            'document_date'  => $row[2],
+            'due_date' => $row[3],
+            'description' => $row[4],
+            'waktu_urus' => $row[5],
+            'unit' => $row[6],
+            'bagian' => $row[7],
             'created_by'  => auth('api')->user()->id,
         ]);
     }

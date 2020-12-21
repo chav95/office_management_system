@@ -31,6 +31,8 @@ class EditDocumentsTable extends Migration
         Schema::table('documents', function (Blueprint $table) {
             $table->string('type')->after('id');
             $table->dropColumn('description');
+            $table->dropColumn('document_date');
+            $table->renameColumn('document_date', 'notif_date')->nullable();
         });
     }
 }
