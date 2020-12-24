@@ -4,7 +4,7 @@
     <div class="row justify-content-center mt-4 mb-4 h-100">
       <div class="col-12">
         <div class="card">
-          <create-doc :selected_doc="selected_doc" :userLogin="userLogin" @success="loadDocData()"/>
+          <create-doc :selected_doc="selected_doc" :userLogin="userLogin" @success="getPageContent(data_page)"/>
           <import-doc @success="loadDocData()"/>
           <div class="card-header">
             <h3 class="card-title"><strong>{{$route.path == '/manage-docs/history' ? 'History ' : ''}}Document List</strong></h3>
@@ -40,7 +40,7 @@
                     <!-- <td>{{item.user.name | ucwords}}</td> -->
                     <td>{{item.user.name}}</td>
                     <td class="no-print">
-                      <div class="modify_box" v-if="(userLogin.id === item.created_by || userLogin.id == 5) && $route.path != '/manage-docs/history'">
+                      <div class="modify_box" v-if="(userLogin.id === item.created_by || userLogin.id == 6) && $route.path != '/manage-docs/history'">
                         <a class="modify-btn" @click="editItem(item)" title="Edit Document">
                           <i class="fa fa-edit color-blue fa-fw fa-lg"></i>
                         </a>
@@ -97,6 +97,8 @@
           description: '',
           user: 0,
         },
+
+        data_page: 1,
       }
     },
     methods:{
@@ -125,7 +127,8 @@
         let content = this.$route.path == '/manage-docs/history' ? 'getDocHistory' : 'getDocData'
         axios.get(window.location.origin+`/api/doc/${content}?page=` + page)
           .then(response => {
-            this.doc_list = response.data;
+            this.doc_list = response.data
+            this.data_page = response.data.current_page
           });
       },
 

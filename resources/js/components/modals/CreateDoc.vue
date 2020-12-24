@@ -28,11 +28,12 @@
 
                   <label>Berlaku Sampai</label>
                   <datepicker v-model="selected_doc.due_date" placeholder="Due Date" 
-                    :language="id" input-class="input-datepicker" 
+                    :language="id" input-class="input-datepicker mb-0" :disabled="this.tidak_terbatas"
                     :disabledDates="{to: new Date(new Date().setDate(new Date().getDate() - 1))}"
                   ></datepicker>
+                  <input type="checkbox" class="mb-1" v-model="tidak_terbatas"> Masa Berlaku Tidak Terbatas <br>
 
-                  <template v-if="userLogin.id == 5">
+                  <template v-if="userLogin.privilege == 'admin' || userLogin.privilege == 'super_admin'">
                     <label>User</label>
                     <select v-model="selected_doc.user" class="form-control" placeholder="Document Owner">
                       <option value="0" disabled>Select User</option>
@@ -83,11 +84,18 @@
         en,
 
         user_data: {},
+        tidak_terbatas: false,
 
         loading: false,
       }
     },
     computed: {
+      due_date_disable(){
+        if(this.tidak_terbatas == true){
+          return true
+        }
+        return false
+      },
       completed(){
         if(this.selected_doc.name !== '' /*&& this.selected_doc.notif_date != '' && this.selected_doc.due_date != ''*/){
           return true
@@ -112,6 +120,7 @@
       submitDoc(){
         if(this.completed === true){
           this.loading = true
+          this.selected_doc.due_date = this.tidak_terbatas == true ? 'Tidak Terbatas' : this.selected_doc.due_date
           let text = this.selected_doc.action == 'create_doc'
             ? 'Add New'
             : 'Edit'

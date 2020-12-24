@@ -81,8 +81,8 @@ class DocumentController extends Controller
                         Document::where('id', $request->id)->update([
                             'name' => $request->name,
                             'no_document' => $request->no_document,
-                            'document_date' => date('Y-m-d', strtotime($request->document_date)),
-                            'due_date' => date('Y-m-d', strtotime($request->due_date)),
+                            'document_date' => /*date('Y-m-d', strtotime(*/$request->document_date/*))*/,
+                            'due_date' => /*date('Y-m-d', strtotime(*/$request->due_date/*))*/,
                             'description' => $request->description,
                             'created_by' => $request->user,
                         ])
@@ -104,7 +104,9 @@ class DocumentController extends Controller
                 $result = Document::with('user')
                     ->where('due_date', '>=', date('Y-m-d'))
                     ->orderBy('name', 'ASC')
-                    ->orderBy('due_date', 'ASC')->paginate(10);
+                    ->orderBy('due_date', 'ASC')
+                    ->orderBy('created_by', 'ASC')
+                    ->paginate(10);
             // }else{
             //     $result = Document::with('user')
             //         ->where('due_date', '>=', date('Y-m-d'))
