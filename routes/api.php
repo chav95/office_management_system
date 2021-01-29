@@ -21,7 +21,6 @@ Route::apiResources([
     'doc' => 'API\DocumentController',
     'maintenance' => 'API\MaintenanceController',
     'log' => 'API\LogController',
-    'wishlist' => 'API\WishlistController',
     'user' => 'API\UserController',
     'company' => 'API\CompanyController',
     'driver' => 'API\DriverController',
