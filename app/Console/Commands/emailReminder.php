@@ -49,7 +49,12 @@ class emailReminder extends Command
             ->get();
 
         foreach ($doc as $item){
-            Mail::to('chavinpradana@gmail.com')->send(new UpcomingDocNotif(Document::find($item->id)));
+            Mail::to(
+                'nefi@jtd.co.id', 
+                'corporate.secretary@jtd.co.id', 
+                'Legal.sdm@jtdjp.co.id', 
+                'legal.jtd@gmail.com'
+            )->send(new UpcomingDocNotif(Document::find($item->id)));
         }
 
         $maintenance = Maintenance::with('user')
@@ -59,7 +64,12 @@ class emailReminder extends Command
             ->get();
 
         foreach ($maintenance as $item){
-            Mail::to('chavinpradana@gmail.com')->send(new UpcomingMaintainNotif(Document::find($item->id)));
+            Mail::to(
+                'nefi@jtd.co.id', 
+                'corporate.secretary@jtd.co.id', 
+                'Legal.sdm@jtdjp.co.id', 
+                'legal.jtd@gmail.com'
+            )->send(new UpcomingMaintainNotif(Document::find($item->id)));
         }
     }
 }
