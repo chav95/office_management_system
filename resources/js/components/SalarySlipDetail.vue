@@ -19,12 +19,13 @@
         <div class="row">
           <div class="col-12">
             <!-- Main content -->
-            <div class="doc-container p-3 mb-3">
+            <div class="doc-container p-3 mb-3" id="kop-surat-space">
 
             <!-- <template v-if="$route.params.id == 1"> -->
               <div class="row">
                 <div class="col-12" style="font-size: 1.15em">
                   <h4><strong>Rincian Penghasilan Karyawan</strong></h4>
+                  <h4 class="periode"><small>Company: <strong>{{employee_detail.company}}</strong></small></h4>
                   <h4 class="periode"><small>Bulan: <strong>{{periode(employee_detail.month, employee_detail.year)}}</strong></small></h4>
                 </div>
                 <!-- /.col -->
@@ -58,15 +59,11 @@
                       Gaji <span style="float: right">:</span><br>
                       PPh 21 <span style="float: right">:</span><br>
                       Pendapatan Lainnya <span style="float: right">:</span><br>
-                      <hr class="section-line">
-                      <span style="float: right"><strong>Jumlah Penerimaan :</strong></span><br>
                     </div>
                     <div class="col-4 section-right">
                       <span style="float: right">{{numberInThousand(employee_detail.gaji_tunjangan)}}</span><br>
                       <span style="float: right">{{numberInThousand(employee_detail.terima_pph)}}</span><br>
                       <span style="float: right">{{numberInThousand(employee_detail.total_terima_lain)}}</span><br>
-                      <hr class="section-line">
-                      <span style="float: right"><strong>{{numberInThousand(employee_detail.jumlah_penerimaan)}}</strong></span><br>
                     </div>
                   </div>
 
@@ -76,15 +73,11 @@
                     <!-- <h6><strong>Umum</strong></h6> -->
                     <div class="col-6 section-left">
                       PPh 21 <span style="float: right">:</span><br>
-                      Potongan Lainnya <span style="float: right">:</span><br>
-                      <hr class="section-line">
-                      <span style="float: right"><strong>Jumlah Potongan :</strong></span><br>
+                      Potongan Lain <span style="float: right">:</span><br>
                     </div>
                     <div class="col-4 section-right">
                       <span style="float: right">{{numberInThousand(employee_detail.total_potongan_pph)}}</span><br>
                       <span style="float: right">{{numberInThousand(employee_detail.total_potongan_lain)}}</span><br>
-                      <hr class="section-line">
-                      <span style="float: right"><strong>{{numberInThousand(employee_detail.jumlah_potongan)}}</strong></span><br>
                     </div>
                   </div>
                 </div>
@@ -95,13 +88,11 @@
                   <div class="section-container total">
                     <div class="col-6 section">
                       <div class="col-6 section-left">
-                        <strong>Penerimaan</strong> <span style="float: right">:</span> <br>
-                        <strong>Pengurangan</strong> <span style="float: right">:</span> <br>
+                        <strong>Take Home Pay</strong> <span style="float: right">:</span> <br>
                       </div>
                       
                       <div class="col-4 section-right">
                         <strong><span style="float: right">{{numberInThousand(employee_detail.penerimaan)}}</span></strong> <br>
-                        <strong><span style="float: right">{{numberInThousand(employee_detail.pengurang)}}</span></strong> <br>
                       </div>
                     </div>
                   </div>
@@ -126,7 +117,7 @@
                     </div>
 
                     <div class="col-6 section">
-                      <h5><strong>Potongan Lain</strong></h5>
+                      <h5><strong>Potongan</strong></h5>
                       <div v-if="extra_potongan.length > 0">
                         <div v-for="item in extra_potongan" :key="item.id">
                           <div class="col-6 section-left align-bottom">

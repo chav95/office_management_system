@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\RoomBooking;
 
-class BookRoomNotif extends Mailable
+class BookRoomNotif extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

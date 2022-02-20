@@ -9,6 +9,7 @@
             :carData="total_car" 
             @success="$route.path == '/manage-cars/pending-list' ? loadPendingBooking() : loadBookingData()"
           />
+          <export-filter :module="exportModule"/>
           <assign-car 
             :bookingItem="selected_booking" 
             :carData="total_car" 
@@ -24,6 +25,7 @@
                   : ''
               }} Booking Car List</strong></h3>
             <button v-if="$route.path !== '/manage-cars/history'" class="btn btn-primary" style="float: right" @click="createBooking()">Book Car</button>
+            <button v-else-if="$route.path == '/manage-cars/history'" class="btn btn-primary" style="float: right" @click="exportToExcel()">Export Booking</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -205,10 +207,11 @@
   import BookCar from './modals/BookCar'
   import AssignCar from './modals/AssignCar'
   import CreateCar from './modals/CreateCar'
+  import ExportFilter from './modals/ExportFilter'
 
   export default {
     components: {
-      BookCar, AssignCar, CreateCar
+      BookCar, AssignCar, CreateCar, ExportFilter
     },
     data(){
       return{
@@ -252,7 +255,9 @@
           lease_price: 0,
           vendor_id: 0,
           division_id: 0,
-        }
+        },
+
+        exportModule: '',
       }
     },
     mounted(){
@@ -311,6 +316,12 @@
       fullDatetime(datetime){
         moment.locale('id');
         return moment(String(datetime)).format('lll');
+      },
+
+      exportToExcel(){
+        this.exportModule = 'car_booking'
+
+        $('#ExportFilter').modal('show');
       },
       
       createCar(){

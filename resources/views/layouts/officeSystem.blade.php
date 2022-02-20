@@ -124,7 +124,7 @@
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
     <router-link to="/" class="brand-link sidebar-app-logo">
-      <img src="{{asset('storage/app_image/logo.png')}}" alt="Office Management Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <img src="{{asset('/images/logo.png')}}" alt="Office Management Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">Office Management</span>
     </router-link>
 
@@ -133,7 +133,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{asset('storage/app_image/profile_default.png')}}" class="img-circle elevation-2" alt="User Image">
+          <img src="{{asset('/images/profile_default.png')}}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
           <router-link to="/profile" class="d-block text-capitalize">{{Auth::user()->name}}</a>
@@ -151,12 +151,12 @@
             </router-link>
           </li>
           @else
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <router-link to="/dashboard" class="nav-link">
                 <i class="nav-icon fas fa-chart-bar color-teal"></i>
                 <p>Dashboard</p>
               </router-link>
-            </li>
+            </li> -->
             <li class="nav-item">
               <router-link to="/manage-rooms" class="nav-link">
                 <i class="nav-icon fas fa-building color-purple"></i>
@@ -369,7 +369,7 @@
   <footer class="main-footer no-print">
     <!-- To the right -->
     <div class="float-right d-none d-sm-inline">
-      Company Name
+      Jakarta Tollroad Development
     </div>
     <!-- Default to the left -->
     <strong>Copyright &copy; 2020.</strong> All rights reserved.

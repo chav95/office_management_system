@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\CarBooking;
 
-class BookCarDone extends Mailable
+class BookCarDone extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

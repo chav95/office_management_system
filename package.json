@@ -1,5 +1,11 @@
 {
     "private": true,
+    "name": "mantul-dev-site",
+    "version": "1.0.0",
+    "author": {
+        "name": "Chavin Pradana",
+        "email": "chavinpradana@gmail.com"
+    },
     "scripts": {
         "dev": "npm run development",
         "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -11,7 +17,7 @@
     },
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^5.11.2",
-        "axios": "^0.18.1",
+        "axios": "^0.26.0",
         "bootstrap": "^4.0.0",
         "cross-env": "^5.1",
         "jquery": "^3.2",
@@ -32,6 +38,7 @@
         "moment": "^2.24.0",
         "vform": "^1.0.1",
         "vue-apexcharts": "^1.5.2",
+        "vue-excel-export": "^0.1.3",
         "vue-full-calendar": "^2.7.0",
         "vue-router": "^3.1.3",
         "vue-simple-alert": "^1.1.1",

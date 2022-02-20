@@ -18,12 +18,14 @@ import moment from 'moment'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 import VueApexCharts from 'vue-apexcharts'
+import excel from 'vue-excel-export'
 
 Vue.use(VueSimpleAlert)
 Vue.use(require('moment/locale/id'))
 Vue.use(Vuex)
 Vue.use(VueRouter)
 Vue.use(VueApexCharts)
+Vue.use(excel)
 
 let routes = [
     {path: '/', component: require('./components/Welcome.vue').default},

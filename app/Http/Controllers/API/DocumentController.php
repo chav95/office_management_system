@@ -127,6 +127,15 @@ class DocumentController extends Controller
                 ->where('due_date', '<', date('Y-m-d'))
                 ->orderBy('name', 'ASC')
                 ->orderBy('due_date', 'ASC')->paginate(10);
+        }else if($id === 'getIncomingDoc'){
+            $today = date('Y-m-d');
+            $four_weeks = date('Y-m-d', strtotime($today.'+ 14 days'));
+
+            $result = Document::with('user')
+                ->where('due_date', '<=', $four_weeks)
+                ->where('due_date', '>', $today)
+                ->whereRaw("MOD(DATEDIFF(due_date, '$four_weeks'), 7) = 0")
+                ->get();
         }
 
         return $result;

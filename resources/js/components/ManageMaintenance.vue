@@ -9,10 +9,12 @@
             @success="loadMaintenanceData()"
           />
           <import-maintenance @success="loadMaintenanceData()"/>
+          <export-filter :module="exportModule"/>
           <div class="card-header">
             <h3 class="card-title"><strong>Maintenance List</strong></h3>
             <button v-if="$route.path != '/maintenance/history'" class="btn btn-primary" style="float: right" @click="createItem()">New Maintenance</button>
             <button v-if="$route.path != '/maintenance/history'" class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadMaintain">Import From Excel</button>
+            <button v-if="$route.path == '/maintenance/history'" class="btn btn-primary" style="float: right" @click="exportToExcel()">Export Maintenance</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -67,10 +69,11 @@
   import moment from 'moment'
   import CreateMaintenance from './modals/CreateMaintenance'
   import ImportMaintenance from './modals/ImportMaintenance'
+  import ExportFilter from './modals/ExportFilter'
 
   export default {
     components: {
-      CreateMaintenance, ImportMaintenance
+      CreateMaintenance, ImportMaintenance, ExportFilter
     },
     data(){
       return{
@@ -90,6 +93,8 @@
           due_date: '',
           description: '',
         },
+
+        exportModule: '',
       }
     },
     methods:{
@@ -115,6 +120,12 @@
           .then(response => {
             this.maintenance_list = response.data;
           });
+      },
+
+      exportToExcel(){
+        this.exportModule = 'maintenance'
+
+        $('#ExportFilter').modal('show');
       },
 
       createItem(){

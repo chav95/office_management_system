@@ -27,6 +27,7 @@ Route::apiResources([
     'vendor' => 'API\VendorController',
     'division' => 'API\DivisionController',
     'employee' => 'API\EmployeeController',
+    'export' => 'API\ExportController',
 ]);
 
 Route::middleware('auth:api')->get('/user', function (Request $request){

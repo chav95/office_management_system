@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Maintenance;
 
-class NewMaintainNotif extends Mailable
+class NewMaintainNotif extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

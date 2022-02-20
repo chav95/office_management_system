@@ -6,10 +6,12 @@
         <div class="card">
           <create-doc :selected_doc="selected_doc" :userLogin="userLogin" @success="getPageContent(data_page)"/>
           <import-doc @success="loadDocData()"/>
+          <export-filter :module="exportModule"/>
           <div class="card-header">
             <h3 class="card-title"><strong>{{$route.path == '/manage-docs/history' ? 'History ' : ''}}Document List</strong></h3>
             <button v-if="$route.path != '/manage-docs/history'" class="btn btn-primary" style="float: right" @click="createItem()">New Document</button>
             <button v-if="$route.path != '/manage-docs/history'" class="btn btn-primary" style="float: right; margin-right: 5px" data-toggle="modal" data-target="#UploadDoc">Import From Excel</button>
+            <button v-if="$route.path == '/manage-docs/history'" class="btn btn-primary" style="float: right" @click="exportToExcel()">Export Document</button>
           </div>
           <div class="card-body">
             <table id="example1" class="table table-bordered table-striped">
@@ -71,10 +73,11 @@
   import moment from 'moment'
   import CreateDoc from './modals/CreateDoc'
   import ImportDoc from './modals/ImportDoc'
+  import ExportFilter from './modals/ExportFilter'
 
   export default {
     components: {
-      CreateDoc, ImportDoc
+      CreateDoc, ImportDoc, ExportFilter
     },
     data(){
       return{
@@ -85,6 +88,7 @@
         doc_list: {
           data: []
         },
+        incoming_doc: {},
         user_data: {},
 
         selected_doc: {
@@ -97,6 +101,8 @@
           description: '',
           user: 0,
         },
+
+        exportModule: '',
 
         data_page: 1,
       }
@@ -122,6 +128,12 @@
             this.doc_list = data
           })
       },
+      getIncomingDoc(){
+        axios.get(window.location.origin+'/api/doc/getIncomingDoc')
+          .then(({data}) => {
+            this.incoming_doc = data
+          })
+      },
 
       getPageContent(page = 1) {
         let content = this.$route.path == '/manage-docs/history' ? 'getDocHistory' : 'getDocData'
@@ -130,6 +142,12 @@
             this.doc_list = response.data
             this.data_page = response.data.current_page
           });
+      },
+
+      exportToExcel(){
+        this.exportModule = 'document'
+
+        $('#ExportFilter').modal('show');
       },
 
       createItem(){
@@ -179,6 +197,7 @@
         this.userLogin = data;
       });
       this.$route.path == '/manage-docs/history' ? this.loadDocHistory() : this.loadDocData()
+      this.getIncomingDoc()
     },
     watch:{
       '$route.path'(newVal, oldVal){
